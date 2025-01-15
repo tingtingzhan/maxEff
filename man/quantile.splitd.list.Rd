@@ -7,7 +7,7 @@
 \method{quantile}{splitd.list}(x, probs, ...)
 }
 \arguments{
-\item{x}{a \code{'splitd.list'} object, returned from function \link{splitd_}}
+\item{x}{a \code{'splitd.list'} object, returned from function \link{.splitd_}}
 
 \item{probs}{\link[base]{double} scalar or \link[base]{vector}, see \link[stats]{quantile}}
 }
@@ -22,9 +22,9 @@ Function \link{quantile.splitd.list} is a method dispatch of the S3 generic func
 Specifically,
 
 \enumerate{
-\item {collect the univariable regression coefficient estimate from each \link{splitd} model;}
+\item {collect the univariable regression coefficient estimate from each \link{.splitd} model;}
 \item {find the nearest-even (i.e., \code{type = 3}) \link[stats]{quantile} of the coefficients from Step 1;}
-\item {the \link{splitd} models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
+\item {the \link{.splitd} models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
 }
 }
 \keyword{internal}

@@ -37,7 +37,7 @@ Function \link{split_dummy} dichotomizes predictors via repeated sample splits. 
 
 \enumerate{
 \item Generate multiple, i.e., repeated, training-test sample splits (via \link{rSplit})
-\item For each candidate predictor \eqn{x_i}, find the \emph{\strong{median-split-dichotomized regression model}} based on the repeated sample splits, see functions \link{splitd_} and \link{quantile.splitd.list};
+\item For each candidate predictor \eqn{x_i}, find the \emph{\strong{median-split-dichotomized regression model}} based on the repeated sample splits, see functions \link{.splitd_} and \link{quantile.splitd.list};
 }
 }
 \examples{

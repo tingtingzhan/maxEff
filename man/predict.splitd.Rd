@@ -12,7 +12,7 @@
 )
 }
 \arguments{
-\item{object}{an \link{splitd} object}
+\item{object}{an \link{.splitd} object}
 
 \item{newdata}{\link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used}
 

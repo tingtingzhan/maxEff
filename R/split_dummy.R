@@ -22,7 +22,7 @@
 #' 
 #' \enumerate{
 #' \item Generate multiple, i.e., repeated, training-test sample splits (via [rSplit])
-#' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd_] and [quantile.splitd.list];
+#' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [.splitd_] and [quantile.splitd.list];
 #' }
 #' 
 #' @returns 
@@ -125,7 +125,7 @@ split_dummy <- function(
 #' 
 #' @details
 #' Default `(p1>.15 & p1<.85)`.
-#' See explanation of \eqn{p_1} in function [splitd].
+#' See explanation of \eqn{p_1} in function [.splitd].
 #' 
 #' @returns
 #' Function [subset.split_dummy] returns a [split_dummy] object.

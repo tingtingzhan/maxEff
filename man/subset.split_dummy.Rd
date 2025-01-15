@@ -19,6 +19,6 @@ subset.split_dummy
 }
 \details{
 Default \code{(p1>.15 & p1<.85)}.
-See explanation of \eqn{p_1} in function \link{splitd}.
+See explanation of \eqn{p_1} in function \link{.splitd}.
 }
 \keyword{internal}

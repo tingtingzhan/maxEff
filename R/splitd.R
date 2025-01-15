@@ -4,7 +4,7 @@
 #' @description
 #' Split-dichotomized regression model.
 #' 
-#' @param y \link[base]{double}, \link[base]{logical} \link[base]{vector} or \link[survival]{Surv} object, response \eqn{y}
+#' @param null.model a regression model
 #' 
 #' @param x \link[base]{numeric} \link[base]{vector}, predictor \eqn{x}
 #' 
@@ -14,7 +14,7 @@
 #' 
 #' @section Split-Dichotomized Regression Model:
 #' 
-#' Function [splitd] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
+#' Function [.splitd] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
 #' Specifically, given a training-test sample split,
 #' \enumerate{
 #' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via [rpartD]);
@@ -24,7 +24,7 @@
 #' 
 #' @returns
 #' 
-#' Function [splitd] returns a \link[base]{function}, 
+#' Function [.splitd] returns a \link[base]{function}, 
 #' the dichotomizing rule \eqn{\mathcal{D}} based on the training set \eqn{(y_0, x_0)}, 
 #' with additional attributes
 #' \describe{
@@ -75,17 +75,17 @@
 
 #' @title Repeated Split-Dichotomized Regression Model
 #' 
-#' @param y see function [splitd]
+#' @param null.model see function [.splitd]
 #' 
 #' @param ids \link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.  
 #' 
-#' @param ... additional parameters of function [splitd]
+#' @param ... additional parameters of function [.splitd]
 #' 
 #' @details 
-#' Function [splitd_] fits multiple [splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
+#' Function [.splitd_] fits multiple [.splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
 #' 
 #' @returns
-#' Function [splitd_] returns a \link[base]{list} of [splitd] objects.
+#' Function [.splitd_] returns a \link[base]{list} of [.splitd] objects.
 #' 
 #' @keywords internal
 #' @export
@@ -107,7 +107,7 @@
 #' @description
 #' Quantile(s) of `'splitd.list'` object.
 #' 
-#' @param x a `'splitd.list'` object, returned from function [splitd_]
+#' @param x a `'splitd.list'` object, returned from function [.splitd_]
 #' 
 #' @param probs \link[base]{double} scalar or \link[base]{vector}, see \link[stats]{quantile}
 #' 
@@ -120,9 +120,9 @@
 #' Specifically,
 #' 
 #' \enumerate{
-#' \item {collect the univariable regression coefficient estimate from each [splitd] model;}
+#' \item {collect the univariable regression coefficient estimate from each [.splitd] model;}
 #' \item {find the nearest-even (i.e., `type = 3`) \link[stats]{quantile} of the coefficients from Step 1;}
-#' \item {the [splitd] models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
+#' \item {the [.splitd] models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
 #' }
 #' 
 #' @returns
@@ -149,7 +149,7 @@ quantile.splitd.list <- function(x, probs, ...) {
 #' @description
 #' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 #' 
-#' @param object an [splitd] object
+#' @param object an [.splitd] object
 #' 
 #' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
 #' 
@@ -166,7 +166,7 @@ quantile.splitd.list <- function(x, probs, ...) {
 #' or a \link[stats]{lm} model for \link[base]{numeric} response.
 #' 
 #' @keywords internal
-#' @importFrom stats predict
+#' @importFrom stats predict update
 #' @export predict.splitd
 #' @export
 predict.splitd <- function(

@@ -7,19 +7,19 @@
 .splitd_(null.model, ids, ...)
 }
 \arguments{
+\item{null.model}{see function \link{.splitd}}
+
 \item{ids}{\link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.}
 
-\item{...}{additional parameters of function \link{splitd}}
-
-\item{y}{see function \link{splitd}}
+\item{...}{additional parameters of function \link{.splitd}}
 }
 \value{
-Function \link{splitd_} returns a \link[base]{list} of \link{splitd} objects.
+Function \link{.splitd_} returns a \link[base]{list} of \link{.splitd} objects.
 }
 \description{
 Repeated Split-Dichotomized Regression Model
 }
 \details{
-Function \link{splitd_} fits multiple \link{splitd} models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
+Function \link{.splitd_} fits multiple \link{.splitd} models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
 }
 \keyword{internal}
