@@ -53,23 +53,13 @@ add_num <- function(
     ...
 ) {
   
-  fom0 <- formula(start.model)
+  tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
+  y <- tmp$y
+  data <- tmp$data
+  x_ <- tmp$x_
   
-  y <- start.model$y
-  force(data)
-  if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
-  if (length(y) != nrow(data)) stop('size of `start.model` and `x` do not match')
-  
-  if (!is.language(x) || is.symbol(x) || x[[1L]] != '~' || length(x) != 2L) stop('`x` must be one-sided formula')
-  if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
-  if (!is.matrix(X <- eval(x., envir = data)) || !is.numeric(X)) stop('predictors must be stored in a `numeric` `matrix`')
-  #if (anyNA(X)) # okay!
-  x_ <- lapply(colnames(X), FUN = function(i) {
-    call(name = '[', x., alist(i =)[[1L]], i)
-  })
-  
-  #out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) {
-  out <- lapply(x_, FUN = function(p) { 
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) {
+  #out <- lapply(x_, FUN = function(p) { 
     # (p = x_[[1L]])
     data$x. <- eval(p, envir = data)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)

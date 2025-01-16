@@ -14,14 +14,16 @@ add_dummy_rSplit(
 )
 }
 \arguments{
-\item{start.model}{a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)}
+\item{start.model}{a regression model, e.g.,
+\link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.}
 
-\item{x}{one-sided \link[stats]{formula} to specify
-the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in \code{data}}
+\item{x}{one-sided \link[stats]{formula},
+\link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in \code{data}}
 
-\item{data}{\link[base]{data.frame}}
+\item{data}{(optional) \link[base]{data.frame} in the model \link[base]{call} of \code{start.model}}
 
-\item{n, ...}{additional parameters for function \link{rSplit}}
+\item{n, ...}{additional parameters of function \link{rSplit} for function \link{add_dummy_rSplit}.
+For function \code{add_dummy}, these parameters are not in use}
 
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
 }
