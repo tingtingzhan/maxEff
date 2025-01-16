@@ -6,7 +6,9 @@
 #' 
 #' @param null.model a regression model
 #' 
-#' @param x \link[base]{numeric} \link[base]{vector}, predictor \eqn{x}
+#' @param x_ \link[base]{language}
+#' 
+#' @param data \link[base]{data.frame}
 #' 
 #' @param id \link[base]{logical} \link[base]{vector}, indices of training (`TRUE`) and test (`FALSE`) subjects 
 #' 
@@ -14,7 +16,7 @@
 #' 
 #' @section Split-Dichotomized Regression Model:
 #' 
-#' Function [.splitd] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
+#' Function [splitd] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
 #' Specifically, given a training-test sample split,
 #' \enumerate{
 #' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via [rpartD]);
@@ -24,7 +26,7 @@
 #' 
 #' @returns
 #' 
-#' Function [.splitd] returns a \link[base]{function}, 
+#' Function [splitd] returns a \link[base]{function}, 
 #' the dichotomizing rule \eqn{\mathcal{D}} based on the training set \eqn{(y_0, x_0)}, 
 #' with additional attributes
 #' \describe{
@@ -36,9 +38,10 @@
 #' @keywords internal
 #' @importFrom stats update
 #' @export
-.splitd <- function(null.model, x, id, ...) {
+splitd <- function(null.model, x_, data, id, ...) {
   
   y <- null.model$y
+  x <- eval(x_, envir = data)
   
   # `id`: training set
   rule <- rpartD(y = y[id], x = x[id], check_degeneracy = TRUE)
@@ -47,18 +50,15 @@
   y_ <- y[!id]
   dx_ <- tryCatch(rule(x[!id]), warning = identity)
   if (inherits(dx_, what = 'warning')) return(invisible()) # exception
+  if ('x.' %in% names(data)) stop('do not allow `x.` as an original column in `data`')
+  data$x. <- dx_
   
-  suppressWarnings(m_ <- update(null.model, formula. = y ~ x, data = data.frame(y = y_, x = dx_)))
-  
-  #suppressWarnings(m_ <- if (inherits(y, what = 'Surv')) {
-  #  coxph(formula = y_ ~ dx_)
-  #} else if (is.logical(y) || all(y %in% c(0, 1))) {
-  #  glm(formula = y_ ~ dx_, family = binomial(link = 'logit'))
-  #} else lm(formula = y_ ~ dx_))
-  
+  suppressWarnings(m_ <- update(null.model, formula. = . ~ . + x., data = data[id, , drop = FALSE]))
+
   cf_ <- m_$coefficients[length(m_$coefficients)]
   
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
+  attr(rule, which = 'x') <- x_
   attr(rule, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
   attr(rule, which = 'model') <- m_ # needed for [predict.splitd]
   class(rule) <- c('splitd', class(rule))
@@ -75,22 +75,22 @@
 
 #' @title Repeated Split-Dichotomized Regression Model
 #' 
-#' @param null.model see function [.splitd]
+#' @param null.model see function [splitd]
 #' 
 #' @param ids \link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.  
 #' 
-#' @param ... additional parameters of function [.splitd]
+#' @param ... additional parameters of function [splitd]
 #' 
 #' @details 
-#' Function [.splitd_] fits multiple [.splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
+#' Function [splitd_] fits multiple [splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
 #' 
 #' @returns
-#' Function [.splitd_] returns a \link[base]{list} of [.splitd] objects.
+#' Function [splitd_] returns a \link[base]{list} of [splitd] objects.
 #' 
 #' @keywords internal
 #' @export
-.splitd_ <- function(null.model, ids, ...) {
-  ret_ <- lapply(ids, FUN = function(id) .splitd(null.model = null.model, id = id, ...))
+splitd_ <- function(null.model, ids, ...) {
+  ret_ <- lapply(ids, FUN = function(id) splitd(null.model = null.model, id = id, ...))
   ret <- ret_[lengths(ret_) > 0L]
   class(ret) <- c('splitd.list', class(ret))
   return(ret)
@@ -107,7 +107,7 @@
 #' @description
 #' Quantile(s) of `'splitd.list'` object.
 #' 
-#' @param x a `'splitd.list'` object, returned from function [.splitd_]
+#' @param x a `'splitd.list'` object, returned from function [splitd_]
 #' 
 #' @param probs \link[base]{double} scalar or \link[base]{vector}, see \link[stats]{quantile}
 #' 
@@ -120,9 +120,9 @@
 #' Specifically,
 #' 
 #' \enumerate{
-#' \item {collect the univariable regression coefficient estimate from each [.splitd] model;}
+#' \item {collect the univariable regression coefficient estimate from each [splitd] model;}
 #' \item {find the nearest-even (i.e., `type = 3`) \link[stats]{quantile} of the coefficients from Step 1;}
-#' \item {the [.splitd] models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
+#' \item {the [splitd] models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
 #' }
 #' 
 #' @returns
@@ -149,13 +149,9 @@ quantile.splitd.list <- function(x, probs, ...) {
 #' @description
 #' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 #' 
-#' @param object an [.splitd] object
+#' @param object an [splitd] object
 #' 
 #' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
-#' 
-#' @param formula ..
-#' 
-# @param boolean \link[base]{logical} scalar, whether to use the *dichotomized* predictor (default, `TRUE`), or the continuous predictor (`FALSE`)
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -169,21 +165,13 @@ quantile.splitd.list <- function(x, probs, ...) {
 #' @importFrom stats predict update
 #' @export predict.splitd
 #' @export
-predict.splitd <- function(
-    object, 
-    newdata, 
-    formula = attr(object, which = 'formula', exact = TRUE),
-    # boolean = TRUE, # move to the non-dichotomized version
-    ...
-) {
+predict.splitd <- function(object, newdata, ...) {
   
-  if (!length(formula)) stop('`formula` needed')
-  y <- eval(formula[[2L]], envir = newdata)
-  x <- eval(formula[[3L]], envir = newdata)
-  #if (boolean) x <- object(newx = x)
-  x <- object(newx = x)
+  if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
+  x_ <- attr(object, which = 'x', exact = TRUE)
+  newdata$x. <- object(newx = eval(x_, envir = newdata))
   
   oldmodel <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(oldmodel, formula. = y ~ x, data = data.frame(y = y, x = x)))
+  suppressWarnings(update(oldmodel, data = newdata))
   
 }

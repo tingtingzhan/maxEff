@@ -1,8 +1,8 @@
-Package: split.tzh
+Package: maxEff
 Type: Package
-Title: split.tzh
+Title: Additional Predictor with Maximum Effect Size
 Version: 0.1.0
-Date: 2024-11-14
+Date: 2025-01-16
 Description: a sentence.
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -13,9 +13,6 @@ Language: en-US
 Authors@R: c(person(given = 'Tingting', family = 'Zhan', role =
        c('aut', 'cre', 'cph'), email =
        c('tingtingzhan@gmail.com'), comment = c(ORCID =
-       '0000-0001-9971-4844')), person(given = 'Inna', family =
-       'Chervoneva', role = c('aut', 'cph'), email =
-       'Inna.Chervoneva@jefferson.edu', comment = c(ORCID =
-       '0000-0002-9104-4505')))
+       '0000-0001-9971-4844')))
 Imports: parallel, rpart
 Suggests: knitr, survival, spatstat.grouped.data, spatstat.grouped
