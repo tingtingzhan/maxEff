@@ -36,17 +36,8 @@ print.add_ <- function(x, ...) {
 
 
 
-# @title head.add_
-# @description NO NEED!! simply use ?utils:::head.default
-# @param x a [add_dummy] or [add_num] object
-# @param n positive \link[base]{integer} scalar
-# @returns
-# Function [head.add_] returns an [add_dummy] or [add_num] object.
-# @keywords internal
-# @importFrom utils head
-# @export head.add_
-# @export
 #head.add_ <- function(x, n, ...) {
+#  .Defunct(new = 'utils:::head.default') # since I have `[.add_`
 #  x[seq_len(n)] # not doing any fancy checks
 #}
 
