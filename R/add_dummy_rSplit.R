@@ -95,10 +95,18 @@ add_dummy_rSplit <- function(
   fom0 <- formula(start.model)
   
   y <- start.model$y
+  if (!length(y)) stop('`start.model` response?')
+  
   force(data)
   if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
-  if (length(y) != nrow(data)) stop('size of `start.model` and `x` do not match')
   
+  # reduce `data` to match `start.model`
+  if (length(y) != .row_names_info(data, type = 2L)) {
+    start_na <- start.model$na.action
+    if (!length(start_na)) stop('`start.model` `na.action` not available?')
+    data <- data[-start_na, , drop = FALSE]
+  }
+
   if (!is.language(x) || is.symbol(x) || x[[1L]] != '~' || length(x) != 2L) stop('`x` must be one-sided formula')
   if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
   if (!is.matrix(X <- eval(x., envir = data)) || !is.numeric(X)) stop('predictors must be stored in a `numeric` `matrix`')
