@@ -5,15 +5,15 @@
 \title{add_num}
 \usage{
 add_num(
-  null.model,
+  start.model,
   x,
-  data = eval(null.model$call$data),
+  data = eval(start.model$call$data),
   mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()),
   ...
 )
 }
 \arguments{
-\item{null.model}{a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)}
+\item{start.model}{a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)}
 
 \item{x}{one-sided \link[stats]{formula} to specify
 the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in \code{data}}

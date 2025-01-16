@@ -61,7 +61,8 @@
 #' `caTools::sample.split` is not what we need.
 #' 
 #' @examples
-#' rSplit(n = 3L, x = rep(c(TRUE, FALSE), times = c(20, 30)))
+#' rep(c(TRUE, FALSE), times = c(20, 30)) |>
+#'  rSplit(n = 3L)
 #' 
 #' @seealso \link[base]{split}, `caret::createDataPartition`
 #' @keywords internal

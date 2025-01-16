@@ -16,7 +16,7 @@
 
 #' @title print.add_
 #' 
-#' @param x an [add_dummy] or [add_num] object
+#' @param x an [add_dummy_rSplit] or [add_num] object
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -48,19 +48,19 @@ print.add_ <- function(x, ...) {
 #' @description
 #' ..
 #' 
-#' @param x an [add_dummy] or [add_num] object
+#' @param x an [add_dummy_rSplit] or [add_num] object
 #' 
 #' @param y \link[base]{language}
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
 #' @details
-#' Sort the elements of an [add_dummy] or [add_num] object by a certain criterion `y`.
+#' Sort the elements of an [add_dummy_rSplit] or [add_num] object by a certain criterion `y`.
 #' 
 #' We suggest using `y = abc(cf)`, indicating a `decreasing` order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.  
 #'
 #' @returns 
-#' Function [sort_by.add_] returns an [add_dummy] or [add_num] object.
+#' Function [sort_by.add_] returns an [add_dummy_rSplit] or [add_num] object.
 #' 
 #' @keywords internal
 #' @export sort_by.add_

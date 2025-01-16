@@ -5,7 +5,7 @@
 #' @description
 #' add_num
 #' 
-#' @param null.model a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)
+#' @param start.model a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)
 #' 
 #' @param x one-sided \link[stats]{formula} to specify 
 #' the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in `data`
@@ -46,19 +46,19 @@
 #' @importFrom stats formula update
 #' @export
 add_num <- function(
-    null.model, 
+    start.model, 
     x,
-    data = eval(null.model$call$data),
+    data = eval(start.model$call$data),
     mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), 
     ...
 ) {
   
-  fom0 <- formula(null.model)
+  fom0 <- formula(start.model)
   
-  y <- null.model$y
+  y <- start.model$y
   force(data)
   if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
-  if (length(y) != nrow(data)) stop('size of `null.model` and `x` do not match')
+  if (length(y) != nrow(data)) stop('size of `start.model` and `x` do not match')
   
   if (!is.language(x) || is.symbol(x) || x[[1L]] != '~' || length(x) != 2L) stop('`x` must be one-sided formula')
   if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
@@ -72,7 +72,7 @@ add_num <- function(
   out <- lapply(x_, FUN = function(p) { 
     # (p = x_[[1L]])
     data$x. <- eval(p, envir = data)
-    m_ <- update(null.model, formula. = . ~ . + x., data = data)
+    m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]
     attr(p, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
     attr(p, which = 'model') <- m_ # needed for [predict.*]
@@ -121,8 +121,8 @@ predict.add_num_ <- function(object, newdata, ...) {
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
   newdata$x. <- eval(object, envir = newdata)
   
-  oldmodel <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(oldmodel, data = newdata))
+  m_ <- attr(object, which = 'model', exact = TRUE)
+  suppressWarnings(update(m_, data = newdata))
   
 }
 

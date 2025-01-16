@@ -7,20 +7,20 @@
 \method{sort_by}{add_}(x, y, ...)
 }
 \arguments{
-\item{x}{an \link{add_dummy} or \link{add_num} object}
+\item{x}{an \link{add_dummy_rSplit} or \link{add_num} object}
 
 \item{y}{\link[base]{language}}
 
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \link{sort_by.add_} returns an \link{add_dummy} or \link{add_num} object.
+Function \link{sort_by.add_} returns an \link{add_dummy_rSplit} or \link{add_num} object.
 }
 \description{
 ..
 }
 \details{
-Sort the elements of an \link{add_dummy} or \link{add_num} object by a certain criterion \code{y}.
+Sort the elements of an \link{add_dummy_rSplit} or \link{add_num} object by a certain criterion \code{y}.
 
 We suggest using \code{y = abc(cf)}, indicating a \code{decreasing} order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.
 }

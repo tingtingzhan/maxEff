@@ -1,11 +1,10 @@
 
-
 #' @title Dichotomizing Predictors via Repeated Sample Splits
 #' 
 #' @description
 #' Dichotomizing predictors using repeated sample splits.
 #' 
-#' @param null.model a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)
+#' @param start.model a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)
 #' 
 #' @param x one-sided \link[stats]{formula} to specify 
 #' the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in `data`
@@ -18,7 +17,7 @@
 #' 
 #' @details 
 #' 
-#' Function [add_dummy] dichotomizes predictors via repeated sample splits. Specifically, 
+#' Function [add_dummy_rSplit] dichotomizes predictors via repeated sample splits. Specifically, 
 #' 
 #' \enumerate{
 #' \item Generate multiple, i.e., repeated, training-test sample splits (via [rSplit])
@@ -26,7 +25,7 @@
 #' }
 #' 
 #' @returns 
-#' Function [add_dummy] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
+#' Function [add_dummy_rSplit] returns an object of \link[base]{class} `'add_dummy_rSplit'`, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
 #' 
 #' @examples 
 #' library(spatstat.grouped)
@@ -42,7 +41,7 @@
 #' sQ1 = sQ[-(1:100),] # test set
 #' 
 #' set.seed(2364); m1 = coxph(OS ~ gender, data = sQ0) |>
-#'  add_dummy(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
+#'  add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
 #'  sort_by(y = abs(cf)) |>
 #'  head(n = 2L)
 #' m1
@@ -53,21 +52,21 @@
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula
 #' @export
-add_dummy <- function(
-    null.model, 
+add_dummy_rSplit <- function(
+    start.model, 
     x,
-    data = eval(null.model$call$data),
+    data = eval(start.model$call$data),
     n, 
     mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), 
     ...
 ) {
   
-  fom0 <- formula(null.model)
+  fom0 <- formula(start.model)
   
-  y <- null.model$y
+  y <- start.model$y
   force(data)
   if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
-  if (length(y) != nrow(data)) stop('size of `null.model` and `x` do not match')
+  if (length(y) != nrow(data)) stop('size of `start.model` and `x` do not match')
   
   ids <- rSplit(n = n, x = y, ...) # using same split for all predictors
   
@@ -82,7 +81,7 @@ add_dummy <- function(
   out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) { 
   #out <- lapply(x_, FUN = function(p) { # to debug
     # (p = x_[[1L]])
-    tmp <- splitd_(null.model = null.model, x_ = p, data = data, ids = ids)
+    tmp <- splitd_(start.model = start.model, x_ = p, data = data, ids = ids)
     quantile.splitd.list(tmp, probs = .5)[[1L]]
   })
 
@@ -91,7 +90,7 @@ add_dummy <- function(
   txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
   names(out) <- paste0(arg., txt.)
   
-  class(out) <- c('add_dummy', 'add_', class(out))
+  class(out) <- c('add_dummy_rSplit', 'add_', class(out))
   return(invisible(out))
   
 }
@@ -104,9 +103,9 @@ add_dummy <- function(
 
 
 
-#' @title subset.add_dummy
+#' @title subset.add_dummy_rSplit
 #' 
-#' @param x a [add_dummy] object
+#' @param x a [add_dummy_rSplit] object
 #' 
 #' @param subset \link[base]{language}
 #' 
@@ -115,12 +114,12 @@ add_dummy <- function(
 #' See explanation of \eqn{p_1} in function [splitd].
 #' 
 #' @returns
-#' Function [subset.add_dummy] returns a [add_dummy] object.
+#' Function [subset.add_dummy_rSplit] returns a [add_dummy_rSplit] object.
 #' 
 #' @keywords internal
-#' @export subset.add_dummy
+#' @export subset.add_dummy_rSplit
 #' @export
-subset.add_dummy <- function(x, subset, ...) {
+subset.add_dummy_rSplit <- function(x, subset, ...) {
   subset <- substitute(subset)
   v_sub <- all.vars(subset)
   if (!all(v_sub %in% c('p1'))) stop('criterion must be set on `p1`, for now')
@@ -138,19 +137,19 @@ subset.add_dummy <- function(x, subset, ...) {
 #' @description
 #' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 #' 
-#' @param object an [add_dummy] object
+#' @param object an [add_dummy_rSplit] object
 #' 
 #' @param ... additional parameters of function [predict.splitd], e.g., `newdata`
 #' 
 #' @returns
-#' Function [predict.add_dummy] returns a \link[base]{list} of regression models.
+#' Function [predict.add_dummy_rSplit] returns a \link[base]{list} of regression models.
 #' 
 #' @examples
-#' # see ?add_dummy
+#' # see ?add_dummy_rSplit
 #' @importFrom stats predict
-#' @export predict.add_dummy
+#' @export predict.add_dummy_rSplit
 #' @export
-predict.add_dummy <- function(object, ...) {
+predict.add_dummy_rSplit <- function(object, ...) {
   return(lapply(object, FUN = predict.splitd, ...))
 }
 

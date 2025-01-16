@@ -4,7 +4,7 @@
 #' @description
 #' Split-dichotomized regression model.
 #' 
-#' @param null.model a regression model
+#' @param start.model a regression model
 #' 
 #' @param x_ \link[base]{language}
 #' 
@@ -38,9 +38,9 @@
 #' @keywords internal
 #' @importFrom stats update
 #' @export
-splitd <- function(null.model, x_, data, id, ...) {
+splitd <- function(start.model, x_, data, id, ...) {
   
-  y <- null.model$y
+  y <- start.model$y
   x <- eval(x_, envir = data)
   
   # `id`: training set
@@ -53,7 +53,7 @@ splitd <- function(null.model, x_, data, id, ...) {
   if ('x.' %in% names(data)) stop('do not allow `x.` as an original column in `data`')
   data$x. <- dx_
   
-  suppressWarnings(m_ <- update(null.model, formula. = . ~ . + x., data = data[id, , drop = FALSE]))
+  suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data[id, , drop = FALSE]))
 
   cf_ <- m_$coefficients[length(m_$coefficients)]
   
@@ -75,7 +75,7 @@ splitd <- function(null.model, x_, data, id, ...) {
 
 #' @title Repeated Split-Dichotomized Regression Model
 #' 
-#' @param null.model see function [splitd]
+#' @param start.model see function [splitd]
 #' 
 #' @param ids \link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.  
 #' 
@@ -89,8 +89,8 @@ splitd <- function(null.model, x_, data, id, ...) {
 #' 
 #' @keywords internal
 #' @export
-splitd_ <- function(null.model, ids, ...) {
-  ret_ <- lapply(ids, FUN = function(id) splitd(null.model = null.model, id = id, ...))
+splitd_ <- function(start.model, ids, ...) {
+  ret_ <- lapply(ids, FUN = function(id) splitd(start.model = start.model, id = id, ...))
   ret <- ret_[lengths(ret_) > 0L]
   class(ret) <- c('splitd.list', class(ret))
   return(ret)
@@ -171,7 +171,7 @@ predict.splitd <- function(object, newdata, ...) {
   x_ <- attr(object, which = 'x', exact = TRUE)
   newdata$x. <- object(newx = eval(x_, envir = newdata))
   
-  oldmodel <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(oldmodel, data = newdata))
+  m_ <- attr(object, which = 'model', exact = TRUE)
+  suppressWarnings(update(m_, data = newdata))
   
 }

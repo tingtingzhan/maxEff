@@ -4,10 +4,10 @@
 \alias{splitd}
 \title{Split-Dichotomized Regression Model}
 \usage{
-splitd(null.model, x_, data, id, ...)
+splitd(start.model, x_, data, id, ...)
 }
 \arguments{
-\item{null.model}{a regression model}
+\item{start.model}{a regression model}
 
 \item{x_}{\link[base]{language}}
 
