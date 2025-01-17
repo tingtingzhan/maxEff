@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{an \link{add_num} object}
 
-\item{...}{additional parameters of function \code{predict.add_num_}, e.g., \code{newdata}}
+\item{...}{additional parameters of function \code{predict.add_num}, e.g., \code{newdata}}
 }
 \value{
 Function \link{predict.add_num} returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.

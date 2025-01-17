@@ -46,10 +46,10 @@ dim(sQ)
 sQ0 = sQ[1:100,] # training set
 sQ1 = sQ[-(1:100),] # test set
 
-(m2 = coxph(OS ~ gender, data = sQ0) |>
+(m = coxph(OS ~ gender, data = sQ0) |>
  add_num(x = ~ hladr.quantile) |>
  sort_by(y = abs(cf)) |>
  head(n = 2L))
-predict(m2, newdata = sQ1)
+predict(m, newdata = sQ1)
 
 }

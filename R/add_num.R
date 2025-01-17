@@ -36,11 +36,11 @@
 #' sQ0 = sQ[1:100,] # training set
 #' sQ1 = sQ[-(1:100),] # test set
 #' 
-#' (m2 = coxph(OS ~ gender, data = sQ0) |>
+#' (m = coxph(OS ~ gender, data = sQ0) |>
 #'  add_num(x = ~ hladr.quantile) |>
 #'  sort_by(y = abs(cf)) |>
 #'  head(n = 2L))
-#' predict(m2, newdata = sQ1)
+#' predict(m, newdata = sQ1)
 #' 
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula update
@@ -89,7 +89,7 @@ add_num <- function(
 #' 
 #' @param object an [add_num] object
 #' 
-#' @param ... additional parameters of function `predict.add_num_`, e.g., `newdata`
+#' @param ... additional parameters of function `predict.add_num`, e.g., `newdata`
 #' 
 #' @returns
 #' Function [predict.add_num] returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.

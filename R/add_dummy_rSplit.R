@@ -51,6 +51,13 @@
 #' #hladr.quantile[, "40%"]>=0.21358
 #' predict(m1, newdata = sQ1)
 #' 
+#' m2 = coxph(OS ~ gender, data = sQ0) |>
+#'  add_dummy(x = ~ hladr.quantile) |> subset(subset = p1 > .15 & p1 < .85) |> 
+#'  sort_by(y = abs(cf)) |>
+#'  head(n = 2L)
+#' m2
+#' 
+#' @name add_dummy
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula
 #' @export
@@ -82,10 +89,82 @@ add_dummy_rSplit <- function(
   txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
   names(out) <- paste0(arg., txt.)
   
-  class(out) <- c('add_dummy_rSplit', 'add_', class(out))
+  class(out) <- c('add_dummy_rSplit', 'add_dummy', 'add_', class(out))
   return(invisible(out))
   
 }
+
+
+
+
+
+# think carefully!
+# how is this [add_dummy] different from \link[maxEff]{add_dummy_rSplit}
+# this [add_dummy] should be moved to \pkg{maxEff} and be named [add_dummy] !!!!
+# it's actually easier to copy code from ?maxEff::add_num
+
+#' @rdname add_dummy
+# @param rule (optional) a \link[base]{list}, returned value from function \link[maxEff]{rpartD_}
+#' @details
+#' 
+#' First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on 
+#' response \eqn{y} (via \link[maxEff]{rpartD}).
+#' 
+#' Then, \link[stats]{update} previous multivariable regression `start.model` 
+#' with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
+#' 
+#' @returns
+#' Function [add_dummy] returns an object of class `'add_dummy'`.
+# \item{`attr(,'rule')`}{returned value from function \link[maxEff]{rpartD_}, 
+# dichotomizing rules for the \eqn{k} predictors}
+#' 
+#' @importFrom stats terms update model.frame.default na.pass
+#' @importFrom utils tail
+#' @importFrom maxEff rpartD_
+#' @export
+add_dummy <- function(
+    start.model, 
+    x, 
+    data = eval(start.model$call$data),
+    #rule,
+    mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), 
+    ...
+) {
+  
+  tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
+  y <- tmp$y
+  data <- tmp$data
+  x_ <- tmp$x_
+  
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) {
+  #out <- lapply(x_, FUN = function(p) { 
+    # (p = x_[[1L]])
+    xval <- eval(p, envir = data)
+    rule <- rpartD(y = y, x = xval)
+    data$x. <- rule(xval)
+    m_ <- update(start.model, formula. = . ~ . + x., data = data)
+    cf_ <- m_$coefficients[length(m_$coefficients)]
+    attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
+    attr(rule, which = 'x') <- p
+    attr(rule, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(rule, which = 'model') <- m_ # needed for [predict.*]
+    #class(rule) <- c('add_dummy', class(rule)) # not sure yet
+    return(rule)
+  })
+  
+  # just to beautify!!
+  names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
+  
+  class(out) <- c('add_dummy', 'add_', class(out))
+  return(invisible(out))
+
+}
+
+
+
+
+
+
 
 
 
@@ -128,9 +207,9 @@ add_dummy_rSplit <- function(
 
 
 
-#' @title subset.add_dummy_rSplit
+#' @title subset.add_dummy
 #' 
-#' @param x a [add_dummy_rSplit] object
+#' @param x a [add_dummy_rSplit] and/or [add_dummy] object
 #' 
 #' @param subset \link[base]{language}
 #' 
@@ -139,12 +218,12 @@ add_dummy_rSplit <- function(
 #' See explanation of \eqn{p_1} in function [splitd].
 #' 
 #' @returns
-#' Function [subset.add_dummy_rSplit] returns a [add_dummy_rSplit] object.
+#' Function [subset.add_dummy] returns a [add_dummy] object.
 #' 
 #' @keywords internal
-#' @export subset.add_dummy_rSplit
+#' @export subset.add_dummy
 #' @export
-subset.add_dummy_rSplit <- function(x, subset, ...) {
+subset.add_dummy <- function(x, subset, ...) {
   subset <- substitute(subset)
   v_sub <- all.vars(subset)
   if (!all(v_sub %in% c('p1'))) stop('criterion must be set on `p1`, for now')
