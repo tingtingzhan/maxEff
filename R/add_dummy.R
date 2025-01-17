@@ -258,3 +258,7 @@ predict.add_dummy_rSplit <- function(object, ...) {
 }
 
 
+#' @export
+predict.add_dummy <- function(object, ...) {
+  stop('will do in future; should be easy')
+}
