@@ -71,13 +71,13 @@ dim(sQ)
 sQ0 = sQ[1:100,] # training set
 sQ1 = sQ[-(1:100),] # test set
 
-set.seed(2364); m1 = coxph(OS ~ gender, data = sQ0) |>
+set.seed(234); m1 = coxph(OS ~ gender, data = sQ0) |>
  add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
  sort_by(y = abs(cf)) |>
  head(n = 2L)
 m1
-#hladr.quantile[, "30\%"]>=0.15409
-#hladr.quantile[, "40\%"]>=0.21358
+#hladr.quantile[, "0.1"]>=0.08082
+#hladr.quantile[, "0"]>=0.0259
 predict(m1, newdata = sQ1)
 
 m2 = coxph(OS ~ gender, data = sQ0) |>

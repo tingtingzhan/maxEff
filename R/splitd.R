@@ -48,12 +48,13 @@ splitd <- function(start.model, x_, data, id, ...) {
   
   # `!id`: test set
   y_ <- y[!id]
+  data_ <- data[!id, , drop = FALSE]
   dx_ <- tryCatch(rule(x[!id]), warning = identity)
   if (inherits(dx_, what = 'warning')) return(invisible()) # exception
   if ('x.' %in% names(data)) stop('do not allow `x.` as an original column in `data`')
-  data$x. <- dx_
+  data_$x. <- dx_
   
-  suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data[id, , drop = FALSE]))
+  suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
 
   cf_ <- m_$coefficients[length(m_$coefficients)]
   
