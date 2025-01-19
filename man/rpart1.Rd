@@ -24,7 +24,8 @@ no matter how small improvement in overall \eqn{R^2} is}
 \item{...}{additional parameters of \link[rpart]{rpart} and/or \link[rpart]{rpart.control}}
 }
 \value{
-Function \link{rpart1} returns a \link[base]{function},
+Function \link{rpart1} returns an object of class \link{rpart1},
+which is essentially a \link[base]{function},
 with one parameter \code{newx} taking a \link[base]{double} \link[base]{vector}.
 The returned value of \code{rpart1(y,x)(newx)} is a
 \link[base]{logical} \link[base]{vector}.
@@ -72,11 +73,14 @@ by returning a \code{NA_real_} regression coefficient estimate.
 }
 \note{
 In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
+
+Function \link[rpart]{rpart} is quite slow.
 }
 \examples{
 data(cu.summary, package = 'rpart')
 with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
 (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
+get_cutoff(foo)
 foo(rnorm(10, mean = 24.5))
 }
 \keyword{internal}

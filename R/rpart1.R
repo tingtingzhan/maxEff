@@ -63,22 +63,22 @@
 #' 
 #' @returns 
 #' 
-#' Function [rpart1] returns a \link[base]{function}, 
+#' Function [rpart1] returns an object of class [rpart1], 
+#' which is essentially a \link[base]{function}, 
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
 #' The returned value of `rpart1(y,x)(newx)` is a 
 #' \link[base]{logical} \link[base]{vector}.
-# with \link[base]{attributes}
-# \describe{
-# \item{`attr(,'cutoff')`}{\link[base]{double} scalar, the cutoff value for `newx`}
-# }
 #' 
 #' @note
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
+#' 
+#' Function \link[rpart]{rpart} is quite slow.
 #' 
 #' @examples
 #' data(cu.summary, package = 'rpart')
 #' with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
 #' (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
+#' get_cutoff(foo)
 #' foo(rnorm(10, mean = 24.5))
 #' @keywords internal
 #' @importFrom rpart rpart
@@ -113,20 +113,46 @@ rpart1 <- function(
   fn_ <- alist(newx = )
   fn_[[2L]] <- if (check_degeneracy) call(
     name = '{',
-    call('<-', quote(ret), call('(', node1)),
+    call(name = '<-', quote(ret), call(name = '(', node1)),
     quote(if (all(ret, na.rm = TRUE) || !any(ret, na.rm = TRUE)) warning('Dichotomized value is all-0 or all-1')),
     quote(return(ret))
   ) else node1
   fn <- as.function.default(fn_)
-  attr(fn, which = 'cutoff') <- node1[[3L]] # do note deprecate, for now
-  attr(fn, which = 'text') <- deparse1(node1[c(1L, 3L)])
+  #attr(fn, which = 'cutoff') <- node1[[3L]] # do note deprecate, for now
+  #attr(fn, which = 'text') <- deparse1(node1[c(1L, 3L)])
+  class(fn) <- c('rpart1', class(fn))
   return(fn)
+}
+
+#' @export
+print.rpart1 <- function(x, ...) {
+  cat('\nDichotomizing Rule based on Recursive Partitioning:\n\n')
+  print(unclass(x))
 }
 
 
 
-# @note
-# \link[rpart]{rpart} is quite slow
+#' @title Get Cutoff Value from a Dichotomizing Rule [rpart1]
+#' 
+#' @description
+#' To get the cutoff value from a Dichotomizing Rule [rpart1].
+#' 
+#' @param x see Usage
+#' 
+#' @name get_cutoff
+#' @export
+get_cutoff <- function(x) UseMethod('get_cutoff')
 
+
+#' @rdname get_cutoff
+#' 
+#' @returns
+#' Function [get_cutoff.rpart1] returns a \link[base]{numeric} scalar.
+#' 
+#' @export get_cutoff.rpart1
+#' @export
+get_cutoff.rpart1 <- function(x) {
+  body(x)[[2L]][[3L]][[2L]][[3L]]
+}
 
 
