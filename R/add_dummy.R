@@ -1,4 +1,17 @@
 
+
+
+# ## Dichotomizing Predictor(s) via Dichotomizing Split Sample [splitDichotom]
+#
+# Pipeline `splitDichotom |> subset |> sort_by |> head` identifies 
+# the optimal dichotomizing predictors using repeated sample splits on the *training set*.
+# 
+# Function [predict.splitDichotom] .. testing set
+# 
+
+
+
+
 #' @title Dichotomizing Predictors via Repeated Sample Splits
 #' 
 #' @description

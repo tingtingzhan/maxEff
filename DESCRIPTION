@@ -14,8 +14,8 @@ Authors@R: c(person(given = 'Tingting', family =
         'Zhan', role = c('aut', 'cre', 'cph'), email =
         'tingtingzhan@gmail.com', comment = c(ORCID =
         '0000-0001-9971-4844')), person(given = 'Inna', family =
-        'Chervoneva', role = c('ctb'), email =
+        'Chervoneva', role = c('cph'), email =
         'Inna.Chervoneva@jefferson.edu', comment = c(ORCID =
         '0000-0002-9104-4505')))
 Imports: parallel, rpart
-Suggests: knitr, survival, spatstat.grouped, spatstat.grouped.data, Qindex.data
+Suggests: knitr, survival, spatstat.grouped, spatstat.grouped.data
