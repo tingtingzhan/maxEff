@@ -53,7 +53,7 @@ Function \link{add_dummy_rSplit} dichotomizes predictors via repeated sample spl
 }
 
 First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on
-response \eqn{y} (via \link[maxEff]{rpartD}).
+response \eqn{y} (via \link[maxEff]{rpart1}).
 
 Then, \link[stats]{update} previous multivariable regression \code{start.model}
 with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}.

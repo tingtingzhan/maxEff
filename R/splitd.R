@@ -19,7 +19,7 @@
 #' Function [splitd] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
 #' Specifically, given a training-test sample split,
 #' \enumerate{
-#' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via [rpartD]);
+#' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via [rpart1]);
 #' \item fit a univariable regression model of the response \eqn{y_1} with the dichotomized predictor \eqn{\mathcal{D}(x_1)} in the test set.
 #' }
 #' Currently the Cox proportional hazards (\link[survival]{coxph}) regression for \link[survival]{Surv} response, logistic (\link[stats]{glm}) regression for \link[base]{logical} response and linear (\link[stats]{lm}) regression for \link[stats]{gaussian} response are supported.
@@ -44,7 +44,7 @@ splitd <- function(start.model, x_, data, id, ...) {
   x <- eval(x_, envir = data)
   
   # `id`: training set
-  rule <- rpartD(y = y[id], x = x[id], check_degeneracy = TRUE)
+  rule <- rpart1(y = y[id], x = x[id], check_degeneracy = TRUE)
   
   # `!id`: test set
   y_ <- y[!id]
@@ -76,8 +76,6 @@ splitd <- function(start.model, x_, data, id, ...) {
 
 #' @title Repeated Split-Dichotomized Regression Model
 #' 
-#' @param start.model see function [splitd]
-#' 
 #' @param ids \link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.  
 #' 
 #' @param ... additional parameters of function [splitd]
@@ -90,9 +88,9 @@ splitd <- function(start.model, x_, data, id, ...) {
 #' 
 #' @keywords internal
 #' @export
-splitd_ <- function(start.model, ids, ...) {
-  ret_ <- lapply(ids, FUN = function(id) splitd(start.model = start.model, id = id, ...))
-  ret <- ret_[lengths(ret_) > 0L]
+splitd_ <- function(ids, ...) {
+  ret_ <- lapply(ids, FUN = function(id) splitd(id = id, ...))
+  ret <- ret_[lengths(ret_, use.names = FALSE) > 0L]
   class(ret) <- c('splitd.list', class(ret))
   return(ret)
 }

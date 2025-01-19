@@ -117,11 +117,10 @@ add_dummy_rSplit <- function(
 # it's actually easier to copy code from ?maxEff::add_num
 
 #' @rdname add_dummy
-# @param rule (optional) a \link[base]{list}, returned value from function \link[maxEff]{rpartD_}
 #' @details
 #' 
 #' First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on 
-#' response \eqn{y} (via \link[maxEff]{rpartD}).
+#' response \eqn{y} (via \link[maxEff]{rpart1}).
 #' 
 #' Then, \link[stats]{update} previous multivariable regression `start.model` 
 #' with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
@@ -133,13 +132,11 @@ add_dummy_rSplit <- function(
 #' 
 #' @importFrom stats terms update model.frame.default na.pass
 #' @importFrom utils tail
-#' @importFrom maxEff rpartD_
 #' @export
 add_dummy <- function(
     start.model, 
     x, 
     data = eval(start.model$call$data),
-    #rule,
     mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), 
     ...
 ) {
@@ -153,7 +150,7 @@ add_dummy <- function(
   #out <- lapply(x_, FUN = function(p) { 
     # (p = x_[[1L]])
     xval <- eval(p, envir = data)
-    rule <- rpartD(y = y, x = xval)
+    rule <- rpart1(y = y, x = xval)
     data$x. <- rule(xval)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]

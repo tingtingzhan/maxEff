@@ -1,18 +1,17 @@
 
 
 
-#' @title Dichotomize via Recursive Partitioning
+#' @title Dichotomize via 1st Node of Recursive Partitioning
 #' 
 #' @description
 #' Dichotomize one or more predictors of
 #' a \link[survival]{Surv}, a \link[base]{logical}, or a \link[base]{double} response,
 #' using recursive partitioning and regression tree \link[rpart]{rpart}.
 #' 
-#' @param y a \link[survival]{Surv} object, 
-#' a \link[base]{logical} \link[base]{vector}, 
-#' or a \link[base]{double} \link[base]{vector}, the response \eqn{y}
+#' @param y response \eqn{y}, currently accepting \link[survival]{Surv} object and 
+#' \link[base]{logical} and/or \link[base]{double} \link[base]{vector}
 #' 
-#' @param x \link[base]{numeric} \link[base]{vector}, one predictor \eqn{x}
+#' @param x one \link[base]{numeric} \link[base]{vector} predictor \eqn{x}
 #' 
 #' @param check_degeneracy \link[base]{logical} scalar, whether to allow the 
 #' dichotomized value to be all-`FALSE` or all-`TRUE` (i.e., degenerate) 
@@ -26,7 +25,7 @@
 #' @param ... additional parameters of \link[rpart]{rpart} and/or \link[rpart]{rpart.control}
 #' 
 #' @details
-#' Function [rpartD] dichotomizes one predictor in the following steps, 
+#' Function [rpart1] dichotomizes one predictor in the following steps, 
 #' 
 #' \enumerate{
 #' 
@@ -64,9 +63,9 @@
 #' 
 #' @returns 
 #' 
-#' Function [rpartD] returns a \link[base]{function}, 
+#' Function [rpart1] returns a \link[base]{function}, 
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
-#' The returned value of `rpartD(y,x)(newx)` is a 
+#' The returned value of `rpart1(y,x)(newx)` is a 
 #' \link[base]{logical} \link[base]{vector}.
 # with \link[base]{attributes}
 # \describe{
@@ -77,14 +76,14 @@
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
 #' 
 #' @examples
-#' data(cu.summary, package = 'rpart') # see more details from ?rpart::cu.summary
-#' with(cu.summary, rpartD(y = Price, x = Mileage, check_degeneracy = FALSE))
-#' (foo = with(cu.summary, rpartD(y = Price, x = Mileage)))
+#' data(cu.summary, package = 'rpart')
+#' with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
+#' (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
 #' foo(rnorm(10, mean = 24.5))
 #' @keywords internal
 #' @importFrom rpart rpart
 #' @export
-rpartD <- function(
+rpart1 <- function(
     y, x, 
     check_degeneracy = TRUE,
     cp = .Machine$double.eps, # to force a split even if the overall lack of fit is not decreased
@@ -128,25 +127,6 @@ rpartD <- function(
 
 # @note
 # \link[rpart]{rpart} is quite slow
-
-
-
-#' @title Batch Operation of [rpartD]
-#' 
-#' @param y,... see function [rpartD]
-#' 
-#' @param X \link[base]{data.frame} or \link[base]{list}
-#' 
-#' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
-#' 
-#' @returns 
-#' Function [rpartD_] returns a \link[base]{list} of [rpartD] returns.
-#' 
-#' @importFrom parallel mclapply detectCores
-#' @export
-rpartD_ <- function(y, X, mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), ...) {
-  mclapply(X, mc.cores = mc.cores, FUN = function(x) rpartD(y = y, x = x, ...))
-}
 
 
 

@@ -4,11 +4,9 @@
 \alias{splitd_}
 \title{Repeated Split-Dichotomized Regression Model}
 \usage{
-splitd_(start.model, ids, ...)
+splitd_(ids, ...)
 }
 \arguments{
-\item{start.model}{see function \link{splitd}}
-
 \item{ids}{\link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.}
 
 \item{...}{additional parameters of function \link{splitd}}
