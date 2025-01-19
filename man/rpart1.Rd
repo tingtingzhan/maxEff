@@ -81,6 +81,7 @@ data(cu.summary, package = 'rpart')
 with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
 (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
 get_cutoff(foo)
+labels(foo)
 foo(rnorm(10, mean = 24.5))
 }
 \keyword{internal}

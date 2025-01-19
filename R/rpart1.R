@@ -79,6 +79,7 @@
 #' with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
 #' (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
 #' get_cutoff(foo)
+#' labels(foo)
 #' foo(rnorm(10, mean = 24.5))
 #' @keywords internal
 #' @importFrom rpart rpart
@@ -153,6 +154,13 @@ get_cutoff <- function(x) UseMethod('get_cutoff')
 #' @export
 get_cutoff.rpart1 <- function(x) {
   body(x)[[2L]][[3L]][[2L]][[3L]]
+}
+
+
+# ?base::labels
+#' @export
+labels.rpart1 <- function(object, ...) {
+  deparse1(body(object)[[2L]][[3L]][[2L]][c(1L,3L)])
 }
 
 

@@ -99,7 +99,8 @@ add_dummy_rSplit <- function(
 
   # just to beautify
   arg. <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
-  txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
+  #txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
+  txt. <- vapply(out, FUN = labels.rpart1, FUN.VALUE = '')
   names(out) <- paste0(arg., txt.)
   
   class(out) <- c('add_dummy_rSplit', 'add_dummy', 'add_', class(out))

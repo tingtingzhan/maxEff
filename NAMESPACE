@@ -2,6 +2,7 @@
 
 S3method("[",add_)
 S3method(get_cutoff,rpart1)
+S3method(labels,rpart1)
 S3method(predict,add_dummy)
 S3method(predict,add_dummy_rSplit)
 S3method(predict,add_num)
