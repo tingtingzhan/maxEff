@@ -73,7 +73,7 @@ sQ1 = sQ[-(1:100),] # test set
 
 set.seed(234); m1 = coxph(OS ~ gender, data = sQ0) |>
  add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
- sort_by(y = abs(cf)) |>
+ sort_by(y = abs(effsize)) |>
  head(n = 2L)
 m1
 #hladr.quantile[, "0.1"]>=0.08082
@@ -82,7 +82,7 @@ predict(m1, newdata = sQ1)
 
 m2 = coxph(OS ~ gender, data = sQ0) |>
  add_dummy(x = ~ hladr.quantile) |> subset(subset = p1 > .15 & p1 < .85) |> 
- sort_by(y = abs(cf)) |>
+ sort_by(y = abs(effsize)) |>
  head(n = 2L)
 m2
 

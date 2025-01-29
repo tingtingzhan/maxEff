@@ -57,7 +57,7 @@
 #' 
 #' set.seed(234); m1 = coxph(OS ~ gender, data = sQ0) |>
 #'  add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
-#'  sort_by(y = abs(cf)) |>
+#'  sort_by(y = abs(effsize)) |>
 #'  head(n = 2L)
 #' m1
 #' #hladr.quantile[, "0.1"]>=0.08082
@@ -66,7 +66,7 @@
 #' 
 #' m2 = coxph(OS ~ gender, data = sQ0) |>
 #'  add_dummy(x = ~ hladr.quantile) |> subset(subset = p1 > .15 & p1 < .85) |> 
-#'  sort_by(y = abs(cf)) |>
+#'  sort_by(y = abs(effsize)) |>
 #'  head(n = 2L)
 #' m2
 #' 
@@ -157,7 +157,7 @@ add_dummy <- function(
     cf_ <- m_$coefficients[length(m_$coefficients)]
     attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
     attr(rule, which = 'x') <- p
-    attr(rule, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
     attr(rule, which = 'model') <- m_ # needed for [predict.*]
     #class(rule) <- c('add_dummy', class(rule)) # not sure yet
     return(rule)

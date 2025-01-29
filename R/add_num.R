@@ -38,7 +38,7 @@
 #' 
 #' (m = coxph(OS ~ gender, data = sQ0) |>
 #'  add_num(x = ~ hladr.quantile) |>
-#'  sort_by(y = abs(cf)) |>
+#'  sort_by(y = abs(effsize)) |>
 #'  head(n = 2L))
 #' predict(m, newdata = sQ1)
 #' 
@@ -64,7 +64,7 @@ add_num <- function(
     data$x. <- eval(p, envir = data)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]
-    attr(p, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(p, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
     attr(p, which = 'model') <- m_ # needed for [predict.*]
     class(p) <- c('add_num_', class(p))
     return(p)

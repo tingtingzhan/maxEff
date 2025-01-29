@@ -22,6 +22,6 @@ Function \link{sort_by.add_} returns an \link{add_dummy_rSplit} or \link{add_num
 \details{
 Sort the elements of an \link{add_dummy_rSplit} or \link{add_num} object by a certain criterion \code{y}.
 
-We suggest using \code{y = abc(cf)}, indicating a \code{decreasing} order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.
+We suggest using \code{y = abc(effsize)}, indicating a \code{decreasing} order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.
 }
 \keyword{internal}

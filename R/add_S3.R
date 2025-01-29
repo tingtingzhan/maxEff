@@ -57,7 +57,7 @@ print.add_ <- function(x, ...) {
 #' @details
 #' Sort the elements of an [add_dummy_rSplit] or [add_num] object by a certain criterion `y`.
 #' 
-#' We suggest using `y = abc(cf)`, indicating a `decreasing` order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.  
+#' We suggest using `y = abc(effsize)`, indicating a `decreasing` order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.  
 #'
 #' @returns 
 #' Function [sort_by.add_] returns an [add_dummy_rSplit] or [add_num] object.
@@ -66,7 +66,7 @@ print.add_ <- function(x, ...) {
 #' @export sort_by.add_
 #' @export
 sort_by.add_ <- function(x, y, ...) {
-  cf <- vapply(x, FUN = attr, which = 'cf', exact = TRUE, FUN.VALUE = NA_real_)
+  effsize <- vapply(x, FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
   o <- order(eval(substitute(y)), ...) # ?base::order
   x[o]
 }

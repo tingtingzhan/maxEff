@@ -48,7 +48,7 @@ sQ1 = sQ[-(1:100),] # test set
 
 (m = coxph(OS ~ gender, data = sQ0) |>
  add_num(x = ~ hladr.quantile) |>
- sort_by(y = abs(cf)) |>
+ sort_by(y = abs(effsize)) |>
  head(n = 2L))
 predict(m, newdata = sQ1)
 

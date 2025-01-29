@@ -31,7 +31,7 @@
 #' with additional attributes
 #' \describe{
 #' \item{`attr(,'p1')`}{\link[base]{double} scalar, \eqn{p_1 = \text{Pr}(\mathcal{D}(x_1)=1)}}
-#' \item{`attr(,'cf')`}{\link[base]{double} scalar, univariable regression coefficient estimate of \eqn{y_1\sim\mathcal{D}(x_1)}}
+#' \item{`attr(,'effsize')`}{\link[base]{double} scalar, univariable regression coefficient estimate of \eqn{y_1\sim\mathcal{D}(x_1)}}
 #' \item{`attr(,'formula')`}{(optional), for function [predict.splitd]}
 #' }
 #' 
@@ -60,7 +60,7 @@ splitd <- function(start.model, x_, data, id, ...) {
   
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
   attr(rule, which = 'x') <- x_
-  attr(rule, which = 'cf') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+  attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
   attr(rule, which = 'model') <- m_ # needed for [predict.splitd]
   class(rule) <- c('splitd', class(rule))
   return(rule)
@@ -133,9 +133,9 @@ splitd_ <- function(ids, ...) {
 #' @export quantile.splitd.list
 #' @export
 quantile.splitd.list <- function(x, probs, ...) {
-  cf <- vapply(x, FUN = attr, which = 'cf', exact = TRUE, FUN.VALUE = NA_real_)
-  q_ <- quantile(cf, probs = probs, type = 3L, na.rm = TRUE)
-  return(x[match(q_, table = cf)])
+  effsize <- vapply(x, FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
+  q_ <- quantile(effsize, probs = probs, type = 3L, na.rm = TRUE)
+  return(x[match(q_, table = effsize)])
 }
 
 
