@@ -128,7 +128,18 @@ rpart1 <- function(
 #' @export
 print.rpart1 <- function(x, ...) {
   cat('\nDichotomizing Rule based on Recursive Partitioning:\n\n')
-  print(unclass(x))
+  x0 <- unclass(x)
+  attributes(x0) <- NULL
+  print(x0)
+  
+  atr <- attributes(x)
+  if (!length(atr)) return(invisible())
+  cat('\nDevelopers, use\n')
+  if (length(atr$p1)) cat('\nattr(.,\'p1\') to see the mean of dichotomized value in training, or test (if available), data\n')
+  if (length(atr$x)) cat('\nattr(.,\'x\') to see the name of continous variable that is dichotomized\n')
+  if (length(atr$effsize)) cat('\nattr(.,\'effsize\') to see the regression coefficient, i.e., effect size, of the dichotomized variable in training, or test (if available), data\n')
+  if (length(atr$model)) cat('\nattr(.,\'model\') to see the regression model in training, or test (if available), data\n\n')
+  
 }
 
 
