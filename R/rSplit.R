@@ -13,8 +13,9 @@
 #' @param stratify \link[base]{logical} scalar, 
 #' whether stratification based on `x` needs to be implemented, default `TRUE`
 #' 
-#' @param s_prob \link[base]{double} scalar between 0 and 1, 
-#' split ratio, i.e., percentage of training subjects \eqn{p}, default `.8`
+#' @param p \link[base]{double} scalar between 0 and 1, 
+#' percentage \eqn{p} of training subjects, default `.8`
+# following nomenclature of \link[caret]{createDataPartition}
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -67,7 +68,7 @@
 #' @seealso \link[base]{split}, `caret::createDataPartition`
 #' @keywords internal
 #' @export 
-rSplit <- function(n, x, stratify = TRUE, s_prob = .8, ...) {
+rSplit <- function(n, x, stratify = TRUE, p = .8, ...) {
   
   if (anyNA(x)) stop('do not allow missingness in the response, for now')
   
@@ -110,7 +111,7 @@ rSplit <- function(n, x, stratify = TRUE, s_prob = .8, ...) {
   
   replicate(n = n, expr = {
     idx_train <- lapply(idx, FUN = function(id) {
-      sample(id, size = floor(length(id) * s_prob), replace = FALSE)
+      sample(id, size = floor(length(id) * p), replace = FALSE)
     })
     train <- unlist(idx_train, use.names = FALSE)
     ret <- ret0

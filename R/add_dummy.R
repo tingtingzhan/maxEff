@@ -90,10 +90,10 @@ add_dummy_rSplit <- function(
   
   ids <- rSplit(n = n, x = y, ...) # using same split for all predictors
   
-  #out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) { 
-  out <- lapply(x_, FUN = function(p) { # to debug
-    # (p = x_[[1L]])
-    tmp <- splitd_(start.model = start.model, x_ = p, data = data, ids = ids)
+  #out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) { 
+  out <- lapply(x_, FUN = function(x.) { # to debug
+    # (x. = x_[[1L]])
+    tmp <- splitd_(start.model = start.model, x_ = x., data = data, ids = ids)
     quantile.splitd.list(tmp, probs = .5)[[1L]]
   })
 
@@ -147,16 +147,16 @@ add_dummy <- function(
   data <- tmp$data
   x_ <- tmp$x_
   
-  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) {
-  #out <- lapply(x_, FUN = function(p) { 
-    # (p = x_[[1L]])
-    xval <- eval(p, envir = data)
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
+  #out <- lapply(x_, FUN = function(x.) { 
+    # (x. = x_[[1L]])
+    xval <- eval(x., envir = data)
     rule <- rpart1(y = y, x = xval)
     data$x. <- rule(xval)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]
     attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
-    attr(rule, which = 'x') <- p
+    attr(rule, which = 'x') <- x.
     attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
     attr(rule, which = 'model') <- m_ # needed for [predict.*]
     #class(rule) <- c('add_dummy', class(rule)) # not sure yet

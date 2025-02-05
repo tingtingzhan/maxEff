@@ -4,7 +4,7 @@
 \alias{rSplit}
 \title{Stratified Random Split Sampling}
 \usage{
-rSplit(n, x, stratify = TRUE, s_prob = 0.8, ...)
+rSplit(n, x, stratify = TRUE, p = 0.8, ...)
 }
 \arguments{
 \item{n}{positive \link[base]{integer} scalar, number of \link[base]{replicate}s of random splits to be performed}
@@ -16,8 +16,8 @@ or a \link[survival]{Surv} object}
 \item{stratify}{\link[base]{logical} scalar,
 whether stratification based on \code{x} needs to be implemented, default \code{TRUE}}
 
-\item{s_prob}{\link[base]{double} scalar between 0 and 1,
-split ratio, i.e., percentage of training subjects \eqn{p}, default \code{.8}}
+\item{p}{\link[base]{double} scalar between 0 and 1,
+percentage \eqn{p} of training subjects, default \code{.8}}
 
 \item{...}{additional parameters, currently not in use}
 }

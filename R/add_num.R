@@ -58,16 +58,16 @@ add_num <- function(
   data <- tmp$data
   x_ <- tmp$x_
   
-  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(p) {
-  #out <- lapply(x_, FUN = function(p) { 
-    # (p = x_[[1L]])
-    data$x. <- eval(p, envir = data)
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
+  #out <- lapply(x_, FUN = function(x.) { 
+    # (x. = x_[[1L]])
+    data$x. <- eval(x., envir = data)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]
-    attr(p, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-    attr(p, which = 'model') <- m_ # needed for [predict.*]
-    class(p) <- c('add_num_', class(p))
-    return(p)
+    attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(x., which = 'model') <- m_ # needed for [predict.*]
+    class(x.) <- c('add_num_', class(x.))
+    return(x.)
   })
   
   # just to beautify!!
