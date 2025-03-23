@@ -9,7 +9,7 @@ add_dummy_rSplit(
   start.model,
   x,
   data = eval(start.model$call$data),
-  n,
+  times,
   mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()),
   ...
 )
@@ -31,7 +31,7 @@ add_dummy(
 
 \item{data}{(optional) \link[base]{data.frame} in the model \link[base]{call} of \code{start.model}}
 
-\item{n, ...}{additional parameters of function \link{rSplit} for function \link{add_dummy_rSplit}.
+\item{times, ...}{additional parameters of function \code{\link[=stratifiedPartition]{stratifiedPartition()}} for function \link{add_dummy_rSplit}.
 For function \code{\link[=add_dummy]{add_dummy()}}, these parameters are not in use}
 
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
@@ -48,12 +48,12 @@ Dichotomizing predictors using repeated sample splits.
 Function \code{\link[=add_dummy_rSplit]{add_dummy_rSplit()}} dichotomizes predictors via repeated sample splits. Specifically,
 
 \enumerate{
-\item Generate multiple, i.e., repeated, training-test sample splits (via \link{rSplit})
+\item Generate multiple, i.e., repeated, training-test sample splits (via \code{\link[=stratifiedPartition]{stratifiedPartition()}})
 \item For each candidate predictor \eqn{x_i}, find the \emph{\strong{median-split-dichotomized regression model}} based on the repeated sample splits, see functions \link{splitd_} and \link{quantile.splitd.list};
 }
 
 First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on
-response \eqn{y} (via \link[maxEff]{rpart1}).
+response \eqn{y} (via \link[maxEff]{node1}).
 
 Then, \link[stats]{update} previous multivariable regression \code{start.model}
 with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}.

@@ -12,12 +12,12 @@ splitd_(ids, ...)
 \item{...}{additional parameters of function \link{splitd}}
 }
 \value{
-Function \link{splitd_} returns a \link[base]{list} of \link{splitd} objects.
+Function \code{\link[=splitd_]{splitd_()}} returns a \link[base]{list} of \link{splitd} objects.
 }
 \description{
 Repeated Split-Dichotomized Regression Model
 }
 \details{
-Function \link{splitd_} fits multiple \link{splitd} models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
+Function \code{\link[=splitd_]{splitd_()}} fits multiple \link{splitd} models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
 }
 \keyword{internal}

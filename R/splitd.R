@@ -19,7 +19,7 @@
 #' Function [splitd()] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
 #' Specifically, given a training-test sample split,
 #' \enumerate{
-#' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via [rpart1]);
+#' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via function [node1()]);
 #' \item fit a univariable regression model of the response \eqn{y_1} with the dichotomized predictor \eqn{\mathcal{D}(x_1)} in the test set.
 #' }
 #' Currently the Cox proportional hazards (\link[survival]{coxph}) regression for \link[survival]{Surv} response, logistic (\link[stats]{glm}) regression for \link[base]{logical} response and linear (\link[stats]{lm}) regression for \link[stats]{gaussian} response are supported.
@@ -36,6 +36,7 @@
 #' }
 #' 
 #' @keywords internal
+#' @importFrom rpart rpart
 #' @importFrom stats update
 #' @export
 splitd <- function(start.model, x_, data, id, ...) {
@@ -44,7 +45,8 @@ splitd <- function(start.model, x_, data, id, ...) {
   x <- eval(x_, envir = data)
   
   # `id`: training set
-  rule <- rpart1(y = y[id], x = x[id], check_degeneracy = TRUE)
+  rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
+    node1()
   
   # `!id`: test set
   y_ <- y[!id]
@@ -81,10 +83,10 @@ splitd <- function(start.model, x_, data, id, ...) {
 #' @param ... additional parameters of function [splitd]
 #' 
 #' @details 
-#' Function [splitd_] fits multiple [splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
+#' Function [splitd_()] fits multiple [splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
 #' 
 #' @returns
-#' Function [splitd_] returns a \link[base]{list} of [splitd] objects.
+#' Function [splitd_()] returns a \link[base]{list} of [splitd] objects.
 #' 
 #' @keywords internal
 #' @export

@@ -36,7 +36,7 @@ Split-dichotomized regression model.
 Function \code{\link[=splitd]{splitd()}} performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set.
 Specifically, given a training-test sample split,
 \enumerate{
-\item find the \emph{dichotomizing rule} \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via \link{rpart1});
+\item find the \emph{dichotomizing rule} \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via function \code{\link[=node1]{node1()}});
 \item fit a univariable regression model of the response \eqn{y_1} with the dichotomized predictor \eqn{\mathcal{D}(x_1)} in the test set.
 }
 Currently the Cox proportional hazards (\link[survival]{coxph}) regression for \link[survival]{Surv} response, logistic (\link[stats]{glm}) regression for \link[base]{logical} response and linear (\link[stats]{lm}) regression for \link[stats]{gaussian} response are supported.

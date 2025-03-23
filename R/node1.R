@@ -8,24 +8,17 @@
 #' a \link[survival]{Surv}, a \link[base]{logical}, or a \link[base]{double} response,
 #' using recursive partitioning and regression tree \link[rpart]{rpart}.
 #' 
-#' @param y response \eqn{y}, currently accepting \link[survival]{Surv} object and 
-#' \link[base]{logical} and/or \link[base]{double} \link[base]{vector}
-#' 
-#' @param x one \link[base]{numeric} \link[base]{vector} predictor \eqn{x}
+#' @param x a \link[rpart]{rpart} object
 #' 
 #' @param check_degeneracy \link[base]{logical} scalar, whether to allow the 
 #' dichotomized value to be all-`FALSE` or all-`TRUE` (i.e., degenerate) 
 #' for any one of the predictors.
 #' Default `TRUE` to produce a \link[base]{warning} message for degeneracy.
 #' 
-#' @param cp \link[base]{double} scalar, complexity parameter, see \link[rpart]{rpart.control}.
-#' Default `.Machine$double.eps`, so that a split is enforced 
-#' no matter how small improvement in overall \eqn{R^2} is
-#' 
 #' @param ... additional parameters of \link[rpart]{rpart} and/or \link[rpart]{rpart.control}
 #' 
 #' @details
-#' Function [rpart1] dichotomizes one predictor in the following steps, 
+#' Function [node1()] dichotomizes one predictor in the following steps, 
 #' 
 #' \enumerate{
 #' 
@@ -63,11 +56,9 @@
 #' 
 #' @returns 
 #' 
-#' Function [rpart1] returns an object of class [rpart1], 
+#' Function [node1()] returns an object of class `'node1'`, 
 #' which is essentially a \link[base]{function}, 
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
-#' The returned value of `rpart1(y,x)(newx)` is a 
-#' \link[base]{logical} \link[base]{vector}.
 #' 
 #' @note
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
@@ -75,58 +66,59 @@
 #' Function \link[rpart]{rpart} is quite slow.
 #' 
 #' @examples
-#' data(cu.summary, package = 'rpart')
-#' with(cu.summary, rpart1(y = Price, x = Mileage, check_degeneracy = FALSE))
-#' (foo = with(cu.summary, rpart1(y = Price, x = Mileage)))
+#' library(rpart)
+#' (r = rpart(Price ~ Mileage, data = cu.summary, control = rpart.control(maxdepth = 2L)))
+#' (foo = r |> node1())
 #' get_cutoff(foo)
 #' labels(foo)
-#' foo(rnorm(10, mean = 24.5))
+#' rnorm(6L, mean = 24.5) |> foo()
 #' @keywords internal
-#' @importFrom rpart rpart
 #' @export
-rpart1 <- function(
-    y, x, 
-    check_degeneracy = TRUE,
-    cp = .Machine$double.eps, # to force a split even if the overall lack of fit is not decreased
-    ...
-) {
-  rp <- rpart(
-    formula = y ~ x, 
-    cp = cp, 
-    maxdepth = 2L, # only the first node is needed
-    ...)
-  if (!length(rp$splits)) stop('we must force a split')
+node1 <- function(x, check_degeneracy = TRUE, ...) {
   
-  labs <- labels(rp) # ?rpart:::labels.rpart
-  node1 <- str2lang(labs[2L]) # first node!!!
+  s <- x$splits
+  if (!length(s)) {
+    if (x$control$cp > .Machine$double.eps) {
+      stop('re-run rpart(., cp = .Machine$double.eps) to force a split')
+    } else stop('really?')
+  }
   
-  if (node1[[1L]] == '<=') {
-    node1[[1L]] <- quote(`>`)
-  } else if (node1[[1L]] == '<') {
-    node1[[1L]] <- quote(`>=`)
-  } # else if (node1[[1L]] is '>' or '>=')  do nothing
+  labs <- labels(x) # ?rpart:::labels.rpart
+  nd1 <- str2lang(labs[2L]) # first node!!!
   
-  #if (!identical(node1[[2L]], quote(x))) stop('rpart package updated?')
-  node1[[2L]] <- quote(newx)
+  if (nd1[[1L]] == '<=') {
+    nd1[[1L]] <- quote(`>`)
+  } else if (nd1[[1L]] == '<') {
+    nd1[[1L]] <- quote(`>=`)
+  } # else if (nd1[[1L]] is '>' or '>=')  do nothing
   
-  node1[[3L]] <- rp$splits[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
+  nd1[[2L]] <- quote(newx)
+  
+  nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
   
   fn_ <- alist(newx = )
   fn_[[2L]] <- if (check_degeneracy) call(
     name = '{',
-    call(name = '<-', quote(ret), call(name = '(', node1)),
+    call(name = '<-', quote(ret), call(name = '(', nd1)),
     quote(if (all(ret, na.rm = TRUE) || !any(ret, na.rm = TRUE)) warning('Dichotomized value is all-0 or all-1')),
     quote(return(ret))
-  ) else node1
+  ) else nd1
   fn <- as.function.default(fn_)
-  #attr(fn, which = 'cutoff') <- node1[[3L]] # do note deprecate, for now
-  #attr(fn, which = 'text') <- deparse1(node1[c(1L, 3L)])
-  class(fn) <- c('rpart1', class(fn))
+  #attr(fn, which = 'cutoff') <- nd1[[3L]] # do note deprecate, for now
+  #attr(fn, which = 'text') <- deparse1(nd1[c(1L, 3L)])
+  class(fn) <- c('node1', class(fn))
   return(fn)
 }
 
+
+
+
+
+
+
+
 #' @export
-print.rpart1 <- function(x, ...) {
+print.node1 <- function(x, ...) {
   cat('\nDichotomizing Rule based on Recursive Partitioning:\n\n')
   x0 <- unclass(x)
   attributes(x0) <- NULL
@@ -145,34 +137,35 @@ print.rpart1 <- function(x, ...) {
 
 
 
-#' @title Get Cutoff Value from a Dichotomizing Rule [rpart1]
+#' @title Get Cutoff Value from a Dichotomizing Rule [node1()]
 #' 
 #' @description
-#' To get the cutoff value from a Dichotomizing Rule [rpart1].
+#' To get the cutoff value from a Dichotomizing Rule [node1()].
 #' 
 #' @param x see Usage
 #' 
 #' @name get_cutoff
 #' @export
-get_cutoff <- function(x) UseMethod('get_cutoff')
+get_cutoff <- function(x) UseMethod(generic = 'get_cutoff')
 
 
 #' @rdname get_cutoff
 #' 
 #' @returns
-#' Function [get_cutoff.rpart1] returns a \link[base]{numeric} scalar.
+#' Function [get_cutoff.node1()] returns a \link[base]{numeric} scalar.
 #' 
-#' @export get_cutoff.rpart1
+#' @export get_cutoff.node1
 #' @export
-get_cutoff.rpart1 <- function(x) {
+get_cutoff.node1 <- function(x) {
   body(x)[[2L]][[3L]][[2L]][[3L]]
 }
 
 
 # ?base::labels
 #' @export
-labels.rpart1 <- function(object, ...) {
-  deparse1(body(object)[[2L]][[3L]][[2L]][c(1L,3L)])
+labels.node1 <- function(object, ...) {
+  (body(object)[[2L]][[3L]][[2L]][c(1L,3L)]) |>
+    deparse1()
 }
 
 

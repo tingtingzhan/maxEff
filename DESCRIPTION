@@ -20,7 +20,8 @@ Authors@R: c(person(given = 'Tingting', family =
 Imports: parallel, rpart
 Suggests: 
     knitr,
-    survival,
+    caret,
     groupedHyperframe,
+    survival,
     rmarkdown
 VignetteBuilder: knitr

@@ -27,7 +27,7 @@
 #' 
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
-#' @param n,... additional parameters of function [rSplit] for function [add_dummy_rSplit].
+#' @param times,... additional parameters of function [stratifiedPartition()] for function [add_dummy_rSplit].
 #' For function [add_dummy()], these parameters are not in use
 #' 
 #' @details 
@@ -35,7 +35,7 @@
 #' Function [add_dummy_rSplit()] dichotomizes predictors via repeated sample splits. Specifically, 
 #' 
 #' \enumerate{
-#' \item Generate multiple, i.e., repeated, training-test sample splits (via [rSplit])
+#' \item Generate multiple, i.e., repeated, training-test sample splits (via [stratifiedPartition()])
 #' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd_] and [quantile.splitd.list];
 #' }
 #' 
@@ -52,7 +52,7 @@ add_dummy_rSplit <- function(
     start.model, 
     x,
     data = eval(start.model$call$data),
-    n, 
+    times, 
     mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()), 
     ...
 ) {
@@ -62,7 +62,7 @@ add_dummy_rSplit <- function(
   data <- tmp$data
   x_ <- tmp$x_
   
-  ids <- rSplit(n = n, x = y, ...) # using same split for all predictors
+  ids <- stratifiedPartition(y = y, times = times, ...) # using same split for all predictors
   
   #out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) { 
   out <- lapply(x_, FUN = function(x.) { # to debug
@@ -74,7 +74,7 @@ add_dummy_rSplit <- function(
   # just to beautify
   arg. <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   #txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
-  txt. <- vapply(out, FUN = labels.rpart1, FUN.VALUE = '')
+  txt. <- vapply(out, FUN = labels.node1, FUN.VALUE = '')
   names(out) <- paste0(arg., txt.)
   
   class(out) <- c('add_dummy_rSplit', 'add_dummy', 'add_', class(out))
@@ -95,7 +95,7 @@ add_dummy_rSplit <- function(
 #' @details
 #' 
 #' First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on 
-#' response \eqn{y} (via \link[maxEff]{rpart1}).
+#' response \eqn{y} (via \link[maxEff]{node1}).
 #' 
 #' Then, \link[stats]{update} previous multivariable regression `start.model` 
 #' with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
@@ -105,6 +105,7 @@ add_dummy_rSplit <- function(
 # \item{`attr(,'rule')`}{returned value from function \link[maxEff]{rpartD_}, 
 # dichotomizing rules for the \eqn{k} predictors}
 #' 
+#' @importFrom rpart rpart
 #' @importFrom stats terms update model.frame.default na.pass
 #' @importFrom utils tail
 #' @export
@@ -125,7 +126,7 @@ add_dummy <- function(
   #out <- lapply(x_, FUN = function(x.) { 
     # (x. = x_[[1L]])
     xval <- eval(x., envir = data)
-    rule <- rpart1(y = y, x = xval)
+    rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1()
     data$x. <- rule(xval)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]

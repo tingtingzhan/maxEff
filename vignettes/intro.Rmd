@@ -28,6 +28,7 @@ Examples in this vignette require that the `search` path has
 library(maxEff)
 library(groupedHyperframe)
 library(survival)
+library(rpart)
 ```
 
 Users should remove parameter `mc.cores = 1L` from all examples and use the default option, which engages all CPU cores on the current host for macOS. The authors are forced to have `mc.cores = 1L` in this vignette in order to pass `CRAN`'s submission check.
@@ -38,10 +39,14 @@ Users should remove parameter `mc.cores = 1L` from all examples and use the defa
 ```{r echo = FALSE, results = 'asis'}
 c(
   '`abs`', 'Absolute value', '`base::abs`',
+  '`coxph`', 'Cox model', '`survival::coxph`',
+  '`factor`', 'Factor, or categorical variable', '`base::factor`',
   '`function`', 'R function', '``base::`function` ``',
   '`groupedHyperframe`', 'Grouped hyper data frame', 'https://www.github.com/tingtingzhan/groupedHyperframe',
   '`head`', 'First parts of an object', 'Generic `utils::head`; Dispatch `utils:::head.default`',
+  '`levels`', 'Levels of a `factor`', '`base::levels`',
   '`listof`', 'List of objects (of same class)', '`stats::listof`',
+  '', 'Logistic regression model', '`stats::glm(., family = binomial(\'logit\'))`',
   '`matrix`', 'Matrix', '`base::matrix`',
   '`PFS`', 'Progression/recurrence free survival', 'https://en.wikipedia.org/wiki/Progression-free_survival',
   '`predict`', 'Model prediction', 'Generic `stats::predict`. Dispatches `maxEff::predict.add_num`; `maxEff::predict.add_dummy_rSplit`',
@@ -49,6 +54,7 @@ c(
   '`S3`', '`R`\'s simplest object oriented system', 'https://adv-r.hadley.nz/s3.html',
   '`sort_by`', 'Sort an object by some criterion', 'Generic `base::sort_by`. Dispatch `maxEff::sort_by.add_`',
   '`subset`', 'Subsets of object by conditions', 'Generic `base::subset`. Dispatch `maxEff::subset.add_dummy`',
+  '`Surv`', 'Survival object', '`survival::Surv`',
   '`update`', 'Update and re-fit a model call', 'Generic `stats::update`'
 ) |>
   matrix(nrow = 3L, dimnames = list(c('Term / Abbreviation', 'Description', 'Reference'), NULL)) |>
@@ -57,29 +63,67 @@ c(
   kable()
 ```
 
+# Handy Tools
 
+## `node1()`: Dichotomization via First Node of Recursive Partitioning
 
-# Dichotomize via First Node of Recursive Partitioning
-
-Function `rpart1()` returns a dichotomizing rule, i.e., a **`function`**,
-determined by the first node of a recursive partitioning and regression tree.
-
+Consider the following recursive partitioning and regression example,
 ```{r}
 data(cu.summary, package = 'rpart')
-(foo = cu.summary |> with.default(expr = rpart1(y = Price, x = Mileage)))
+(r = rpart(Price ~ Mileage, data = cu.summary, cp = .Machine$double.eps, maxdepth = 1L))
 ```
 
-The returned dichotomizing rule `foo` converts a `numeric` object to a `logical` object.
+Function `node1()` creates a dichotomizing rule, i.e., a **`function`**, based on the first node of partitioning,
+
+```{r}
+(foo = r |> node1())
+```
+
+
+The dichotomizing rule `foo` converts a `numeric` object to a `logical` object.
 
 ```{r}
 set.seed(125); rnorm(6, mean = 24.5) |> foo()
 ```
 
-Developers may obtain the `numeric` cutoff value of the dichotomizing rule `foo`, or a brief text of to describe the it, for downstream analysis.
+Developers may obtain the `numeric` cutoff value of `foo`, or a brief text of to describe `foo`, for further analysis.
 
 ```{r}
 get_cutoff(foo)
 labels(foo)
+```
+
+
+## `stratifiedPartition()`: Stratified Partition
+
+Function `stratifiedPartition()` performs stratified partition. This is useful as we do not want to end up with a partition in which either of the training or test set having all-`TRUE` or all-`FALSE` responses for logistic regression model, or having all-censored responses for Cox regression model.
+
+* Partition a `double` vector into a training and a test set by odds $p/(1-p)$. Stratification is not needed, as linear regression model seldom runs into degeneration issue.
+```{r}
+set.seed(125); rnorm(n = 10L) |>
+  stratifiedPartition(times = 1L)
+```
+* Partition a `Surv` object and stratified by its censoring status. We want to avoid the situation that Cox model is degenerate if all subjects are censored. Specifically, 
+  + In each of two strata, observed and censored subjects, partition the subjects into a training and a test set by odds $p/(1-p)$.
+  + Combine the training sets, and the test sets, from both strata.
+```{r}
+set.seed(125); (survival::capacitor) |> 
+  with(expr = Surv(time, status)) |>
+  stratifiedPartition(times = 1L)
+```
+* Partition a `logical` vector and stratified by itself. We want to avoid the situation that a logistic regression model is degenerate if subjects are all-`TRUE` or all-`FALSE`. Specifically, 
+  + In each of two strata, subjects with `TRUE` and `FALSE` responses, partition the subjects into a training and a test set by odds $p/(1-p)$.
+  + Combine the training sets, and the test sets, from both strata.
+```{r}
+set.seed(125); rep(c(TRUE, FALSE), times = c(10, 15)) |>
+  stratifiedPartition(times = 1L)
+```
+* Partition a `factor` and stratified by its `levels`.
+Specifically, 
+  + In each level (i.e., strata), partition the subjects into a training and a test set by odds $p/(1-p)$.
+  + Combine the training sets, and the test sets, from all `levels` of $y$.
+```{r}
+# functionality is ready, but no example yet. author is lazy, sorry!
 ```
 
 # Data Preparation
@@ -153,9 +197,9 @@ predict(m1, newdata = s1)
 
 ## Naive Practice: `add_dummy()`
 
-Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable base on the first node of recursive partitioning (via function `rpart1()`) , and update the starting model with each `logical` additional predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` objects with class `'rpart1'`.
+Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable base on the first node of recursive partitioning (via function `node1()`) , and update the starting model with each `logical` additional predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` objects with class `'node1'`.
 
-The `S3` generic `subset()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor. Example below shows that we prefer not to consider a dichotomized predictor which is more unbalanced than 15%/85%.
+The `S3` generic `subset()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor. 
 
 The `S3` generic `sort_by()` sorts the `'add_dummy'` object by the `abs`olute value of regression coefficient (i.e., effect size).
 
@@ -165,7 +209,7 @@ The `S3` generic `head()` chooses the first `n` element from the `'add_dummy'` o
 ```{r}
 set.seed(14837); m2 = m |>
   add_dummy(x = ~ Ki67.quantile) |> 
-  subset(subset = p1 > .15 & p1 < .85) |> 
+  subset(subset = p1 > .05 & p1 < .95) |> 
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
 m2
@@ -184,7 +228,7 @@ Function `add_dummy_rSplit()`
 
 ```{r}
 set.seed(14837); m3 = m |> 
-  add_dummy_rSplit(~ Ki67.quantile, n = 20L) |>
+  add_dummy_rSplit(~ Ki67.quantile, times = 20L) |>
   subset(subset = p1 > .15 & p1 < .85) |>
   sort_by(y = abs(effsize), decreasing = TRUE) |>
   head(n = 2L)
