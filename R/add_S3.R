@@ -16,7 +16,7 @@
 
 #' @title print.add_
 #' 
-#' @param x an [add_dummy_rSplit] or [add_num] object
+#' @param x an [add_dummy_rSplit], [add_dummy] or [add_num] object
 #' 
 #' @param ... additional parameters, currently not in use
 #' 

@@ -7,7 +7,7 @@
 \method{print}{add_}(x, ...)
 }
 \arguments{
-\item{x}{an \link{add_dummy_rSplit} or \link{add_num} object}
+\item{x}{an \link{add_dummy_rSplit}, \link{add_dummy} or \link{add_num} object}
 
 \item{...}{additional parameters, currently not in use}
 }

@@ -49,9 +49,14 @@ splitd <- function(start.model, x_, data, id, ...) {
     node1()
   
   # `!id`: test set
-  y_ <- y[!id]
-  data_ <- data[!id, , drop = FALSE]
-  dx_ <- tryCatch(rule(x[!id]), warning = identity)
+  #y_ <- y[!id]
+  #data_ <- data[!id, , drop = FALSE]
+  #dx_ <- tryCatch(rule(x[!id]), warning = identity)
+  
+  # `-id`: test set (`id` is `integer`)
+  y_ <- y[-id]
+  data_ <- data[-id, , drop = FALSE]
+  dx_ <- tryCatch(rule(x[-id]), warning = identity)
   if (inherits(dx_, what = 'warning')) return(invisible()) # exception
   if ('x.' %in% names(data)) stop('do not allow `x.` as an original column in `data`')
   data_$x. <- dx_

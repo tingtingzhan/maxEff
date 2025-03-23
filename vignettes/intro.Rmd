@@ -96,7 +96,7 @@ labels(foo)
 
 ## `stratifiedPartition()`: Stratified Partition
 
-Function `stratifiedPartition()` performs stratified partition. This is useful as we do not want to end up with a partition in which either of the training or test set having all-`TRUE` or all-`FALSE` responses for logistic regression model, or having all-censored responses for Cox regression model.
+Function `stratifiedPartition()` performs stratified partition. This is useful as we do not want to end up with a partition in which either of the training or test set having all-`TRUE` or all-`FALSE` responses for logistic regression model, or having all-censored responses for Cox regression model.  The input and output of function `stratifiedPartition()` mimic those of the very popular function `caret::createDataPartition()`.
 
 * Partition a `double` vector into a training and a test set by odds $p/(1-p)$. Stratification is not needed, as linear regression model seldom runs into degeneration issue.
 ```{r}
@@ -172,7 +172,7 @@ summary(m <- coxph(PFS ~ Tstage, data = s0))
 
 # Additional `numeric` Predictors with Maximum Effect Size
 
-Function `add_num()` treats each additional predictor as a `numeric` variable, and `update` the starting model with each additional predictor.  Function `add_num()` returns an `'add_num'` object, which is a `listof` objects with an internal class `'add_num_'`.
+Function `add_num()` treats each additional predictor as a `numeric` variable, and `update`s the starting model with each additional predictor.  Function `add_num()` returns an `'add_num'` object, which is a `listof` objects with an internal class `'add_num_'`.
 
 The `S3` generic `sort_by()` sorts the `'add_num'` object by the `abs`olute value of regression coefficient (i.e., effect size). 
 
@@ -197,7 +197,7 @@ predict(m1, newdata = s1)
 
 ## Naive Practice: `add_dummy()`
 
-Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable base on the first node of recursive partitioning (via function `node1()`) , and update the starting model with each `logical` additional predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` objects with class `'node1'`.
+Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable using function `node1()`, and `update`s the starting model with each `logical` additional predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` objects with class `'node1'`.
 
 The `S3` generic `subset()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor. 
 

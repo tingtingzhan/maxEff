@@ -64,8 +64,8 @@ add_dummy_rSplit <- function(
   
   ids <- stratifiedPartition(y = y, times = times, ...) # using same split for all predictors
   
-  #out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) { 
-  out <- lapply(x_, FUN = function(x.) { # to debug
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) { 
+  #out <- lapply(x_, FUN = function(x.) { # to debug
     # (x. = x_[[1L]])
     tmp <- splitd_(start.model = start.model, x_ = x., data = data, ids = ids)
     quantile.splitd.list(tmp, probs = .5)[[1L]]
@@ -123,7 +123,6 @@ add_dummy <- function(
   x_ <- tmp$x_
   
   out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
-  #out <- lapply(x_, FUN = function(x.) { 
     # (x. = x_[[1L]])
     xval <- eval(x., envir = data)
     rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1()

@@ -19,49 +19,22 @@ percentage \eqn{p} of training subjects, default \code{.8}}
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=stratifiedPartition]{stratifiedPartition()}} returns a length-\eqn{n} \link[base]{list} of
-\link[base]{logical} \link[base]{vector}s.
-In each \link[base]{logical} \link[base]{vector},
-the \code{TRUE} elements indicate training subjects and
-the \code{FALSE} elements indicate test subjects.
+Function \code{\link[=stratifiedPartition]{stratifiedPartition()}} returns a length-\eqn{n} \link[stats]{listof}
+\link[base]{integer} \link[base]{vector}s.
+In each \link[base]{integer} \link[base]{vector} indicates the training subjects.
 }
 \description{
 A partition, stratified based on the type of the response.
 }
 \details{
-Function \code{\link[=stratifiedPartition]{stratifiedPartition()}} performs stratified partition.
-Specifically,
-
-\itemize{
-
-\item If \eqn{y} is a \link[base]{double} \link[base]{vector},
-then partition \eqn{y} into a training and a test set by odds \eqn{p/(1-p)}, without stratification.
-
-\item Otherwise, if \eqn{y} is a \link[survival]{Surv} object, then partition \eqn{y} and stratified by its censoring status.
-Specifically, in each of two strata, observed and censored subjects,
-partition the subjects into a training and a test set by odds \eqn{p/(1-p)}.
-Then combine the training sets, and the test sets, from both strata.
-
-\item Otherwise, if \eqn{y} is a \link[base]{logical} \link[base]{vector}, then partition \eqn{y} and stratified by itself.
-Specifically, in each of two strata, subjects with \code{TRUE} and \code{FALSE} responses,
-partition the subjects into a training and a test set by odds \eqn{p/(1-p)}.
-Then combine the training sets, and the test sets, from both strata.
-
-\item Otherwise, if \eqn{y} is a \link[base]{factor} \link[base]{vector}, then partition \eqn{y} andstratified by its \link[base]{levels}.
-Specifically, in each level (i.e., strata),
-partition the subjects into a training and a test set by odds \eqn{p/(1-p)}.
-Then combine the training sets, and the test sets, from all levels of \eqn{y}.
-
-}
+See \code{vignette('intro', package = 'maxEff')}.
 }
 \note{
-Nomenclature of the parameters of function \code{\link[=stratifiedPartition]{stratifiedPartition()}} follows those of function \link[caret]{createDataPartition}.
+Nomenclature of the parameters, as well as the returned object, of function \code{\link[=stratifiedPartition]{stratifiedPartition()}} follows those of function \link[caret]{createDataPartition}.
 
 Function \code{caTools::sample.split} is not what we need.
 }
 \examples{
-set.seed(125); rep(c(TRUE, FALSE), times = c(10, 15)) |>
- stratifiedPartition(times = 3L)
-
+# vignette('intro', package = 'maxEff')
 }
 \keyword{internal}
