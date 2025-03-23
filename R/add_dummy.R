@@ -28,11 +28,11 @@
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
 #' @param n,... additional parameters of function [rSplit] for function [add_dummy_rSplit].
-#' For function `add_dummy`, these parameters are not in use
+#' For function [add_dummy()], these parameters are not in use
 #' 
 #' @details 
 #' 
-#' Function [add_dummy_rSplit] dichotomizes predictors via repeated sample splits. Specifically, 
+#' Function [add_dummy_rSplit()] dichotomizes predictors via repeated sample splits. Specifically, 
 #' 
 #' \enumerate{
 #' \item Generate multiple, i.e., repeated, training-test sample splits (via [rSplit])
@@ -40,36 +40,10 @@
 #' }
 #' 
 #' @returns 
-#' Function [add_dummy_rSplit] returns an object of \link[base]{class} `'add_dummy_rSplit'`, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
+#' Function [add_dummy_rSplit()] returns an object of \link[base]{class} `'add_dummy_rSplit'`, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
 #' 
 #' @examples 
-#' library(spatstat.grouped)
-#' library(spatstat.grouped.data)
-#' library(survival) # to help ?spatstat.geom::hyperframe understand ?survival::Surv
-#' 
-#' s = grouped_ppp(hladr + phenotype ~ OS + gender + age | patient_id/image_id, data = wrobel_lung)
-#' sQ = s |>
-#'  aggregate_quantile(by = ~ patient_id, probs = seq.int(from = 0, to = 1, by = .1))
-#' dim(sQ)
-#' 
-#' sQ0 = sQ[1:100,] # training set
-#' sQ1 = sQ[-(1:100),] # test set
-#' 
-#' set.seed(234); m1 = coxph(OS ~ gender, data = sQ0) |>
-#'  add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
-#'  sort_by(y = abs(effsize)) |>
-#'  head(n = 2L)
-#' m1
-#' #hladr.quantile[, "0.1"]>=0.08082
-#' #hladr.quantile[, "0"]>=0.0259
-#' predict(m1, newdata = sQ1)
-#' 
-#' m2 = coxph(OS ~ gender, data = sQ0) |>
-#'  add_dummy(x = ~ hladr.quantile) |> subset(subset = p1 > .15 & p1 < .85) |> 
-#'  sort_by(y = abs(effsize)) |>
-#'  head(n = 2L)
-#' m2
-#' 
+#' # see vignette('intro')
 #' @name add_dummy
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula
@@ -127,7 +101,7 @@ add_dummy_rSplit <- function(
 #' with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
 #' 
 #' @returns
-#' Function [add_dummy] returns an object of class `'add_dummy'`.
+#' Function [add_dummy()] returns an object of class `'add_dummy'`.
 # \item{`attr(,'rule')`}{returned value from function \link[maxEff]{rpartD_}, 
 # dichotomizing rules for the \eqn{k} predictors}
 #' 
@@ -226,10 +200,10 @@ add_dummy <- function(
 #' 
 #' @details
 #' Default `(p1>.15 & p1<.85)`.
-#' See explanation of \eqn{p_1} in function [splitd].
+#' See explanation of \eqn{p_1} in function [splitd()].
 #' 
 #' @returns
-#' Function [subset.add_dummy] returns a [add_dummy] object.
+#' Function [subset.add_dummy()] returns a [add_dummy()] object.
 #' 
 #' @keywords internal
 #' @export subset.add_dummy
@@ -257,7 +231,7 @@ subset.add_dummy <- function(x, subset, ...) {
 #' @param ... additional parameters of function [predict.splitd], e.g., `newdata`
 #' 
 #' @returns
-#' Function [predict.add_dummy_rSplit] returns a \link[base]{list} of regression models.
+#' Function [predict.add_dummy_rSplit()] returns a \link[base]{list} of regression models.
 #' 
 #' @examples
 #' # see ?add_dummy_rSplit

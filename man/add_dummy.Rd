@@ -32,20 +32,20 @@ add_dummy(
 \item{data}{(optional) \link[base]{data.frame} in the model \link[base]{call} of \code{start.model}}
 
 \item{n, ...}{additional parameters of function \link{rSplit} for function \link{add_dummy_rSplit}.
-For function \code{add_dummy}, these parameters are not in use}
+For function \code{\link[=add_dummy]{add_dummy()}}, these parameters are not in use}
 
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
 }
 \value{
-Function \link{add_dummy_rSplit} returns an object of \link[base]{class} \code{'add_dummy_rSplit'}, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
+Function \code{\link[=add_dummy_rSplit]{add_dummy_rSplit()}} returns an object of \link[base]{class} \code{'add_dummy_rSplit'}, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
 
-Function \link{add_dummy} returns an object of class \code{'add_dummy'}.
+Function \code{\link[=add_dummy]{add_dummy()}} returns an object of class \code{'add_dummy'}.
 }
 \description{
 Dichotomizing predictors using repeated sample splits.
 }
 \details{
-Function \link{add_dummy_rSplit} dichotomizes predictors via repeated sample splits. Specifically,
+Function \code{\link[=add_dummy_rSplit]{add_dummy_rSplit()}} dichotomizes predictors via repeated sample splits. Specifically,
 
 \enumerate{
 \item Generate multiple, i.e., repeated, training-test sample splits (via \link{rSplit})
@@ -59,31 +59,5 @@ Then, \link[stats]{update} previous multivariable regression \code{start.model}
 with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}.
 }
 \examples{
-library(spatstat.grouped)
-library(spatstat.grouped.data)
-library(survival) # to help ?spatstat.geom::hyperframe understand ?survival::Surv
-
-s = grouped_ppp(hladr + phenotype ~ OS + gender + age | patient_id/image_id, data = wrobel_lung)
-sQ = s |>
- aggregate_quantile(by = ~ patient_id, probs = seq.int(from = 0, to = 1, by = .1))
-dim(sQ)
-
-sQ0 = sQ[1:100,] # training set
-sQ1 = sQ[-(1:100),] # test set
-
-set.seed(234); m1 = coxph(OS ~ gender, data = sQ0) |>
- add_dummy_rSplit(x = ~ hladr.quantile, n = 20L) |> subset(subset = p1 > .15 & p1 < .85) |>
- sort_by(y = abs(effsize)) |>
- head(n = 2L)
-m1
-#hladr.quantile[, "0.1"]>=0.08082
-#hladr.quantile[, "0"]>=0.0259
-predict(m1, newdata = sQ1)
-
-m2 = coxph(OS ~ gender, data = sQ0) |>
- add_dummy(x = ~ hladr.quantile) |> subset(subset = p1 > .15 & p1 < .85) |> 
- sort_by(y = abs(effsize)) |>
- head(n = 2L)
-m2
-
+# see vignette('intro')
 }

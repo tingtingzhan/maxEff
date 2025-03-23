@@ -12,7 +12,7 @@
 \item{...}{additional parameters of function \link{predict.splitd}, e.g., \code{newdata}}
 }
 \value{
-Function \link{predict.add_dummy_rSplit} returns a \link[base]{list} of regression models.
+Function \code{\link[=predict.add_dummy_rSplit]{predict.add_dummy_rSplit()}} returns a \link[base]{list} of regression models.
 }
 \description{
 Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).

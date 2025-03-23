@@ -133,6 +133,7 @@ print.rpart1 <- function(x, ...) {
   print(x0)
   
   atr <- attributes(x)
+  atr$class <- NULL # don't want to print
   if (!length(atr)) return(invisible())
   cat('\nDevelopers, use\n')
   if (length(atr$p1)) cat('\nattr(.,\'p1\') to see the mean of dichotomized value in training, or test (if available), data\n')

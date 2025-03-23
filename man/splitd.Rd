@@ -18,7 +18,7 @@ splitd(start.model, x_, data, id, ...)
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \link{splitd} returns a \link[base]{function},
+Function \code{\link[=splitd]{splitd()}} returns a \link[base]{function},
 the dichotomizing rule \eqn{\mathcal{D}} based on the training set \eqn{(y_0, x_0)},
 with additional attributes
 \describe{
@@ -33,7 +33,7 @@ Split-dichotomized regression model.
 \section{Split-Dichotomized Regression Model}{
 
 
-Function \link{splitd} performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set.
+Function \code{\link[=splitd]{splitd()}} performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set.
 Specifically, given a training-test sample split,
 \enumerate{
 \item find the \emph{dichotomizing rule} \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via \link{rpart1});

@@ -25,31 +25,14 @@ the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{
 \item{...}{additional parameters, currently of no use}
 }
 \value{
-Function \link{add_num} ..
+Function \code{\link[=add_num]{add_num()}} ..
 }
 \description{
 add_num
 }
 \details{
-Function \link{add_num} ..
+Function \code{\link[=add_num]{add_num()}} ..
 }
 \examples{
-library(spatstat.grouped)
-library(spatstat.grouped.data)
-library(survival) # to help ?spatstat.geom::hyperframe understand ?survival::Surv
-
-s = grouped_ppp(hladr + phenotype ~ OS + gender + age | patient_id/image_id, data = wrobel_lung)
-sQ = s |>
- aggregate_quantile(by = ~ patient_id, probs = seq.int(from = 0, to = 1, by = .1))
-dim(sQ)
-
-sQ0 = sQ[1:100,] # training set
-sQ1 = sQ[-(1:100),] # test set
-
-(m = coxph(OS ~ gender, data = sQ0) |>
- add_num(x = ~ hladr.quantile) |>
- sort_by(y = abs(effsize)) |>
- head(n = 2L))
-predict(m, newdata = sQ1)
-
+# see vignette('intro')
 }

@@ -12,7 +12,7 @@
 \item{...}{additional parameters of function \code{predict.add_num}, e.g., \code{newdata}}
 }
 \value{
-Function \link{predict.add_num} returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.
+Function \code{\link[=predict.add_num]{predict.add_num()}} returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.
 }
 \description{
 Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).

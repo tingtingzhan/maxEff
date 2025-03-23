@@ -12,13 +12,13 @@
 \item{subset}{\link[base]{language}}
 }
 \value{
-Function \link{subset.add_dummy} returns a \link{add_dummy} object.
+Function \code{\link[=subset.add_dummy]{subset.add_dummy()}} returns a \code{\link[=add_dummy]{add_dummy()}} object.
 }
 \description{
 subset.add_dummy
 }
 \details{
 Default \code{(p1>.15 & p1<.85)}.
-See explanation of \eqn{p_1} in function \link{splitd}.
+See explanation of \eqn{p_1} in function \code{\link[=splitd]{splitd()}}.
 }
 \keyword{internal}

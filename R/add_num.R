@@ -18,30 +18,13 @@
 #' 
 #' @details 
 #' 
-#' Function [add_num] ..
+#' Function [add_num()] ..
 #' 
 #' @returns 
-#' Function [add_num] ..
+#' Function [add_num()] ..
 #' 
 #' @examples 
-#' library(spatstat.grouped)
-#' library(spatstat.grouped.data)
-#' library(survival) # to help ?spatstat.geom::hyperframe understand ?survival::Surv
-#' 
-#' s = grouped_ppp(hladr + phenotype ~ OS + gender + age | patient_id/image_id, data = wrobel_lung)
-#' sQ = s |>
-#'  aggregate_quantile(by = ~ patient_id, probs = seq.int(from = 0, to = 1, by = .1))
-#' dim(sQ)
-#' 
-#' sQ0 = sQ[1:100,] # training set
-#' sQ1 = sQ[-(1:100),] # test set
-#' 
-#' (m = coxph(OS ~ gender, data = sQ0) |>
-#'  add_num(x = ~ hladr.quantile) |>
-#'  sort_by(y = abs(effsize)) |>
-#'  head(n = 2L))
-#' predict(m, newdata = sQ1)
-#' 
+#' # see vignette('intro')
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula update
 #' @export
@@ -68,12 +51,13 @@ add_num <- function(
     attr(x., which = 'model') <- m_ # needed for [predict.*]
     class(x.) <- c('add_num_', class(x.))
     return(x.)
-  })
+  }) # class is 'list'
   
   # just to beautify!!
   names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   
-  class(out) <- c('add_num', 'add_', class(out))
+  #class(out) <- c('add_num', 'add_', class(out))
+  class(out) <- c('add_num', 'add_', 'listof')
   return(invisible(out))
   
 }
@@ -92,7 +76,7 @@ add_num <- function(
 #' @param ... additional parameters of function `predict.add_num`, e.g., `newdata`
 #' 
 #' @returns
-#' Function [predict.add_num] returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.
+#' Function [predict.add_num()] returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.
 #' 
 #' @examples
 #' # see ?`Qindex-package`

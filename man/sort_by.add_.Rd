@@ -14,7 +14,7 @@
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \link{sort_by.add_} returns an \link{add_dummy_rSplit} or \link{add_num} object.
+Function \code{\link[=sort_by.add_]{sort_by.add_()}} returns an \link{add_dummy_rSplit} or \link{add_num} object.
 }
 \description{
 ..
