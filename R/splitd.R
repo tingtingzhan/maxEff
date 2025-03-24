@@ -32,7 +32,6 @@
 #' \describe{
 #' \item{`attr(,'p1')`}{\link[base]{double} scalar, \eqn{p_1 = \text{Pr}(\mathcal{D}(x_1)=1)}}
 #' \item{`attr(,'effsize')`}{\link[base]{double} scalar, univariable regression coefficient estimate of \eqn{y_1\sim\mathcal{D}(x_1)}}
-#' \item{`attr(,'formula')`}{(optional), for function [predict.splitd]}
 #' }
 #' 
 #' @keywords internal
@@ -47,11 +46,6 @@ splitd <- function(start.model, x_, data, id, ...) {
   # `id`: training set
   rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
     node1()
-  
-  # `!id`: test set
-  #y_ <- y[!id]
-  #data_ <- data[!id, , drop = FALSE]
-  #dx_ <- tryCatch(rule(x[!id]), warning = identity)
   
   # `-id`: test set (`id` is `integer`)
   y_ <- y[-id]
@@ -68,8 +62,9 @@ splitd <- function(start.model, x_, data, id, ...) {
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
   attr(rule, which = 'x') <- x_
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-  attr(rule, which = 'model') <- m_ # needed for [predict.splitd]
-  class(rule) <- c('splitd', class(rule))
+  attr(rule, which = 'model') <- m_ # only model formula needed for [predict.node1]!!!
+  # class(rule) <- c('splitd', class(rule)) # removed Spring 2025!!!
+  # [predict.splitd()] will become [predict.node1()] !!!
   return(rule)
 }
 
@@ -81,69 +76,6 @@ splitd <- function(start.model, x_, data, id, ...) {
 
 
 
-#' @title Repeated Split-Dichotomized Regression Model
-#' 
-#' @param ids \link[base]{list} of \link[base]{logical} \link[base]{vector}s, multiple copies of indices of repeated training-test sample splits.  
-#' 
-#' @param ... additional parameters of function [splitd]
-#' 
-#' @details 
-#' Function [splitd_()] fits multiple [splitd] models on the response \eqn{y} and predictor \eqn{x}, based on each copy of the repeated training-test sample splits.
-#' 
-#' @returns
-#' Function [splitd_()] returns a \link[base]{list} of [splitd] objects.
-#' 
-#' @keywords internal
-#' @export
-splitd_ <- function(ids, ...) {
-  ret_ <- lapply(ids, FUN = function(id) splitd(id = id, ...))
-  ret <- ret_[lengths(ret_, use.names = FALSE) > 0L]
-  class(ret) <- c('splitd.list', class(ret))
-  return(ret)
-}
-
-
-
-
-
-
-
-#' @title Quantile of Split-Dichotomized Regression Models
-#' 
-#' @description
-#' Quantile(s) of `'splitd.list'` object.
-#' 
-#' @param x a `'splitd.list'` object, returned from function [splitd_]
-#' 
-#' @param probs \link[base]{double} scalar or \link[base]{vector}, see \link[stats]{quantile}
-#' 
-#' @details
-#' 
-#' Function [quantile.splitd.list] is a method dispatch of the S3 generic function \link[stats]{quantile} on `'splitd.list'` object.
-# finds the \link[stats]{quantile}
-# of the univariable regression coefficient (i.e., effect size) of a dichotomized predictor,
-# based on repeated given training-test sample splits.
-#' Specifically,
-#' 
-#' \enumerate{
-#' \item {collect the univariable regression coefficient estimate from each [splitd] model;}
-#' \item {find the nearest-even (i.e., `type = 3`) \link[stats]{quantile} of the coefficients from Step 1;}
-#' \item {the [splitd] models corresponding to the selected coefficient quantile(s) in Step 2, is returned.}
-#' }
-#' 
-#' @returns
-#' Function [quantile.splitd.list] returns a `'splitd.list'` object.
-#' 
-#' @keywords internal
-#' @importFrom stats quantile
-#' @method quantile splitd.list
-#' @export quantile.splitd.list
-#' @export
-quantile.splitd.list <- function(x, probs, ...) {
-  effsize <- vapply(x, FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
-  q_ <- quantile(effsize, probs = probs, type = 3L, na.rm = TRUE)
-  return(x[match(q_, table = effsize)])
-}
 
 
 
@@ -155,29 +87,31 @@ quantile.splitd.list <- function(x, probs, ...) {
 #' @description
 #' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 #' 
-#' @param object an [splitd] object
+#' @param object an [node1] object, as an element of the \link[stats]{listof} return from functions [add_dummy()] or [add_dummy_stratifiedPartition()]
 #' 
 #' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns
-#' Function [predict.splitd] returns a regression model, 
-#' either a \link[survival]{coxph} model for \link[survival]{Surv} response, 
-#' a \link[stats]{glm} for \link[base]{logical} response, 
-#' or a \link[stats]{lm} model for \link[base]{numeric} response.
+#' Function [predict.node1()] returns a updated regression model.
 #' 
 #' @keywords internal
 #' @importFrom stats predict update
-#' @export predict.splitd
+#' @export predict.node1
 #' @export
-predict.splitd <- function(object, newdata, ...) {
+predict.node1 <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
-  x_ <- attr(object, which = 'x', exact = TRUE)
-  newdata$x. <- object(newx = eval(x_, envir = newdata))
   
-  m_ <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(m_, data = newdata))
+  newdata$x. <- object |>
+    attr(which = 'x', exact = TRUE) |> # a 'langugage'!
+    eval(envir = newdata) |> 
+    object() # dichotomize!
+  
+  object |>
+    attr(which = 'model', exact = TRUE) |> 
+    update(data = newdata) |> 
+    suppressWarnings()
   
 }

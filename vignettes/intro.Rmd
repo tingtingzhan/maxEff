@@ -18,7 +18,8 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 # Introduction
 
-This vignette ...
+This vignette documents three methods of selecting one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size.   The three methods are implemented in functions `add_num()`, `add_dummy()` and `add_dummy_stratifiedPartition()`.
+
 
 ## Note to Users
 
@@ -49,10 +50,11 @@ c(
   '', 'Logistic regression model', '`stats::glm(., family = binomial(\'logit\'))`',
   '`matrix`', 'Matrix', '`base::matrix`',
   '`PFS`', 'Progression/recurrence free survival', 'https://en.wikipedia.org/wiki/Progression-free_survival',
-  '`predict`', 'Model prediction', 'Generic `stats::predict`. Dispatches `maxEff::predict.add_num`; `maxEff::predict.add_dummy_rSplit`',
+  '`predict`', 'Model prediction', 'Generic `stats::predict`. Dispatches `maxEff::predict.add_num`; `maxEff::predict.add_dummy`',
   '`rpart`', 'Recursive partitioning and regression trees', '`rpart::rpart`',
   '`S3`', '`R`\'s simplest object oriented system', 'https://adv-r.hadley.nz/s3.html',
   '`sort_by`', 'Sort an object by some criterion', 'Generic `base::sort_by`. Dispatch `maxEff::sort_by.add_`',
+  '`stratifiedPartition`', 'Stratified partition', '`maxEff::stratifiedPartition`', 
   '`subset`', 'Subsets of object by conditions', 'Generic `base::subset`. Dispatch `maxEff::subset.add_dummy`',
   '`Surv`', 'Survival object', '`survival::Surv`',
   '`update`', 'Update and re-fit a model call', 'Generic `stats::update`'
@@ -170,13 +172,13 @@ Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the
 summary(m <- coxph(PFS ~ Tstage, data = s0))
 ```
 
-# Additional `numeric` Predictors with Maximum Effect Size
+# Additional `numeric` Predictor with Maximum Effect Size
 
 Function `add_num()` treats each additional predictor as a `numeric` variable, and `update`s the starting model with each additional predictor.  Function `add_num()` returns an `'add_num'` object, which is a `listof` objects with an internal class `'add_num_'`.
 
-The `S3` generic `sort_by()` sorts the `'add_num'` object by the `abs`olute value of regression coefficient (i.e., effect size). 
+The `S3` generic `sort_by()` sorts the `'add_num'` object by the `abs`olute value of the regression coefficient (i.e., effect size) of the additioanal `numeric` predictor.
 
-The `S3` generic `head()` chooses the first `n` element from the `'add_num'` object returned from the previous step.
+The `S3` generic `head()` chooses the top `n` element from the object returned from the previous step.
 
 ```{r}
 set.seed(14837); m1 = m |>
@@ -189,26 +191,26 @@ m1
 The S3 generic `predict()` uses model `m1` on the test set `s1`.
 
 ```{r}
-predict(m1, newdata = s1)
+m1[1L] |> predict(newdata = s1)
 ```
 
 
-# Additional `logical` Predictors with Maximum Effect Size
+# Additional `logical` Predictor with Maximum Effect Size
 
-## Naive Practice: `add_dummy()`
+## `add_dummy()`: Naive Practice
 
-Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable using function `node1()`, and `update`s the starting model with each `logical` additional predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` objects with class `'node1'`.
+Function `add_dummy()` partitions each additional `numeric` predictor into a `logical` variable using function `node1()`, and `update`s the starting model by adding in each of the dichotomized `logical` predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` `node1` objects.
 
 The `S3` generic `subset()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor. 
 
-The `S3` generic `sort_by()` sorts the `'add_dummy'` object by the `abs`olute value of regression coefficient (i.e., effect size).
+The `S3` generic `sort_by()` sorts the `'add_dummy'` object by the `abs`olute value of regression coefficient (i.e., effect size) of the additional `logical` predictor.
 
-The `S3` generic `head()` chooses the first `n` element from the `'add_dummy'` object returned from the previous step.
+The `S3` generic `head()` chooses the top `n` element from the object returned from the previous step.
 
 
 ```{r}
 set.seed(14837); m2 = m |>
-  add_dummy(x = ~ Ki67.quantile) |> 
+  add_dummy(x = ~ Ki67.quantile, mc.cores = 1L) |>
   subset(subset = p1 > .05 & p1 < .95) |> 
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
@@ -218,17 +220,23 @@ m2
 The S3 generic `predict()` uses model `m2` on the test set `s1`.
 
 ```{r}
-# predict(m2, newdata = s1) # author too lazy; not done yet
+m2[1L] |> predict(newdata = s1)
 ```
 
 
-## `add_dummy_rSplit()`
+## `add_dummy_stratifiedPartition()`: via Repeated Stratified Partitions
 
-Function `add_dummy_rSplit()`
+Function `add_dummy_stratifiedPartition()` partitions each additional `numeric` predictor into a `logical` variable in the following steps.
+
+1. Generate multiple, i.e., repeated, `stratifiedPartition`s.
+2. For each `stratifiedPartition`, create a dichotomizing rule (via function `node1()`) on the training set. Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size) of the additional `logical` predictor.
+3. Among all `stratifiedPartition`s, select the one with median effect size of the additional `logical` predictor.
+
+Function `add_dummy_stratifiedPartition()` also returns an `'add_dummy'` object.
 
 ```{r}
 set.seed(14837); m3 = m |> 
-  add_dummy_rSplit(~ Ki67.quantile, times = 20L) |>
+  add_dummy_stratifiedPartition(~ Ki67.quantile, times = 20L, mc.cores = 1L) |>
   subset(subset = p1 > .15 & p1 < .85) |>
   sort_by(y = abs(effsize), decreasing = TRUE) |>
   head(n = 2L)
@@ -237,5 +245,5 @@ m3
 
 
 ```{r}
-predict(m3, newdata = s1)
+m3[1L] |> predict(newdata = s1)
 ```

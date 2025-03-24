@@ -24,7 +24,6 @@ with additional attributes
 \describe{
 \item{\code{attr(,'p1')}}{\link[base]{double} scalar, \eqn{p_1 = \text{Pr}(\mathcal{D}(x_1)=1)}}
 \item{\code{attr(,'effsize')}}{\link[base]{double} scalar, univariable regression coefficient estimate of \eqn{y_1\sim\mathcal{D}(x_1)}}
-\item{\code{attr(,'formula')}}{(optional), for function \link{predict.splitd}}
 }
 }
 \description{

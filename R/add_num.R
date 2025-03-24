@@ -24,7 +24,7 @@
 #' Function [add_num()] ..
 #' 
 #' @examples 
-#' # see vignette('intro')
+#' # vignette('intro', package = 'maxEff')
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula update
 #' @export
@@ -73,13 +73,13 @@ add_num <- function(
 #' 
 #' @param object an [add_num] object
 #' 
-#' @param ... additional parameters of function `predict.add_num`, e.g., `newdata`
+#' @param ... additional parameters of function `predict.add_num_`, e.g., `newdata`
 #' 
 #' @returns
-#' Function [predict.add_num()] returns a \link[base]{list} of regression models, \link[survival]{coxph} model for \link[survival]{Surv} response, \link[stats]{glm} for \link[base]{logical} response, and \link[stats]{lm} model for \link[base]{numeric} response.
+#' Function [predict.add_num()] returns a \link[stats]{listof} regression models.
 #' 
 #' @examples
-#' # see ?`Qindex-package`
+#' # # vignette('intro', package = 'maxEff')
 #' @importFrom stats predict
 #' @export predict.add_num
 #' @export

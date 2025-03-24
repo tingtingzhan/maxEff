@@ -14,11 +14,14 @@
 
 
 
-#' @title print.add_
+#' @title S3 Method Dispatches to `'add_'` Class
 #' 
-#' @param x an [add_dummy_rSplit], [add_dummy] or [add_num] object
+#' @param x an object returned from functions 
+#' [add_dummy_stratifiedPartition()], [add_dummy()] or [add_num()]
 #' 
-#' @param ... additional parameters, currently not in use
+#' @param y \link[base]{language}, see function \link[base]{sort_by}
+#' 
+#' @param ... additional parameters of S3 generic \link[base]{sort_by}, etc.
 #' 
 #' @details
 #' ..
@@ -26,6 +29,7 @@
 #' @returns
 #' Function [print.add_] does not have a returned value
 #' 
+#' @name S3_add_
 #' @keywords internal
 #' @export print.add_
 #' @export
@@ -36,24 +40,14 @@ print.add_ <- function(x, ...) {
 
 
 
-#' @title [sort_by.add_]
-#' 
-#' @description
-#' ..
-#' 
-#' @param x an [add_dummy_rSplit] or [add_num] object
-#' 
-#' @param y \link[base]{language}
-#' 
-#' @param ... additional parameters, currently not in use
+#' @rdname S3_add_
 #' 
 #' @details
-#' Sort the elements of an [add_dummy_rSplit] or [add_num] object by a certain criterion `y`.
-#' 
-#' We suggest using `y = abc(effsize)`, indicating a `decreasing` order of the \link[base]{abs}olute values of the regression coefficient estimate of the median-split-dichotomized regression models.  
+#' Function [sort_by.add_()] sorts the elements of an `'add_'` object by a certain criterion `y`.
+#' We suggest using `y = abc(effsize)` and `decreasing = TRUE` order of the \link[base]{abs}olute values of the effect sizes of additional predictor.  
 #'
 #' @returns 
-#' Function [sort_by.add_()] returns an [add_dummy_rSplit] or [add_num] object.
+#' Function [sort_by.add_()] returns an object of the same \link[base]{class} as input `x`.
 #' 
 #' @keywords internal
 #' @export sort_by.add_

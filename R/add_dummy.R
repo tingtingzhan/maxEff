@@ -27,28 +27,28 @@
 #' 
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
-#' @param times,... additional parameters of function [stratifiedPartition()] for function [add_dummy_rSplit].
+#' @param times,... additional parameters of function [stratifiedPartition()] for function [add_dummy_stratifiedPartition].
 #' For function [add_dummy()], these parameters are not in use
 #' 
 #' @details 
 #' 
-#' Function [add_dummy_rSplit()] dichotomizes predictors via repeated sample splits. Specifically, 
+#' Function [add_dummy_stratifiedPartition()] dichotomizes predictors via repeated sample splits. Specifically, 
 #' 
 #' \enumerate{
 #' \item Generate multiple, i.e., repeated, training-test sample splits (via [stratifiedPartition()])
-#' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd_] and [quantile.splitd.list];
+#' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd()];
 #' }
 #' 
 #' @returns 
-#' Function [add_dummy_rSplit()] returns an object of \link[base]{class} `'add_dummy_rSplit'`, which is a \link[base]{list} of dichotomizing \link[base]{function}s.
+#' Function [add_dummy_stratifiedPartition()] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[stats]{listof} [node1] objects.
 #' 
 #' @examples 
-#' # see vignette('intro')
+#' # vignette('intro', package = 'maxEff')
 #' @name add_dummy
 #' @importFrom parallel mclapply detectCores
-#' @importFrom stats formula
+#' @importFrom stats formula quantile
 #' @export
-add_dummy_rSplit <- function(
+add_dummy_stratifiedPartition <- function(
     start.model, 
     x,
     data = eval(start.model$call$data),
@@ -64,20 +64,23 @@ add_dummy_rSplit <- function(
   
   ids <- stratifiedPartition(y = y, times = times, ...) # using same split for all predictors
   
-  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) { 
-  #out <- lapply(x_, FUN = function(x.) { # to debug
+  out <- mclapply(x_, FUN = function(x.) { 
     # (x. = x_[[1L]])
-    tmp <- splitd_(start.model = start.model, x_ = x., data = data, ids = ids)
-    quantile.splitd.list(tmp, probs = .5)[[1L]]
-  })
+    tmp_ <- ids |>
+      lapply(FUN = splitd, start.model = start.model, x_ = x., data = data)
+    tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
+    
+    effsize <- tmp |> 
+      vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
+    id <- tmp |> 
+      seq_along() |> 
+      quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
+    return(tmp[[order(effsize)[id]]])  
+  }, mc.cores = mc.cores)
 
-  # just to beautify
-  arg. <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
-  #txt. <- vapply(out, FUN = attr, which = 'text', exact = TRUE, FUN.VALUE = '')
-  txt. <- vapply(out, FUN = labels.node1, FUN.VALUE = '')
-  names(out) <- paste0(arg., txt.)
+  names(out) <- paste0(names(out), vapply(out, FUN = labels.node1, FUN.VALUE = ''))
   
-  class(out) <- c('add_dummy_rSplit', 'add_dummy', 'add_', class(out))
+  class(out) <- c('add_dummy', 'add_', class(out))
   return(invisible(out))
   
 }
@@ -86,28 +89,16 @@ add_dummy_rSplit <- function(
 
 
 
-# think carefully!
-# how is this [add_dummy] different from \link[maxEff]{add_dummy_rSplit}
-# this [add_dummy] should be moved to \pkg{maxEff} and be named [add_dummy] !!!!
-# it's actually easier to copy code from ?maxEff::add_num
 
 #' @rdname add_dummy
-#' @details
-#' 
-#' First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on 
-#' response \eqn{y} (via \link[maxEff]{node1}).
-#' 
-#' Then, \link[stats]{update} previous multivariable regression `start.model` 
-#' with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
-#' 
+# @details
+# First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on response \eqn{y} (via \link[maxEff]{node1}).
+# Then, \link[stats]{update} previous multivariable regression `start.model` with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
 #' @returns
-#' Function [add_dummy()] returns an object of class `'add_dummy'`.
-# \item{`attr(,'rule')`}{returned value from function \link[maxEff]{rpartD_}, 
-# dichotomizing rules for the \eqn{k} predictors}
-#' 
+#' Function [add_dummy()] returns an object of class `'add_dummy'`, 
+#' which is a \link[stats]{listof} [node1] objects.
 #' @importFrom rpart rpart
-#' @importFrom stats terms update model.frame.default na.pass
-#' @importFrom utils tail
+#' @importFrom stats update
 #' @export
 add_dummy <- function(
     start.model, 
@@ -120,28 +111,26 @@ add_dummy <- function(
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
   data <- tmp$data
-  x_ <- tmp$x_
   
-  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
-    # (x. = x_[[1L]])
-    xval <- eval(x., envir = data)
-    rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1()
-    data$x. <- rule(xval)
-    m_ <- update(start.model, formula. = . ~ . + x., data = data)
-    cf_ <- m_$coefficients[length(m_$coefficients)]
-    attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
-    attr(rule, which = 'x') <- x.
-    attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-    attr(rule, which = 'model') <- m_ # needed for [predict.*]
-    #class(rule) <- c('add_dummy', class(rule)) # not sure yet
-    return(rule)
-  })
+  out <- tmp$x_ |> 
+    mclapply(FUN = function(x) {
+      # (x = tmp$x_[[1L]])
+      xval <- eval(x, envir = data)
+      rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1() # partition rule based on complete data
+      data$x. <- rule(xval) # partition rule applied to complete data
+      suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data))
+      cf_ <- m_$coefficients[length(m_$coefficients)]
+      attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
+      attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+      attr(rule, which = 'x') <- x # do I really need?
+      attr(rule, which = 'model') <- m_ # only model formula needed for [predict.node1]!!!
+      return(rule)
+    }, mc.cores = mc.cores)
   
-  # just to beautify!!
-  names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
+  names(out) <- paste0(names(out), vapply(out, FUN = labels.node1, FUN.VALUE = ''))
   
-  class(out) <- c('add_dummy', 'add_', class(out))
-  return(invisible(out))
+  class(out) <- c('add_dummy', 'add_', 'listof')
+  return(out)
 
 }
 
@@ -175,9 +164,13 @@ add_dummy <- function(
   if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
   if (!is.matrix(X <- eval(x., envir = data)) || !is.numeric(X)) stop('predictors must be stored in a `numeric` `matrix`')
   #if (anyNA(X)) # okay!
-  x_ <- lapply(colnames(X), FUN = function(i) {
-    call(name = '[', x., alist(i =)[[1L]], i)
-  })
+  
+  x_ <- X |> 
+    colnames() |> 
+    lapply(FUN = function(i) {
+      call(name = '[', x., alist(i =)[[1L]], i)
+    })
+  names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   
   return(list(
     y = y,
@@ -192,20 +185,25 @@ add_dummy <- function(
 
 
 
-#' @title subset.add_dummy
+#' @title S3 Method Dispatches to `'add_dummy'` Class
 #' 
-#' @param x a [add_dummy_rSplit] and/or [add_dummy] object
+#' @param x,object an object returned from functions [add_dummy_stratifiedPartition()] or [add_dummy()]
 #' 
 #' @param subset \link[base]{language}
 #' 
+#' @param ... additional parameters of function [predict.node1()], e.g., `newdata`
+#' 
 #' @details
-#' Default `(p1>.15 & p1<.85)`.
+#' Function [subset.add_dummy()], default subset `(p1>.15 & p1<.85)`.
 #' See explanation of \eqn{p_1} in function [splitd()].
 #' 
 #' @returns
 #' Function [subset.add_dummy()] returns a [add_dummy()] object.
 #' 
+#' @examples
+#' # vignette('intro', package = 'maxEff')
 #' @keywords internal
+#' @name S3_add_dummy
 #' @export subset.add_dummy
 #' @export
 subset.add_dummy <- function(x, subset, ...) {
@@ -218,32 +216,18 @@ subset.add_dummy <- function(x, subset, ...) {
 
 
 
-
-
-
-#' @title Regression Models with Optimal Dichotomizing Predictors
-#' 
-#' @description
-#' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
-#' 
-#' @param object an [add_dummy_rSplit] object
-#' 
-#' @param ... additional parameters of function [predict.splitd], e.g., `newdata`
+#' @rdname S3_add_dummy
 #' 
 #' @returns
-#' Function [predict.add_dummy_rSplit()] returns a \link[base]{list} of regression models.
+#' Function [predict.add_dummy()] returns a \link[stats]{listof} regression models.
 #' 
-#' @examples
-#' # see ?add_dummy_rSplit
 #' @importFrom stats predict
-#' @export predict.add_dummy_rSplit
-#' @export
-predict.add_dummy_rSplit <- function(object, ...) {
-  return(lapply(object, FUN = predict.splitd, ...))
-}
-
-
+#' @export predict.add_dummy
 #' @export
 predict.add_dummy <- function(object, ...) {
-  stop('will do in future; should be easy')
+  ret <- object |> lapply(FUN = predict.node1, ...)
+  class(ret) <- 'listof'
+  return(ret)
 }
+
+

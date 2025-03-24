@@ -34,5 +34,5 @@ add_num
 Function \code{\link[=add_num]{add_num()}} ..
 }
 \examples{
-# see vignette('intro')
+# vignette('intro', package = 'maxEff')
 }
