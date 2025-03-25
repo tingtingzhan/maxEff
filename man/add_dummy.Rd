@@ -3,7 +3,7 @@
 \name{add_dummy}
 \alias{add_dummy}
 \alias{add_dummy_partition}
-\title{Dichotomizing Predictors via Repeated Sample Splits}
+\title{Additional Predictor as \link[base]{logical}}
 \usage{
 add_dummy_partition(
   start.model,
@@ -43,16 +43,23 @@ Function \code{\link[=add_dummy]{add_dummy()}} returns an object of class \code{
 which is a \link[stats]{listof} \link{node1} objects.
 }
 \description{
-Dichotomizing predictors using repeated sample splits.
+Additional predictor as \link[base]{logical}.
 }
 \details{
-Function \code{\link[=add_dummy_partition]{add_dummy_partition()}} dichotomizes predictors via repeated sample splits. Specifically,
-
+Function \code{\link[=add_dummy_partition]{add_dummy_partition()}} partitions each additional \link[base]{numeric} predictor
+into a \link[base]{logical} variable in the following steps.
 \enumerate{
-\item Generate multiple, i.e., repeated, training-test sample splits (via \code{\link[=statusPartition]{statusPartition()}})
-\item For each candidate predictor \eqn{x_i}, find the \emph{\strong{median-split-dichotomized regression model}} based on the repeated sample splits, see functions \code{\link[=splitd]{splitd()}};
+\item {Generate multiple, i.e., repeated, partitions via functions \link[caret]{createDataPartition} or \code{\link[=statusPartition]{statusPartition()}}.}
+\item {For each partition, create a dichotomizing rule (via function \code{node1()}) on the training set.
+Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size)
+of the additional \link[base]{logical} predictor.}
+\item {Among all partitions, select the one with median effect size of the additional \link[base]{logical} predictor.}
 }
+
+Function \code{\link[=add_dummy]{add_dummy()}} partitions each additional
+\link[base]{numeric} predictor into a \link[base]{logical} variable
+using function \code{\link[=node1]{node1()}},
+then \link[stats]{update}s the starting model by adding in each of the dichotomized
+\link[base]{logical} predictor.
 }
-\examples{
-# vignette('intro', package = 'maxEff')
-}
+\keyword{internal}

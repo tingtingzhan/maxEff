@@ -18,7 +18,7 @@ Default \code{TRUE} to produce a \link[base]{warning} message for degeneracy.}
 }
 \value{
 Function \code{\link[=node1]{node1()}} returns an object of class \code{'node1'},
-which is essentially a \link[base]{function},
+which is a \link[base]{function}
 with one parameter \code{newx} taking a \link[base]{double} \link[base]{vector}.
 }
 \description{

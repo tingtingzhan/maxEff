@@ -17,6 +17,4 @@ Function \code{\link[=predict.add_num]{predict.add_num()}} returns a \link[stats
 \description{
 Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 }
-\examples{
-# # vignette('intro', package = 'maxEff')
-}
+\keyword{internal}

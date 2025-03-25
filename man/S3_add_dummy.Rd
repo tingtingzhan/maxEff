@@ -29,7 +29,4 @@ S3 Method Dispatches to \code{'add_dummy'} Class
 Function \code{\link[=subset.add_dummy]{subset.add_dummy()}}, default subset \code{(p1>.15 & p1<.85)}.
 See explanation of \eqn{p_1} in function \code{\link[=splitd]{splitd()}}.
 }
-\examples{
-# vignette('intro', package = 'maxEff')
-}
 \keyword{internal}

@@ -34,7 +34,4 @@ See \code{vignette('intro', package = 'maxEff')}.
 \note{
 Function \code{caTools::sample.split} is not what we need.
 }
-\examples{
-# vignette('intro', package = 'maxEff')
-}
 \keyword{internal}

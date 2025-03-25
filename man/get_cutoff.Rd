@@ -18,3 +18,4 @@ Function \code{\link[=get_cutoff.node1]{get_cutoff.node1()}} returns a \link[bas
 \description{
 To get the cutoff value from a Dichotomizing Rule \code{\link[=node1]{node1()}}.
 }
+\keyword{internal}

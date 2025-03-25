@@ -12,10 +12,10 @@
 
 
 
-#' @title Dichotomizing Predictors via Repeated Sample Splits
+#' @title Additional Predictor as \link[base]{logical}
 #' 
 #' @description
-#' Dichotomizing predictors using repeated sample splits.
+#' Additional predictor as \link[base]{logical}.
 #' 
 #' @param start.model a regression model, e.g., 
 #' \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.
@@ -30,20 +30,22 @@
 #' @param times,... additional parameters of function [statusPartition()] for function [add_dummy_partition].
 #' For function [add_dummy()], these parameters are not in use
 #' 
-#' @details 
-#' 
-#' Function [add_dummy_partition()] dichotomizes predictors via repeated sample splits. Specifically, 
-#' 
+#' @details
+#' Function [add_dummy_partition()] partitions each additional \link[base]{numeric} predictor 
+#' into a \link[base]{logical} variable in the following steps.
 #' \enumerate{
-#' \item Generate multiple, i.e., repeated, training-test sample splits (via [statusPartition()])
-#' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd()];
+#' \item {Generate multiple, i.e., repeated, partitions via functions \link[caret]{createDataPartition} or [statusPartition()].}
+#' \item {For each partition, create a dichotomizing rule (via function `node1()`) on the training set. 
+#' Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size) 
+#' of the additional \link[base]{logical} predictor.}
+#' \item {Among all partitions, select the one with median effect size of the additional \link[base]{logical} predictor.}
 #' }
+#' 
 #' 
 #' @returns 
 #' Function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[stats]{listof} [node1] objects.
 #' 
-#' @examples 
-#' # vignette('intro', package = 'maxEff')
+#' @keywords internal
 #' @name add_dummy
 #' @importFrom caret createDataPartition
 #' @importFrom parallel mclapply detectCores
@@ -95,9 +97,14 @@ add_dummy_partition <- function(
 
 
 #' @rdname add_dummy
-# @details
-# First, obtain the dichotomizing rules \eqn{\mathbf{\mathcal{D}}} of predictors \eqn{x_1,\cdots,x_k} based on response \eqn{y} (via \link[maxEff]{node1}).
-# Then, \link[stats]{update} previous multivariable regression `start.model` with dichotomized predictors \eqn{\left(\tilde{x}_1,\cdots,\tilde{x}_k\right) = \mathcal{D}\left(x_1,\cdots,x_k\right)}. 
+#' 
+#' @details 
+#' Function [add_dummy()] partitions each additional 
+#' \link[base]{numeric} predictor into a \link[base]{logical} variable 
+#' using function [node1()], 
+#' then \link[stats]{update}s the starting model by adding in each of the dichotomized 
+#' \link[base]{logical} predictor. 
+#' 
 #' @returns
 #' Function [add_dummy()] returns an object of class `'add_dummy'`, 
 #' which is a \link[stats]{listof} [node1] objects.
@@ -208,8 +215,6 @@ add_dummy <- function(
 #' @returns
 #' Function [subset.add_dummy()] returns a [add_dummy()] object.
 #' 
-#' @examples
-#' # vignette('intro', package = 'maxEff')
 #' @keywords internal
 #' @name S3_add_dummy
 #' @export subset.add_dummy

@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_num.R
 \name{add_num}
 \alias{add_num}
-\title{add_num}
+\title{Additional Predictor as \link[base]{numeric}}
 \usage{
 add_num(
   start.model,
@@ -25,14 +25,14 @@ the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{
 \item{...}{additional parameters, currently of no use}
 }
 \value{
-Function \code{\link[=add_num]{add_num()}} ..
+Function \code{\link[=add_num]{add_num()}} returns an \link{add_num} object,
+which is a \link[stats]{listof} objects with an internal class \code{'add_num_'}.
 }
 \description{
-add_num
+Additional predictor as \link[base]{numeric}.
 }
 \details{
-Function \code{\link[=add_num]{add_num()}} ..
+Function \code{\link[=add_num]{add_num()}} treats each additional predictor as a \link[base]{numeric} variable,
+and \link[stats]{update}s the starting model with each additional predictor.
 }
-\examples{
-# vignette('intro', package = 'maxEff')
-}
+\keyword{internal}

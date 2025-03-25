@@ -57,7 +57,7 @@
 #' @returns 
 #' 
 #' Function [node1()] returns an object of class `'node1'`, 
-#' which is essentially a \link[base]{function}, 
+#' which is a \link[base]{function}
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
 #' 
 #' @note
@@ -144,6 +144,7 @@ print.node1 <- function(x, ...) {
 #' 
 #' @param x see Usage
 #' 
+#' @keywords internal
 #' @name get_cutoff
 #' @export
 get_cutoff <- function(x) UseMethod(generic = 'get_cutoff')

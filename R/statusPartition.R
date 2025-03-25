@@ -32,8 +32,6 @@
 #' @note
 #' Function `caTools::sample.split` is not what we need.
 #' 
-#' @examples
-#' # vignette('intro', package = 'maxEff')
 #' @keywords internal
 #' @export 
 statusPartition <- function(y, times, p = .8, ...) {

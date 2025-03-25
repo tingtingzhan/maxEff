@@ -55,7 +55,7 @@ c(
   '`rpart`', 'Recursive partitioning and regression trees', '`rpart::rpart`',
   '`S3`', '`R`\'s simplest object oriented system', 'https://adv-r.hadley.nz/s3.html',
   '`sort_by`', 'Sort an object by some criterion', 'Generic `base::sort_by`. Dispatch `maxEff::sort_by.add_`',
-  '`statusPartition`', 'Stratified partition by survival status', '`maxEff::statusPartition`, `caret::createDataPartition`', 
+  '`partition`', 'Stratified partition', '`maxEff::statusPartition`, `caret::createDataPartition`', 
   '`subset`', 'Subsets of object by conditions', 'Generic `base::subset`. Dispatch `maxEff::subset.add_dummy`',
   '`Surv`', 'Survival object', '`survival::Surv`',
   '`update`', 'Update and re-fit a model call', 'Generic `stats::update`'
@@ -211,9 +211,9 @@ m2[1L] |> predict(newdata = s1)
 
 Function `add_dummy_partition()` partitions each additional `numeric` predictor into a `logical` variable in the following steps.
 
-1. Generate multiple, i.e., repeated, `statusPartition`s.
-2. For each `statusPartition`, create a dichotomizing rule (via function `node1()`) on the training set. Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size) of the additional `logical` predictor.
-3. Among all `statusPartition`s, select the one with median effect size of the additional `logical` predictor.
+1. Generate multiple, i.e., repeated, partitions.
+2. For each partition, create a dichotomizing rule (via function `node1()`) on the training set. Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size) of the additional `logical` predictor.
+3. Among all partitions, select the one with median effect size of the additional `logical` predictor.
 
 Function `add_dummy_partition()` also returns an `'add_dummy'` object.
 

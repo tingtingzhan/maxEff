@@ -1,9 +1,9 @@
 
 
-#' @title add_num
+#' @title Additional Predictor as \link[base]{numeric}
 #' 
 #' @description
-#' add_num
+#' Additional predictor as \link[base]{numeric}.
 #' 
 #' @param start.model a regression model (e.g., \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.)
 #' 
@@ -17,14 +17,14 @@
 #' @param ... additional parameters, currently of no use
 #' 
 #' @details 
-#' 
-#' Function [add_num()] ..
+#' Function [add_num()] treats each additional predictor as a \link[base]{numeric} variable, 
+#' and \link[stats]{update}s the starting model with each additional predictor.  
 #' 
 #' @returns 
-#' Function [add_num()] ..
+#' Function [add_num()] returns an [add_num] object, 
+#' which is a \link[stats]{listof} objects with an internal class `'add_num_'`.
 #' 
-#' @examples 
-#' # vignette('intro', package = 'maxEff')
+#' @keywords internal
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula update
 #' @export
@@ -78,13 +78,14 @@ add_num <- function(
 #' @returns
 #' Function [predict.add_num()] returns a \link[stats]{listof} regression models.
 #' 
-#' @examples
-#' # # vignette('intro', package = 'maxEff')
+#' @keywords internal
 #' @importFrom stats predict
 #' @export predict.add_num
 #' @export
 predict.add_num <- function(object, ...) {
-  return(lapply(object, FUN = predict.add_num_, ...))
+  ret <- object |> lapply(FUN = predict.add_num_, ...)
+  class(ret) <- 'listof'
+  return(ret)
 }
 
 
