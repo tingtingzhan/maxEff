@@ -27,28 +27,29 @@
 #' 
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
-#' @param times,... additional parameters of function [stratifiedPartition()] for function [add_dummy_stratifiedPartition].
+#' @param times,... additional parameters of function [statusPartition()] for function [add_dummy_partition].
 #' For function [add_dummy()], these parameters are not in use
 #' 
 #' @details 
 #' 
-#' Function [add_dummy_stratifiedPartition()] dichotomizes predictors via repeated sample splits. Specifically, 
+#' Function [add_dummy_partition()] dichotomizes predictors via repeated sample splits. Specifically, 
 #' 
 #' \enumerate{
-#' \item Generate multiple, i.e., repeated, training-test sample splits (via [stratifiedPartition()])
+#' \item Generate multiple, i.e., repeated, training-test sample splits (via [statusPartition()])
 #' \item For each candidate predictor \eqn{x_i}, find the ***median-split-dichotomized regression model*** based on the repeated sample splits, see functions [splitd()];
 #' }
 #' 
 #' @returns 
-#' Function [add_dummy_stratifiedPartition()] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[stats]{listof} [node1] objects.
+#' Function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[stats]{listof} [node1] objects.
 #' 
 #' @examples 
 #' # vignette('intro', package = 'maxEff')
 #' @name add_dummy
+#' @importFrom caret createDataPartition
 #' @importFrom parallel mclapply detectCores
 #' @importFrom stats formula quantile
 #' @export
-add_dummy_stratifiedPartition <- function(
+add_dummy_partition <- function(
     start.model, 
     x,
     data = eval(start.model$call$data),
@@ -62,7 +63,10 @@ add_dummy_stratifiedPartition <- function(
   data <- tmp$data
   x_ <- tmp$x_
   
-  ids <- stratifiedPartition(y = y, times = times, ...) # using same split for all predictors
+  ids <- if (inherits(y, what = 'Surv')) {
+    statusPartition(y = y, times = times, ...)
+  } else createDataPartition(y = y, times = times, groups = 2L, ...)
+  # using same split for all predictors
   
   out <- mclapply(x_, FUN = function(x.) { 
     # (x. = x_[[1L]])
@@ -149,6 +153,10 @@ add_dummy <- function(
   
   y <- start.model$y
   if (!length(y)) stop('`start.model` response?')
+  if (all(y %in% c(0, 1), na.rm = TRUE)) y <- as.logical(y)
+  # packageDate('caret') # 2024-12-09
+  # ?caret::createDataPartition **not** good with 'numeric' 0/1 response `y`
+  # tzh will write to author again (after he responds with [statusPartition()])
   
   force(data)
   if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
@@ -187,7 +195,7 @@ add_dummy <- function(
 
 #' @title S3 Method Dispatches to `'add_dummy'` Class
 #' 
-#' @param x,object an object returned from functions [add_dummy_stratifiedPartition()] or [add_dummy()]
+#' @param x,object an object returned from functions [add_dummy_partition()] or [add_dummy()]
 #' 
 #' @param subset \link[base]{language}
 #' 

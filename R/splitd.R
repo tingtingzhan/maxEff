@@ -87,7 +87,7 @@ splitd <- function(start.model, x_, data, id, ...) {
 #' @description
 #' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
 #' 
-#' @param object an [node1] object, as an element of the \link[stats]{listof} return from functions [add_dummy()] or [add_dummy_stratifiedPartition()]
+#' @param object an [node1] object, as an element of the \link[stats]{listof} return from functions [add_dummy()] or [add_dummy_partition()]
 #' 
 #' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
 #' 

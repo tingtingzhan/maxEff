@@ -17,7 +17,7 @@
 #' @title S3 Method Dispatches to `'add_'` Class
 #' 
 #' @param x an object returned from functions 
-#' [add_dummy_stratifiedPartition()], [add_dummy()] or [add_num()]
+#' [add_dummy_partition()], [add_dummy()] or [add_num()]
 #' 
 #' @param y \link[base]{language}, see function \link[base]{sort_by}
 #' 

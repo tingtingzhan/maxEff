@@ -7,7 +7,7 @@
 \method{predict}{node1}(object, newdata, ...)
 }
 \arguments{
-\item{object}{an \link{node1} object, as an element of the \link[stats]{listof} return from functions \code{\link[=add_dummy]{add_dummy()}} or \code{\link[=add_dummy_stratifiedPartition]{add_dummy_stratifiedPartition()}}}
+\item{object}{an \link{node1} object, as an element of the \link[stats]{listof} return from functions \code{\link[=add_dummy]{add_dummy()}} or \code{\link[=add_dummy_partition]{add_dummy_partition()}}}
 
 \item{newdata}{\link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used}
 

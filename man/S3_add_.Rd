@@ -12,7 +12,7 @@
 }
 \arguments{
 \item{x}{an object returned from functions
-\code{\link[=add_dummy_stratifiedPartition]{add_dummy_stratifiedPartition()}}, \code{\link[=add_dummy]{add_dummy()}} or \code{\link[=add_num]{add_num()}}}
+\code{\link[=add_dummy_partition]{add_dummy_partition()}}, \code{\link[=add_dummy]{add_dummy()}} or \code{\link[=add_num]{add_num()}}}
 
 \item{...}{additional parameters of S3 generic \link[base]{sort_by}, etc.}
 

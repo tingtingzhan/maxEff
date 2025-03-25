@@ -11,7 +11,7 @@
 \method{predict}{add_dummy}(object, ...)
 }
 \arguments{
-\item{x, object}{an object returned from functions \code{\link[=add_dummy_stratifiedPartition]{add_dummy_stratifiedPartition()}} or \code{\link[=add_dummy]{add_dummy()}}}
+\item{x, object}{an object returned from functions \code{\link[=add_dummy_partition]{add_dummy_partition()}} or \code{\link[=add_dummy]{add_dummy()}}}
 
 \item{subset}{\link[base]{language}}
 

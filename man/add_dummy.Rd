@@ -2,10 +2,10 @@
 % Please edit documentation in R/add_dummy.R
 \name{add_dummy}
 \alias{add_dummy}
-\alias{add_dummy_stratifiedPartition}
+\alias{add_dummy_partition}
 \title{Dichotomizing Predictors via Repeated Sample Splits}
 \usage{
-add_dummy_stratifiedPartition(
+add_dummy_partition(
   start.model,
   x,
   data = eval(start.model$call$data),
@@ -31,13 +31,13 @@ add_dummy(
 
 \item{data}{(optional) \link[base]{data.frame} in the model \link[base]{call} of \code{start.model}}
 
-\item{times, ...}{additional parameters of function \code{\link[=stratifiedPartition]{stratifiedPartition()}} for function \link{add_dummy_stratifiedPartition}.
+\item{times, ...}{additional parameters of function \code{\link[=statusPartition]{statusPartition()}} for function \link{add_dummy_partition}.
 For function \code{\link[=add_dummy]{add_dummy()}}, these parameters are not in use}
 
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
 }
 \value{
-Function \code{\link[=add_dummy_stratifiedPartition]{add_dummy_stratifiedPartition()}} returns an object of \link[base]{class} \code{'add_dummy'}, which is a \link[stats]{listof} \link{node1} objects.
+Function \code{\link[=add_dummy_partition]{add_dummy_partition()}} returns an object of \link[base]{class} \code{'add_dummy'}, which is a \link[stats]{listof} \link{node1} objects.
 
 Function \code{\link[=add_dummy]{add_dummy()}} returns an object of class \code{'add_dummy'},
 which is a \link[stats]{listof} \link{node1} objects.
@@ -46,10 +46,10 @@ which is a \link[stats]{listof} \link{node1} objects.
 Dichotomizing predictors using repeated sample splits.
 }
 \details{
-Function \code{\link[=add_dummy_stratifiedPartition]{add_dummy_stratifiedPartition()}} dichotomizes predictors via repeated sample splits. Specifically,
+Function \code{\link[=add_dummy_partition]{add_dummy_partition()}} dichotomizes predictors via repeated sample splits. Specifically,
 
 \enumerate{
-\item Generate multiple, i.e., repeated, training-test sample splits (via \code{\link[=stratifiedPartition]{stratifiedPartition()}})
+\item Generate multiple, i.e., repeated, training-test sample splits (via \code{\link[=statusPartition]{statusPartition()}})
 \item For each candidate predictor \eqn{x_i}, find the \emph{\strong{median-split-dichotomized regression model}} based on the repeated sample splits, see functions \code{\link[=splitd]{splitd()}};
 }
 }
