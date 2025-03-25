@@ -43,7 +43,7 @@ c(
   '`coxph`', 'Cox model', '`survival::coxph`',
   '`factor`', 'Factor, or categorical variable', '`base::factor`',
   '`function`', 'R function', '``base::`function` ``',
-  '`groupedHyperframe`', 'Grouped hyper data frame', 'https://www.github.com/tingtingzhan/groupedHyperframe',
+  '`groupedHyperframe`', 'Grouped hyper data frame', ' https://CRAN.R-project.org/package=groupedHyperframe',
   '`head`', 'First parts of an object', 'Generic `utils::head`; Dispatch `utils:::head.default`',
   '`levels`', 'Levels of a `factor`', '`base::levels`',
   '`listof`', 'List of objects (of same class)', '`stats::listof`',
@@ -207,7 +207,7 @@ m2[1L] |> predict(newdata = s1)
 ```
 
 
-## `add_dummy_partition()`: via Repeated Stratified Partitions
+## `add_dummy_partition()`: via Repeated Partitions
 
 Function `add_dummy_partition()` partitions each additional `numeric` predictor into a `logical` variable in the following steps.
 
