@@ -125,7 +125,7 @@ s = Ki67 |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
-Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from the [**Introduction** vignette of package **`groupedHyperframe`**](https://cran.r-project.org/web/packages/groupedHyperframe/vignettes/intro.html).
+Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from the **Introduction** vignette of package [**`groupedHyperframe`**](https://CRAN.R-project.org/package=groupedHyperframe).
 
 Candidate of additional predictors are stored in a `matrix`-column.  Each additional predictor is a column of this `matrix`-column.
 
