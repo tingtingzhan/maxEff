@@ -8,8 +8,9 @@
 \description{
 Methods of selecting one from many numeric predictors for a regression model, to ensure that the additional predictor has the maximum effect size.
 }
-\details{
-Help files of individual functions are intentionally suppressed in the \code{pdf} manual.
+\note{
+Help files of individual functions are intentionally suppressed in this \code{pdf} manual.
+
 Users are encouraged to get started with
 
 \code{vignette('intro', package = 'maxEff')}
