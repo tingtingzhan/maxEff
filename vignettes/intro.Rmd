@@ -125,12 +125,7 @@ s = Ki67 |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
-Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from vignette of package **`groupedHyperframe`**.
-
-```{r eval = FALSE}
-devtools::install_github('tingtingzhan/groupedHyperframe', build_vignettes = TRUE)
-vignette('intro', package = 'groupedHyperframe')
-```
+Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from the [**Introduction** vignette of package **`groupedHyperframe`**](https://cran.r-project.org/web/packages/groupedHyperframe/vignettes/intro.html).
 
 Candidate of additional predictors are stored in a `matrix`-column.  Each additional predictor is a column of this `matrix`-column.
 
@@ -144,7 +139,7 @@ s$Ki67.quantile |> colnames() |> head()
 Partition into a training (80%) and test (20%) set.
 
 ```{r}
-set.seed(234); id = sort.int(sample.int(n = nrow(s), size = nrow(s)*.8))
+set.seed(234); id = sample.int(n = nrow(s), size = nrow(s)*.8) |> sort.int()
 s0 = s[id, , drop = FALSE] # training set
 s1 = s[-id, , drop = FALSE] # test set
 ```
