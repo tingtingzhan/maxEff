@@ -121,7 +121,7 @@ s = Ki67 |>
     Ki67 = log1p(Ki67)
     PFS = Surv(time = recfreesurv_mon, event = recurrence)
   }) |>
-  grouped_ppp(formula = Ki67 ~ PFS + node + Tstage | patientID/tissueID, coords = FALSE) |>
+  as.groupedHyperframe.data.frame(group = ~ patientID/tissueID) |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
