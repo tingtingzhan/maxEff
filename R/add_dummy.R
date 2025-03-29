@@ -60,9 +60,11 @@ add_dummy_partition <- function(
     ...
 ) {
   
+  hc <- unclass(data)$hypercolumns
+  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
-  data <- tmp$data
+  #data <- tmp$data # not here!
   x_ <- tmp$x_
   
   ids <- if (inherits(y, what = 'Surv')) {
@@ -119,6 +121,8 @@ add_dummy <- function(
     ...
 ) {
   
+  hc <- unclass(data)$hypercolumns
+  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
   data <- tmp$data
@@ -126,7 +130,7 @@ add_dummy <- function(
   out <- tmp$x_ |> 
     mclapply(FUN = function(x) {
       # (x = tmp$x_[[1L]])
-      xval <- eval(x, envir = data)
+      xval <- eval(x, envir = hc)
       rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1() # partition rule based on complete data
       data$x. <- rule(xval) # partition rule applied to complete data
       suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data))
@@ -152,48 +156,6 @@ add_dummy <- function(
 
 
 
-
-
-.prepare_add_ <- function(start.model, x, data, envir = parent.frame(), ...) {
-  
-  fom0 <- formula(start.model)
-  
-  y <- start.model$y
-  if (!length(y)) stop('`start.model` response?')
-  if (all(y %in% c(0, 1), na.rm = TRUE)) y <- as.logical(y)
-  # packageDate('caret') # 2024-12-09
-  # ?caret::createDataPartition **not** good with 'numeric' 0/1 response `y`
-  # tzh will write to author again (after he responds with [statusPartition()])
-  
-  force(data)
-  if (!is.data.frame(data)) stop('unavailable to retrieve `data` ?')
-  
-  # reduce `data` to match `start.model`
-  if (length(y) != .row_names_info(data, type = 2L)) {
-    start_na <- start.model$na.action
-    if (!length(start_na)) stop('`start.model` `na.action` not available?')
-    data <- data[-start_na, , drop = FALSE]
-  }
-
-  if (!is.language(x) || is.symbol(x) || x[[1L]] != '~' || length(x) != 2L) stop('`x` must be one-sided formula')
-  if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
-  if (!is.matrix(X <- eval(x., envir = data)) || !is.numeric(X)) stop('predictors must be stored in a `numeric` `matrix`')
-  #if (anyNA(X)) # okay!
-  
-  x_ <- X |> 
-    colnames() |> 
-    lapply(FUN = function(i) {
-      call(name = '[', x., alist(i =)[[1L]], i)
-    })
-  names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
-  
-  return(list(
-    y = y,
-    data = data,
-    x_ = x_
-  ))
-  
-}
 
 
 

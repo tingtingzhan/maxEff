@@ -36,6 +36,8 @@ add_num <- function(
     ...
 ) {
   
+  hc <- unclass(data)$hypercolumns
+  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
   data <- tmp$data
@@ -44,7 +46,7 @@ add_num <- function(
   out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
   #out <- lapply(x_, FUN = function(x.) { 
     # (x. = x_[[1L]])
-    data$x. <- eval(x., envir = data)
+    data$x. <- eval(x., envir = hc)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
     cf_ <- m_$coefficients[length(m_$coefficients)]
     attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
@@ -94,10 +96,12 @@ predict.add_num <- function(object, ...) {
 predict.add_num_ <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
-  newdata$x. <- eval(object, envir = newdata)
+  hc <- unclass(newdata)$hypercolumns
+  newd <- unclass(newdata)$df
+  newd$x. <- eval(object, envir = hc)
   
   m_ <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(m_, data = newdata))
+  suppressWarnings(update(m_, data = newd))
   
 }
 

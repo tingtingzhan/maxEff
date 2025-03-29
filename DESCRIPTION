@@ -18,6 +18,6 @@ Authors@R: c(person(given = 'Tingting', family = 'Zhan', role =
        family = 'Chervoneva', role = c('aut'), email =
        'Inna.Chervoneva@jefferson.edu', comment = c(ORCID =
        '0000-0002-9104-4505')))
-Imports: caret, parallel, rpart
+Imports: caret, parallel, rpart, spatstat.geom
 Suggests: knitr, groupedHyperframe, survival, rmarkdown
 VignetteBuilder: knitr

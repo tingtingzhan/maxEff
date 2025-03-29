@@ -45,6 +45,7 @@ c(
   '`function`', 'R function', '``base::`function` ``',
   '`groupedHyperframe`', 'Grouped hyper data frame', ' https://CRAN.R-project.org/package=groupedHyperframe',
   '`head`', 'First parts of an object', 'Generic `utils::head`; Dispatch `utils:::head.default`',
+  '`hypercolumns`, `hyperframe`', '(Hyper columns of) hyper data frame', '`spatstat.geom::hyperframe`',
   '`levels`', 'Levels of a `factor`', '`base::levels`',
   '`listof`', 'List of objects (of same class)', '`stats::listof`',
   '', 'Logistic regression model', '`stats::glm(., family = binomial(\'logit\'))`',
@@ -121,19 +122,12 @@ s = Ki67 |>
     Ki67 = log1p(Ki67)
     PFS = Surv(time = recfreesurv_mon, event = recurrence)
   }) |>
-  as.groupedHyperframe.data.frame(group = ~ patientID/tissueID) |>
+  as.groupedHyperframe(group = ~ patientID/tissueID) |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
+Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`Ki67.quantile`*.
 Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from the **Introduction** vignette of package [**`groupedHyperframe`**](https://CRAN.R-project.org/package=groupedHyperframe).
-
-Candidate of additional predictors are stored in a `matrix`-column.  Each additional predictor is a column of this `matrix`-column.
-
-```{r}
-names(s)
-s$Ki67.quantile |> dim()
-s$Ki67.quantile |> colnames() |> head()
-```
 
 
 Partition into a training (80%) and test (20%) set.

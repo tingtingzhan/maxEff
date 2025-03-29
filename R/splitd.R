@@ -41,7 +41,11 @@
 splitd <- function(start.model, x_, data, id, ...) {
   
   y <- start.model$y
-  x <- eval(x_, envir = data)
+  
+  hc <- unclass(data)$hypercolumns
+  data <- unclass(data)$df
+  
+  x <- eval(x_, envir = hc)
   
   # `id`: training set
   rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
@@ -103,15 +107,17 @@ splitd <- function(start.model, x_, data, id, ...) {
 predict.node1 <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
+  hc <- unclass(newdata)$hypercolumns
+  newd <- unclass(newdata)$df
   
-  newdata$x. <- object |>
+  newd$x. <- object |>
     attr(which = 'x', exact = TRUE) |> # a 'langugage'!
-    eval(envir = newdata) |> 
+    eval(envir = hc) |> 
     object() # dichotomize!
   
   object |>
     attr(which = 'model', exact = TRUE) |> 
-    update(data = newdata) |> 
+    update(data = newd) |> 
     suppressWarnings()
   
 }
