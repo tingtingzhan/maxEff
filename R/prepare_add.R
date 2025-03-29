@@ -27,7 +27,7 @@
   
   x_ <- X[[1L]] |> 
     names() |> 
-    lapply(FUN = function(j) {
+    lapply(FUN = \(j) {
       call(name = '.slice', x., j)
     })
   names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')

@@ -72,7 +72,7 @@ add_dummy_partition <- function(
   } else createDataPartition(y = y, times = times, groups = 2L, ...)
   # using same split for all predictors
   
-  out <- mclapply(x_, FUN = function(x.) { 
+  out <- mclapply(x_, FUN = \(x.) { 
     # (x. = x_[[1L]])
     tmp_ <- ids |>
       lapply(FUN = splitd, start.model = start.model, x_ = x., data = data)
@@ -128,7 +128,7 @@ add_dummy <- function(
   data <- tmp$data
   
   out <- tmp$x_ |> 
-    mclapply(FUN = function(x) {
+    mclapply(FUN = \(x) {
       # (x = tmp$x_[[1L]])
       xval <- eval(x, envir = hc)
       rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1() # partition rule based on complete data

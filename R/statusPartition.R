@@ -49,7 +49,7 @@ statusPartition <- function(y, times, p = .8, ...) {
   )
 
   ret <- replicate(n = times, expr = {
-    idx |> lapply(FUN = function(id) {
+    idx |> lapply(FUN = \(id) {
       sample(id, size = floor(length(id) * p), replace = FALSE)
     }) |>
       unlist(use.names = FALSE) |>

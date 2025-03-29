@@ -43,8 +43,8 @@ add_num <- function(
   data <- tmp$data
   x_ <- tmp$x_
   
-  out <- mclapply(x_, mc.cores = mc.cores, FUN = function(x.) {
-  #out <- lapply(x_, FUN = function(x.) { 
+  out <- mclapply(x_, mc.cores = mc.cores, FUN = \(x.) {
+  #out <- lapply(x_, FUN = \(x.) { 
     # (x. = x_[[1L]])
     data$x. <- eval(x., envir = hc)
     m_ <- update(start.model, formula. = . ~ . + x., data = data)
