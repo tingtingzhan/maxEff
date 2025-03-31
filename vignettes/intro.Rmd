@@ -18,7 +18,8 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 # Introduction
 
-This vignette documents three methods of selecting one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size.   The three methods are implemented in functions `add_num()`, `add_dummy()` and `add_dummy_partition()`.
+This vignette of package **`maxEff`** ([Github](https://github.com/tingtingzhan/maxEff),
+[RPubs](https://rpubs.com/tingtingzhan/maxEff)) documents three methods of selecting one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size.   The three methods are implemented in functions `add_num()`, `add_dummy()` and `add_dummy_partition()`.
 
 
 ## Note to Users
@@ -35,7 +36,7 @@ library(rpart)
 Users should remove parameter `mc.cores = 1L` from all examples and use the default option, which engages all CPU cores on the current host for macOS. The authors are forced to have `mc.cores = 1L` in this vignette in order to pass `CRAN`'s submission check.
 
 
-## List of Terms and Abbreviations
+## Terms and Abbreviations
 
 ```{r echo = FALSE, results = 'asis'}
 c(
@@ -66,6 +67,13 @@ c(
   as.data.frame.matrix() |> 
   kable()
 ```
+
+## Acknowledgement
+
+This work supported by NCI R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X)) and R01CA253977 (H. Rui and I. Chervoneva). 
+
+
+
 
 # Handy Tools
 
@@ -114,20 +122,20 @@ table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by status
 
 # Data Preparation
 
-Data preparation
+Data set `Ki67` in package **`groupedHyperframe`** is a `groupedHyperframe`. 
+
+```{r}
+data(Ki67, package = 'groupedHyperframe')
+Ki67
+```
 
 ```{r}
 s = Ki67 |>
-  within.data.frame(expr = {
-    Ki67 = log1p(Ki67)
-    PFS = Surv(time = recfreesurv_mon, event = recurrence)
-  }) |>
-  as.groupedHyperframe(group = ~ patientID/tissueID) |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
-Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`Ki67.quantile`*.
-Users are encouraged to learn more about functions `grouped_ppp()` and `aggregate_quantile()` from the **Introduction** vignette of package [**`groupedHyperframe`**](https://CRAN.R-project.org/package=groupedHyperframe).
+Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`logKi67.quantile`*.
+Users are encouraged to learn more about `groupedHyperframe` class and function `aggregate_quantile()` from package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe).
 
 
 Partition into a training (80%) and test (20%) set.
@@ -154,7 +162,7 @@ The `S3` generic `head()` chooses the top `n` element from the object returned f
 
 ```{r}
 set.seed(14837); m1 = m |>
-  add_num(x = ~ Ki67.quantile, mc.cores = 1L) |>
+  add_num(x = ~ logKi67.quantile, mc.cores = 1L) |>
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
 m1
@@ -182,7 +190,7 @@ The `S3` generic `head()` chooses the top `n` element from the object returned f
 
 ```{r}
 set.seed(14837); m2 = m |>
-  add_dummy(x = ~ Ki67.quantile, mc.cores = 1L) |>
+  add_dummy(x = ~ logKi67.quantile, mc.cores = 1L) |>
   subset(subset = p1 > .05 & p1 < .95) |> 
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
@@ -208,7 +216,7 @@ Function `add_dummy_partition()` also returns an `'add_dummy'` object.
 
 ```{r}
 set.seed(14837); m3 = m |> 
-  add_dummy_partition(~ Ki67.quantile, times = 20L, mc.cores = 1L) |>
+  add_dummy_partition(~ logKi67.quantile, times = 20L, mc.cores = 1L) |>
   subset(subset = p1 > .15 & p1 < .85) |>
   sort_by(y = abs(effsize), decreasing = TRUE) |>
   head(n = 2L)
