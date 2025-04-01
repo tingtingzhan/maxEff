@@ -162,7 +162,18 @@ get_cutoff.node1 <- function(x) {
 }
 
 
-# ?base::labels
+
+#' @title Find \link[base]{labels} from [node1] 
+#' 
+#' @param object a [node1] object
+#' 
+#' @param ... additional parameters, currently not in use
+#' 
+#' @returns 
+#' Function [labels.node1()] returns a \link[base]{character} scalar.
+#' 
+#' @keywords internal
+#' @export labels.node1
 #' @export
 labels.node1 <- function(object, ...) {
   (body(object)[[2L]][[3L]][[2L]][c(1L,3L)]) |>

@@ -10,7 +10,6 @@ Methods of selecting one from many numeric predictors for a regression model, to
 }
 \note{
 Help files of individual functions are intentionally suppressed in this \code{pdf} manual.
-
 Users are encouraged to get started with
 
 \code{vignette('intro', package = 'maxEff')}

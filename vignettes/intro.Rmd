@@ -40,27 +40,30 @@ Users should remove parameter `mc.cores = 1L` from all examples and use the defa
 
 ```{r echo = FALSE, results = 'asis'}
 c(
+  '', 'Forward pipe operator', '`?base::pipeOp` introduced in `R` 4.1.0', 
   '`abs`', 'Absolute value', '`base::abs`',
   '`coxph`', 'Cox model', '`survival::coxph`',
+  '`CRAN`, `R`', 'The Comprehensive R Archive Network', 'https://cran.r-project.org',
   '`factor`', 'Factor, or categorical variable', '`base::factor`',
-  '`function`', 'R function', '``base::`function` ``',
-  '`groupedHyperframe`', 'Grouped hyper data frame', ' https://CRAN.R-project.org/package=groupedHyperframe',
-  '`head`', 'First parts of an object', 'Generic `utils::head`; Dispatch `utils:::head.default`',
+  '`function`', '`R` function', '``base::`function` ``',
+  '`groupedHyperframe`', 'Grouped hyper data frame', ' `groupedHyperframe::as.groupedHyperframe`',
+  '`head`', 'First parts of an object', '`utils::head`; `utils:::head.default`',
   '`hypercolumns`, `hyperframe`', '(Hyper columns of) hyper data frame', '`spatstat.geom::hyperframe`',
+  '`labels`', 'Labels from object', '`base::labels`; `maxEff::labels.node1`',
   '`levels`', 'Levels of a `factor`', '`base::levels`',
-  '`listof`', 'List of objects (of same class)', '`stats::listof`',
-  '', 'Logistic regression model', '`stats::glm(., family = binomial(\'logit\'))`',
+  '`listof`', 'List of objects', '`stats::listof`',
+  '`logistic`', 'Logistic regression model', '`stats::glm(., family = binomial(\'logit\'))`',
   '`matrix`', 'Matrix', '`base::matrix`',
+  '`partition`', 'Stratified partition', '`maxEff::statusPartition`, `caret::createDataPartition`', 
   '`PFS`', 'Progression/recurrence free survival', 'https://en.wikipedia.org/wiki/Progression-free_survival',
-  '`predict`', 'Model prediction', 'Generic `stats::predict`. Dispatches `maxEff::predict.add_num`; `maxEff::predict.add_dummy`',
+  '`predict`', 'Model prediction', '`stats::predict`; `maxEff::predict.add_num`; `maxEff::predict.add_dummy`',
   '`quantile`', 'Quantile', '`stats::quantile`',
   '`rpart`', 'Recursive partitioning and regression trees', '`rpart::rpart`',
-  '`S3`', '`R`\'s simplest object oriented system', 'https://adv-r.hadley.nz/s3.html',
-  '`sort_by`', 'Sort an object by some criterion', 'Generic `base::sort_by`. Dispatch `maxEff::sort_by.add_`',
-  '`partition`', 'Stratified partition', '`maxEff::statusPartition`, `caret::createDataPartition`', 
-  '`subset`', 'Subsets of object by conditions', 'Generic `base::subset`. Dispatch `maxEff::subset.add_dummy`',
+  '`S3`, `generic`, `methods`', '`S3` object oriented system',  '`base::UseMethod`; `utils::methods`; `utils::getS3method`; https://adv-r.hadley.nz/s3.html',
+  '`sort_by`', 'Sort an object by some criterion', '`base::sort_by`; `maxEff::sort_by.add_`',
+  '`subset`', 'Subsets of object by conditions', '`base::subset`; `maxEff::subset.add_dummy`',
   '`Surv`', 'Survival object', '`survival::Surv`',
-  '`update`', 'Update and re-fit a model call', 'Generic `stats::update`'
+  '`update`', 'Update and re-fit a model call', '`stats::update`'
 ) |>
   matrix(nrow = 3L, dimnames = list(c('Term / Abbreviation', 'Description', 'Reference'), NULL)) |>
   t.default() |>
@@ -70,7 +73,7 @@ c(
 
 ## Acknowledgement
 
-This work supported by NCI R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X)) and R01CA253977 (H. Rui and I. Chervoneva). 
+This work is supported by NCI R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X)) and R01CA253977 (H. Rui and I. Chervoneva). 
 
 
 
@@ -101,8 +104,8 @@ set.seed(125); rnorm(6, mean = 24.5) |> foo()
 Developers may obtain the `numeric` cutoff value of `foo`, or a brief text of to describe `foo`, for further analysis.
 
 ```{r}
-get_cutoff(foo)
-labels(foo)
+foo |> get_cutoff()
+foo |> labels()
 ```
 
 
