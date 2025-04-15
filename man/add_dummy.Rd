@@ -10,7 +10,7 @@ add_dummy_partition(
   x,
   data = eval(start.model$call$data),
   times,
-  mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()),
+  mc.cores = getOption("mc.cores"),
   ...
 )
 
@@ -18,7 +18,7 @@ add_dummy(
   start.model,
   x,
   data = eval(start.model$call$data),
-  mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()),
+  mc.cores = getOption("mc.cores"),
   ...
 )
 }

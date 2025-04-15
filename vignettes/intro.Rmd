@@ -33,6 +33,13 @@ library(survival)
 library(rpart)
 ```
 
+```{r}
+#| echo: false
+library(knitr) # for tables in this vignette
+#options(mc.cores = 1L) # for CRAN submission
+```
+
+
 Users should remove parameter `mc.cores = 1L` from all examples and use the default option, which engages all CPU cores on the current host for macOS. The authors are forced to have `mc.cores = 1L` in this vignette in order to pass `CRAN`'s submission check.
 
 

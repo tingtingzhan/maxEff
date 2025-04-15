@@ -8,7 +8,7 @@ add_num(
   start.model,
   x,
   data = eval(start.model$call$data),
-  mc.cores = switch(.Platform$OS.type, windows = 1L, detectCores()),
+  mc.cores = getOption("mc.cores"),
   ...
 )
 }
