@@ -60,8 +60,6 @@ add_dummy_partition <- function(
     ...
 ) {
   
-  hc <- unclass(data)$hypercolumns
-  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
   #data <- tmp$data # not here!
@@ -72,19 +70,20 @@ add_dummy_partition <- function(
   } else createDataPartition(y = y, times = times, groups = 2L, ...)
   # using same split for all predictors
   
-  out <- mclapply(x_, FUN = \(x.) { 
-    # (x. = x_[[1L]])
-    tmp_ <- ids |>
-      lapply(FUN = splitd, start.model = start.model, x_ = x., data = data)
-    tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
-    
-    effsize <- tmp |> 
-      vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
-    id <- tmp |> 
-      seq_along() |> 
-      quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
-    return(tmp[[order(effsize)[id]]])  
-  }, mc.cores = mc.cores)
+  out <- x_ |>
+    mclapply(FUN = \(x.) { 
+      # (x. = x_[[1L]])
+      tmp_ <- ids |>
+        lapply(FUN = splitd, start.model = start.model, x_ = x., data = data)
+      tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
+      
+      effsize <- tmp |> 
+        vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
+      id <- tmp |> 
+        seq_along() |> 
+        quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
+      return(tmp[[order(effsize)[id]]])  
+    }, mc.cores = mc.cores)
 
   names(out) <- paste0(names(out), vapply(out, FUN = labels.node1, FUN.VALUE = ''))
   
@@ -121,23 +120,24 @@ add_dummy <- function(
     ...
 ) {
   
-  hc <- unclass(data)$hypercolumns
-  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
-  data <- tmp$data
+  data_ <- tmp$data
   
   out <- tmp$x_ |> 
-    mclapply(FUN = \(x) {
-      # (x = tmp$x_[[1L]])
-      xval <- eval(x, envir = hc)
+    mclapply(FUN = \(x.) {
+      # (x. = tmp$x_[[1L]])
+      xval <- with(data = data, ee = x.) # ?spatstat.geom::with.hyperframe
       rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1() # partition rule based on complete data
-      data$x. <- rule(xval) # partition rule applied to complete data
-      suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data))
+      data_$x. <- rule(xval) # partition rule applied to complete data
+      suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
       cf_ <- m_$coefficients[length(m_$coefficients)]
-      attr(rule, which = 'p1') <- mean.default(data$x., na.rm = TRUE)
+      attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
       attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-      attr(rule, which = 'x') <- x # do I really need?
+      
+      # attr(rule, which = 'x') <- x # was
+      attr(rule, which = 'x') <- x. # new 2025-07-15
+      
       attr(rule, which = 'model') <- m_ # only model formula needed for [predict.node1]!!!
       return(rule)
     }, mc.cores = mc.cores)

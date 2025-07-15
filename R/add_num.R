@@ -36,19 +36,17 @@ add_numeric <- function(
     ...
 ) {
   
-  hc <- unclass(data)$hypercolumns
-  
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
-  data <- tmp$data
+  data_ <- tmp$data # 'data.frame'
   x_ <- tmp$x_
   
   out <- x_ |>
     # lapply(FUN = \(x.) { 
     mclapply(mc.cores = mc.cores, FUN = \(x.) {
       # (x. = x_[[1L]])
-      data$x. <- eval(x., envir = hc)
-      m_ <- update(start.model, formula. = . ~ . + x., data = data)
+      data_$x. <- with(data = data, ee = x.) # ?spatstat.geom::with.hyperframe
+      m_ <- update(start.model, formula. = . ~ . + x., data = data_)
       cf_ <- m_$coefficients[length(m_$coefficients)]
       attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
       attr(x., which = 'model') <- m_ # needed for [predict.*]
@@ -97,9 +95,8 @@ predict.add_numeric <- function(object, ...) {
 predict.add_numeric_ <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
-  hc <- unclass(newdata)$hypercolumns
   newd <- unclass(newdata)$df
-  newd$x. <- eval(object, envir = hc)
+  newd$x. <- with(data = newdata, ee = object) # ?spatstat.geom::with.hyperframe
   
   m_ <- attr(object, which = 'model', exact = TRUE)
   suppressWarnings(update(m_, data = newd))

@@ -23,12 +23,12 @@
   
   if (!is.language(x) || is.symbol(x) || x[[1L]] != '~' || length(x) != 2L) stop('`x` must be one-sided formula')
   if (!is.symbol(x. <- x[[2L]])) stop('rhs(x) must be a symbol')
-  X <- data[[x.]]
+  X <- data[[x.]] # 'list'; the hypercolumn
   
   x_ <- X[[1L]] |> 
     names() |> 
     lapply(FUN = \(j) {
-      call(name = '.slice', x., j)
+      call(name = '[', x., j)
     })
   names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   

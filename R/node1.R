@@ -66,8 +66,8 @@
 #' Function \link[rpart]{rpart} is quite slow.
 #' 
 #' @examples
-#' library(rpart)
-#' (r = rpart(Price ~ Mileage, data = cu.summary, control = rpart.control(maxdepth = 2L)))
+#' data(cu.summary, package = 'rpart')
+#' (r = rpart::rpart(Price ~ Mileage, data = cu.summary, cp = .Machine$double.eps, maxdepth = 1L))
 #' (foo = r |> node1())
 #' get_cutoff(foo)
 #' labels(foo)

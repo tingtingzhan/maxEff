@@ -42,10 +42,9 @@ splitd <- function(start.model, x_, data, id, ...) {
   
   y <- start.model$y
   
-  hc <- unclass(data)$hypercolumns
-  data <- unclass(data)$df
+  data_df <- unclass(data)$df
   
-  x <- eval(x_, envir = hc)
+  x <- with(data = data, ee = x_) # ?spatstat.geom::with.hyperframe
   
   # `id`: training set
   rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
@@ -53,10 +52,10 @@ splitd <- function(start.model, x_, data, id, ...) {
   
   # `-id`: test set (`id` is `integer`)
   y_ <- y[-id]
-  data_ <- data[-id, , drop = FALSE]
+  data_ <- data_df[-id, , drop = FALSE]
   dx_ <- tryCatch(rule(x[-id]), warning = identity)
   if (inherits(dx_, what = 'warning')) return(invisible()) # exception
-  if ('x.' %in% names(data)) stop('do not allow `x.` as an original column in `data`')
+  if ('x.' %in% names(data_df)) stop('do not allow `x.` as an original column in `data`')
   data_$x. <- dx_
   
   suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
@@ -107,12 +106,12 @@ splitd <- function(start.model, x_, data, id, ...) {
 predict.node1 <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
-  hc <- unclass(newdata)$hypercolumns
+  
   newd <- unclass(newdata)$df
   
   newd$x. <- object |>
     attr(which = 'x', exact = TRUE) |> # a 'langugage'!
-    eval(envir = hc) |> 
+    with(data = newdata, ee = _) |> # ?spatstat.geom::with.hyperframe
     object() # dichotomize!
   
   object |>
