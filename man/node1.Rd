@@ -4,17 +4,12 @@
 \alias{node1}
 \title{Dichotomize via 1st Node of Recursive Partitioning}
 \usage{
-node1(x, check_degeneracy = TRUE, ...)
+node1(x, ...)
 }
 \arguments{
-\item{x}{a \link[rpart]{rpart} object}
+\item{x}{an \link[rpart]{rpart.object}}
 
-\item{check_degeneracy}{\link[base]{logical} scalar, whether to allow the
-dichotomized value to be all-\code{FALSE} or all-\code{TRUE} (i.e., degenerate)
-for any one of the predictors.
-Default \code{TRUE} to produce a \link[base]{warning} message for degeneracy.}
-
-\item{...}{additional parameters of \link[rpart]{rpart} and/or \link[rpart]{rpart.control}}
+\item{...}{additional parameters, currently not in use}
 }
 \value{
 Function \code{\link[=node1]{node1()}} returns an object of class \code{'node1'},
@@ -22,45 +17,7 @@ which is a \link[base]{function}
 with one parameter \code{newx} taking a \link[base]{double} \link[base]{vector}.
 }
 \description{
-Dichotomize one or more predictors of
-a \link[survival]{Surv}, a \link[base]{logical}, or a \link[base]{double} response,
-using recursive partitioning and regression tree \link[rpart]{rpart}.
-}
-\details{
-Function \code{\link[=node1]{node1()}} dichotomizes one predictor in the following steps,
-
-\enumerate{
-
-\item {Recursive partitioning and regression tree \link[rpart]{rpart} analysis is
-performed for the response \eqn{y} and the predictor \eqn{x}.}
-
-\item {The \link[rpart]{labels.rpart} of the first node of
-the \link[rpart]{rpart} tree
-is considered as the dichotomizing rule of the \link[base]{double} predictor \eqn{x}.
-The term \emph{dichotomizing rule} indicates the combination of an inequality sign
-(\link[base]{>}, \link[base]{>=}, \link[base]{<} and \link[base]{<=})
-and a \link[base]{double} cutoff threshold \eqn{a}}
-
-\item {The dichotomizing rule from Step 2 is further processed, such that
-\itemize{
-\item {\eqn{<a} is regarded as \eqn{\geq a}}
-\item {\eqn{\leq a} is regarded as \eqn{>a}}
-\item {\eqn{> a} and \eqn{\geq a} are regarded as is.}
-}
-This step is necessary for a narrative of
-\emph{greater than} or \emph{greater than or equal to}
-the threshold \eqn{a}.}
-
-\item {A \link[base]{warning} message is produced,
-if the dichotomizing rule, applied to a new \link[base]{double} predictor \code{newx}, creates
-an all-\code{TRUE} or all-\code{FALSE} result.
-We do not make the algorithm \link[base]{stop},
-as most regression models in R are capable of handling
-an all-\code{TRUE} or all-\code{FALSE} predictor,
-by returning a \code{NA_real_} regression coefficient estimate.
-}
-
-}
+Dichotomize via 1st Node of Recursive Partitioning
 }
 \note{
 In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
@@ -68,11 +25,6 @@ In future \link[base]{integer} and \link[base]{factor} predictors will be suppor
 Function \link[rpart]{rpart} is quite slow.
 }
 \examples{
-data(cu.summary, package = 'rpart')
-(r = rpart::rpart(Price ~ Mileage, data = cu.summary, cp = .Machine$double.eps, maxdepth = 1L))
-(foo = r |> node1())
-get_cutoff(foo)
-labels(foo)
-rnorm(6L, mean = 24.5) |> foo()
+# See intro vignette, section Appendix, subsection node1()
 }
 \keyword{internal}

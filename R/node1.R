@@ -3,59 +3,11 @@
 
 #' @title Dichotomize via 1st Node of Recursive Partitioning
 #' 
-#' @description
-#' Dichotomize one or more predictors of
-#' a \link[survival]{Surv}, a \link[base]{logical}, or a \link[base]{double} response,
-#' using recursive partitioning and regression tree \link[rpart]{rpart}.
+#' @param x an \link[rpart]{rpart.object}
 #' 
-#' @param x a \link[rpart]{rpart} object
-#' 
-#' @param check_degeneracy \link[base]{logical} scalar, whether to allow the 
-#' dichotomized value to be all-`FALSE` or all-`TRUE` (i.e., degenerate) 
-#' for any one of the predictors.
-#' Default `TRUE` to produce a \link[base]{warning} message for degeneracy.
-#' 
-#' @param ... additional parameters of \link[rpart]{rpart} and/or \link[rpart]{rpart.control}
-#' 
-#' @details
-#' Function [node1()] dichotomizes one predictor in the following steps, 
-#' 
-#' \enumerate{
-#' 
-#' \item {Recursive partitioning and regression tree \link[rpart]{rpart} analysis is 
-#' performed for the response \eqn{y} and the predictor \eqn{x}.}
-#' 
-#' \item {The \link[rpart]{labels.rpart} of the first node of 
-#' the \link[rpart]{rpart} tree
-#' is considered as the dichotomizing rule of the \link[base]{double} predictor \eqn{x}.
-#' The term *dichotomizing rule* indicates the combination of an inequality sign
-#' (\link[base]{>}, \link[base]{>=}, \link[base]{<} and \link[base]{<=}) 
-#' and a \link[base]{double} cutoff threshold \eqn{a}}
-#' 
-#' \item {The dichotomizing rule from Step 2 is further processed, such that
-#' \itemize{
-#' \item {\eqn{<a} is regarded as \eqn{\geq a}}
-#' \item {\eqn{\leq a} is regarded as \eqn{>a}}
-#' \item {\eqn{> a} and \eqn{\geq a} are regarded as is.}
-#' }
-#' This step is necessary for a narrative of 
-#' *greater than* or *greater than or equal to* 
-#' the threshold \eqn{a}.}
-#' 
-#' \item {A \link[base]{warning} message is produced, 
-#' if the dichotomizing rule, applied to a new \link[base]{double} predictor `newx`, creates 
-#' an all-`TRUE` or all-`FALSE` result.
-#' We do not make the algorithm \link[base]{stop}, 
-#' as most regression models in R are capable of handling 
-#' an all-`TRUE` or all-`FALSE` predictor,
-#' by returning a `NA_real_` regression coefficient estimate.
-#' }
-#' 
-#' }
-#' 
+#' @param ... additional parameters, currently not in use
 #' 
 #' @returns 
-#' 
 #' Function [node1()] returns an object of class `'node1'`, 
 #' which is a \link[base]{function}
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
@@ -66,15 +18,13 @@
 #' Function \link[rpart]{rpart} is quite slow.
 #' 
 #' @examples
-#' data(cu.summary, package = 'rpart')
-#' (r = rpart::rpart(Price ~ Mileage, data = cu.summary, cp = .Machine$double.eps, maxdepth = 1L))
-#' (foo = r |> node1())
-#' get_cutoff(foo)
-#' labels(foo)
-#' rnorm(6L, mean = 24.5) |> foo()
+#' # See intro vignette, section Appendix, subsection node1()
 #' @keywords internal
 #' @export
-node1 <- function(x, check_degeneracy = TRUE, ...) {
+node1 <- function(
+    x, 
+    ...
+) {
   
   s <- x$splits
   if (!length(s)) {
@@ -84,7 +34,8 @@ node1 <- function(x, check_degeneracy = TRUE, ...) {
   }
   
   labs <- labels(x) # ?rpart:::labels.rpart
-  nd1 <- str2lang(labs[2L]) # first node!!!
+  nd1 <- labs[2L] |> # first node!!!
+    str2lang() 
   
   if (nd1[[1L]] == '<=') {
     nd1[[1L]] <- quote(`>`)
@@ -97,41 +48,76 @@ node1 <- function(x, check_degeneracy = TRUE, ...) {
   nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
   
   fn_ <- alist(newx = )
-  fn_[[2L]] <- if (check_degeneracy) call(
+  fn_[[2L]] <- call(
     name = '{',
     call(name = '<-', quote(ret), call(name = '(', nd1)),
     quote(if (all(ret, na.rm = TRUE) || !any(ret, na.rm = TRUE)) warning('Dichotomized value is all-0 or all-1')),
     quote(return(ret))
-  ) else nd1
+  )
   fn <- as.function.default(fn_)
-  #attr(fn, which = 'cutoff') <- nd1[[3L]] # do note deprecate, for now
-  #attr(fn, which = 'text') <- deparse1(nd1[c(1L, 3L)])
+  
+  attr(fn, which = 'x') <- rownames(s)[1L] |> 
+    as.symbol()
+  
   class(fn) <- c('node1', class(fn))
   return(fn)
 }
 
 
 
-
-
+#' @title Predict by [node1()]
+#' 
+#' @param object a [node1] object
+#' 
+#' @param newdata a \link[base]{data.frame} or \link[spatstat.geom]{hyperframe}
+#' 
+#' @param ... place holder for `S3` generic
+#' 
+#' @keywords internal
+#' @importFrom stats predict
+#' @export predict.node1
+#' @export
+predict.node1 <- function(object, newdata, ...) {
+  
+  if (inherits(newdata, what = 'data.frame')) {
+    cl <- call(name = 'object', attr(object, which = 'x', exact = TRUE))
+    return(with.default(data = newdata, expr = eval(cl)))
+  }
+  
+  if (inherits(newdata, what = 'hyperframe')) {
+    stop('be careful with spatstat.geom::with.hyperframe')
+  }
+  
+}
 
 
 
 #' @export
 print.node1 <- function(x, ...) {
-  cat('\nDichotomizing Rule based on Recursive Partitioning:\n\n')
+  
+  attr(x, which = 'x', exact = TRUE) |>
+    deparse1() |>
+    sprintf(fmt = 'Dichotomizing Rule (%s) via Recursive Partitioning:\n\n') |>
+    cat()
+  
   x0 <- unclass(x)
   attributes(x0) <- NULL
+  
+  # environment(x0) <- globalenv() 
+  # suppresses <environment: > line, but does write to .GlobalEnv
+  # do NOT do this!!
+  
   print(x0)
   
-  atr <- attributes(x)
-  atr$class <- NULL # don't want to print
-  if (!length(atr)) return(invisible())
-  cat('\nDevelopers, use\n')
-  if (length(atr$p1)) cat('\nattr(.,\'p1\') to see the mean of dichotomized value in training, or test (if available), data\n')
-  if (length(atr$x)) cat('\nattr(.,\'x\') to see the name of continous variable that is dichotomized\n')
-  if (length(atr$effsize)) cat('\nattr(.,\'effsize\') to see the regression coefficient, i.e., effect size, of the dichotomized variable in training, or test (if available), data\n')
-  if (length(atr$model)) cat('\nattr(.,\'model\') to see the regression model in training, or test (if available), data\n\n')
+  # all below: TO BE REMOVED!!!
+  #atr <- attributes(x)
+  #atr$class <- NULL # don't want to print
+  #if (!length(atr)) return(invisible())
+  
+  #cat('\nDevelopers, use\n')
+  #if (length(atr$p1)) cat('\nattr(.,\'p1\') to see the mean of dichotomized value in training, or test (if available), data\n')
+  #if (length(atr$effsize)) cat('\nattr(.,\'effsize\') to see the regression coefficient, i.e., effect size, of the dichotomized variable in training, or test (if available), data\n')
+  #if (length(atr$model)) cat('\nattr(.,\'model\') to see the regression model in training, or test (if available), data\n\n')
   
 }
 

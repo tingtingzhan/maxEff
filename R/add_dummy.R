@@ -128,17 +128,19 @@ add_dummy <- function(
     mclapply(FUN = \(x.) {
       # (x. = tmp$x_[[1L]])
       xval <- with(data = data, ee = x.) # ?spatstat.geom::with.hyperframe
-      rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> node1() # partition rule based on complete data
+      
+      rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
+        node1() # before 2025-07-16
+        # node1(data.name = x.) # don't do this yet..
+      attr(rule, which = 'x') <- x. # 2025-07-15
+
       data_$x. <- rule(xval) # partition rule applied to complete data
       suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
       cf_ <- m_$coefficients[length(m_$coefficients)]
       attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
       attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
       
-      # attr(rule, which = 'x') <- x # was
-      attr(rule, which = 'x') <- x. # new 2025-07-15
-      
-      attr(rule, which = 'model') <- m_ # only model formula needed for [predict.node1]!!!
+      attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
       return(rule)
     }, mc.cores = mc.cores)
   
@@ -168,7 +170,7 @@ add_dummy <- function(
 #' 
 #' @param subset \link[base]{language}
 #' 
-#' @param ... additional parameters of function [predict.node1()], e.g., `newdata`
+#' @param ... additional parameters of function [update.node1()], e.g., `newdata`
 #' 
 #' @details
 #' Function [subset.add_dummy()], default subset `(p1>.15 & p1<.85)`.
@@ -200,7 +202,8 @@ subset.add_dummy <- function(x, subset, ...) {
 #' @export predict.add_dummy
 #' @export
 predict.add_dummy <- function(object, ...) {
-  ret <- object |> lapply(FUN = predict.node1, ...)
+  # think about changing this to [update.add_dummy()] too 
+  ret <- object |> lapply(FUN = update.node1, ...)
   class(ret) <- 'listof'
   return(ret)
 }

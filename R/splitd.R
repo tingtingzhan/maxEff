@@ -63,11 +63,15 @@ splitd <- function(start.model, x_, data, id, ...) {
   cf_ <- m_$coefficients[length(m_$coefficients)]
   
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
+  
+  # might need to change after 2025-07-16 change in [node1()]
   attr(rule, which = 'x') <- x_
+  # after might need to change 
+  
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-  attr(rule, which = 'model') <- m_ # only model formula needed for [predict.node1]!!!
+  attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
   # class(rule) <- c('splitd', class(rule)) # removed Spring 2025!!!
-  # [predict.splitd()] will become [predict.node1()] !!!
+  # [predict.splitd()] will become [update.node1()] !!!
   return(rule)
 }
 
@@ -97,17 +101,26 @@ splitd <- function(start.model, x_, data, id, ...) {
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns
-#' Function [predict.node1()] returns a updated regression model.
+#' Function [update.node1()] returns a updated regression model.
 #' 
 #' @keywords internal
-#' @importFrom stats predict update
-#' @export predict.node1
+#' @importFrom stats update
+#' @export update.node1
 #' @export
-predict.node1 <- function(object, newdata, ...) {
+# was named [predict.node1()]
+update.node1 <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
   
   newd <- unclass(newdata)$df
+  
+  #with(data = newdata, expr = object()) # does not work!! why??
+  
+  #with(data = newdata, expr = {
+  #  object(logMarker.E.cumtrapz["140"])
+  #}) # works
+  
+  # may be my idea is not great..
   
   newd$x. <- object |>
     attr(which = 'x', exact = TRUE) |> # a 'langugage'!

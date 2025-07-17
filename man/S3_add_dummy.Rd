@@ -15,7 +15,7 @@
 
 \item{subset}{\link[base]{language}}
 
-\item{...}{additional parameters of function \code{\link[=predict.node1]{predict.node1()}}, e.g., \code{newdata}}
+\item{...}{additional parameters of function \code{\link[=update.node1]{update.node1()}}, e.g., \code{newdata}}
 }
 \value{
 Function \code{\link[=subset.add_dummy]{subset.add_dummy()}} returns a \code{\link[=add_dummy]{add_dummy()}} object.
