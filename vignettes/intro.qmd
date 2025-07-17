@@ -254,27 +254,33 @@ fn1 |> get_cutoff()
 fn1 |> labels()
 ```
 
-## 🚧 `statusPartition()`
+## `statusPartition()` {#sec-statusPartition}
 
-Stratified Partition by Survival Status
-
-Function `statusPartition()` performs stratified partition based on the survival status of a `Surv` response, to avoid the situation that Cox model is degenerate if all subjects are censored. This is a deviation from the very popular function `caret::createDataPartition()`, which stratifies `Surv` response by the `quantile`s of the survival time.
+Function `statusPartition()` partitions stratified a `Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more partitioned data set being degenerate due to the fact that all subjects in that partition being censored. Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** version `r packageVersion('caret')`).
 
 ```{r}
-y = (survival::capacitor) |> 
+y = survival::capacitor |> 
   with(expr = Surv(time, status))
+```
+
+
+```{r}
 set.seed(15); id = y |>
   statusPartition(times = 1L, p = .5)
-table(y[id[[1L]], 2L]) / table(y[,2L]) # balanced by status
+table(y[id[[1L]], 2L]) / table(y[,2L]) # balanced by survival status
+```
+
+
+```{r}
 set.seed(15); id0 = y |>
   caret::createDataPartition(times = 1L, p = .5)
-table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by status
+table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 ```
 
 ## Terms and Abbreviations
 
 | Term / Abbreviation | Description |
-|----|----|
+|------------------------------------|------------------------------------|
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
