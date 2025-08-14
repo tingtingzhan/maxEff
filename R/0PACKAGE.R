@@ -7,7 +7,7 @@
 #' 
 #' `vignette('intro', package = 'maxEff')`
 #' 
-#' 
+#' @import groupedHyperframe
 '_PACKAGE'
 
 
