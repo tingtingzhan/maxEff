@@ -10,7 +10,7 @@ toc: true
 toc-location: left
 toc-depth: 4
 toc-title: ''
-editor: visual
+editor: source
 bibliography: maxEff.bib
 knitr:
   opts_chunk: 
@@ -47,7 +47,6 @@ library(survival)
 
 ```{r}
 #| echo: false
-library(knitr) # for tables in this vignette
 #options(mc.cores = 1L) # for CRAN submission
 ```
 
@@ -193,7 +192,7 @@ m3[1L] |> predict(newdata = s1)
 
 ## `node1()` {#sec-node1}
 
-Function `node1()` dichotomizes a single `numeric` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. We illustrate
+Function `node1()` dichotomizes a single `numeric` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
 
 -   the use of function `node1()`,
 -   the `S3` class `'node1'`, and
@@ -228,14 +227,14 @@ The `S3` method dispatch `print.node1()` displays the dichomizing rule as a `fun
 fn1
 ```
 
-Dichotomizing rule `fn1` should be used as any R `function` to dichotomizes a `numeric` `vector` to a `logical` `vector`.
+Dichotomizing rule *`fn1`* should be used as any R `function`.
 
 ```{r}
 set.seed(35); rnorm(6, mean = 53.5) |> 
   fn1()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomize the numeric variable *`age`* in the test set, using the dichotomizing rule `fn1` determined by the training set.
+The `S3` method dispatch `predict.node1()` dichotomize the numeric variable *`age`* in the test set, using the dichotomizing rule *`fn1`* determined by the training set.
 
 ```{r}
 data.frame(
@@ -245,24 +244,23 @@ data.frame(
 )
 ```
 
-Developers may obtain the `numeric` cutoff value of the dichotomizing rule `fn1`, or a brief text of to describe it, for further analysis.
+Developers may obtain the `numeric` cutoff value of the dichotomizing rule *`fn1`*, or a brief text of to describe it, for further analysis.
 
 ```{r}
 #| code-fold: true
-#| code-summary: Unchartered zone!
+#| code-summary: 'R code: subject to change!'
 fn1 |> get_cutoff()
 fn1 |> labels()
 ```
 
 ## `statusPartition()` {#sec-statusPartition}
 
-Function `statusPartition()` partitions stratified a `Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more partitioned data set being degenerate due to the fact that all subjects in that partition being censored. Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** version `r packageVersion('caret')`).
+Function `statusPartition()` partitions stratified a `survival::Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more partitioned data set being degenerate due to the fact that all subjects in that partition being censored. Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
 
 ```{r}
 y = survival::capacitor |> 
   with(expr = Surv(time, status))
 ```
-
 
 ```{r}
 set.seed(15); id = y |>
@@ -270,14 +268,13 @@ set.seed(15); id = y |>
 table(y[id[[1L]], 2L]) / table(y[,2L]) # balanced by survival status
 ```
 
-
 ```{r}
 set.seed(15); id0 = y |>
   caret::createDataPartition(times = 1L, p = .5)
 table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 ```
 
-## Terms and Abbreviations
+## Terms & Abbreviations {#sec-terms}
 
 | Term / Abbreviation | Description |
 |------------------------------------|------------------------------------|
