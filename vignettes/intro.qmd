@@ -129,15 +129,15 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 
 # Data Preparation
 
-Data set `Ki67` in package **`groupedHyperframe`** is a `groupedHyperframe`.
+<!--Data set `Ki67` in package **`groupedHyperframe`** is a `groupedHyperframe`.-->
 
 ```{r}
-data(Ki67, package = 'groupedHyperframe')
-Ki67
+Ki67g = groupedHyperframe::Ki67 |>
+  grouped_ppp(formula = logKi67 ~ PFS + Tstage + adj_rad + adj_chemo + histology + Her2 + HR + node + race + age | patientID/tissueID, data = _)
 ```
 
 ```{r}
-s = Ki67 |>
+s = Ki67g |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
