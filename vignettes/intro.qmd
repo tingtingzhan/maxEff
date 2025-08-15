@@ -107,7 +107,11 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 -   R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X))
 -   R01CA253977 (H. Rui and I. Chervoneva).
 
-# Data Preparation
+# Examples
+
+## Non-Spatial Example
+
+[Point user to `groupedHyperframe` vignette, section *Publications*.]{style="background-color: yellow"}
 
 ```{r}
 Ki67q = groupedHyperframe::Ki67 |>
@@ -125,7 +129,24 @@ Ki67q |>
   head()
 ```
 
-Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`logKi67.quantile`*. Users are encouraged to learn more about `groupedHyperframe` class and function `aggregate_quantile()` from package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe).
+## Spatial Example
+
+```{r}
+Ki67s = groupedHyperframe::Ki67 |>
+  grouped_ppp(formula = logKi67 ~ . | patientID/tissueID) |>
+  Emark_(r = seq.int(from = 0, to = 100)) |>
+  aggregate_fv(by = ~ patientID)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'A `hyperframe` *`Ki67s`* with aggregated `Emark`'
+Ki67s |>
+  head()
+```
+
+
+# Data Partition
 
 Partition into a training (80%) and test (20%) set.
 

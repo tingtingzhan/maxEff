@@ -11,6 +11,9 @@
 
 
 
+# [~~Highlighted strike through test.~~]{style="background-color: #FFFF00"}
+# [Highlighted test.]{style="background-color: #FFFF00"}
+
 
 
 
