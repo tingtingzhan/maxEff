@@ -109,12 +109,10 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 
 # Data Preparation
 
-<!--Data set `Ki67` in package **`groupedHyperframe`** is a `groupedHyperframe`.-->
-
 ```{r}
 Ki67q = groupedHyperframe::Ki67 |>
   within.data.frame(expr = {
-    x = y = NULL
+    x = y = NULL # remove x- and y-coords for non-spatial application
   }) |>
   as.groupedHyperframe(group = ~ patientID/tissueID) |>
   aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
