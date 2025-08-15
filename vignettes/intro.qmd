@@ -33,50 +33,38 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 # Introduction
 
-This vignette of package **`maxEff`** ([Github](https://github.com/tingtingzhan/maxEff), [RPubs](https://rpubs.com/tingtingzhan/maxEff)) documents three methods of selecting one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size. 
+This vignette provides examples of using `R` packages
+
+-   **`groupedHyperframe`**, @groupedHyperframe, [CRAN](https://cran.r-project.org/package=groupedHyperframe), [Github](https://github.com/tingtingzhan/groupedHyperframe), [RPubs](https://rpubs.com/tingtingzhan/groupedHyperframe)
+-   **`maxEff`**, @maxEff, [CRAN](https://cran.r-project.org/package=maxEff), [Github](https://github.com/tingtingzhan/maxEff), [RPubs](https://rpubs.com/tingtingzhan/maxEff)
+
+to select one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size.
 
 R terminology might be different from that of mathematics and statistics. Please refer to Appendix @sec-terms for explanation and reference of the terms and abbreviations used in this vignette.
-
-Package **`maxEff`** `Depends` on packages
-
--   `r '\U1f5dd'` **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), key suggest, for the data structure of grouped hyper data frame
 
 Package **`maxEff`** `Imports` packages
 
 -   `r '\U1f5dd'` **`caret`** [@caret, v`r packageVersion('caret')`], for data partition
 -   **`parallel`** shipped with `r R.version$version.string`, for parallel computing
 -   `r '\U1f5dd'` **`rpart`** [@rpart, v`r packageVersion('rpart')`], key dependency, for recursive partitioning
--   `r '\U1f5dd'` **`spatstat.geom`** [@spatstat15, dev v`r packageVersion('spatstat.geom')`], key dependency, for additional support of `hyperframe`
+-   `r '\U1f5dd'` **`spatstat.geom`** [@spatstat15, dev v`r packageVersion('spatstat.geom')`], key dependency, for `hyperframe` data structure
 
 Package **`maxEff`** `Suggests` packages
 
+-   **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), for data preparation
 -   `r '\U1f5dd'` **`survival`** [@survival, v`r packageVersion('survival')`], key suggest, <!--for function `survival:::as.data.frame.Surv()`--> to help `hyperframe` understand `Surv` object
+
+Package **`groupedHyperframe`** dependencies are outlined in its separate vignette ([CRAN](https://cran.r-project.org/package=groupedHyperframe/vignettes/groupedHyperframe.html), [RPubs](https://rpubs.com/tingtingzhan/groupedHyperframe)).
 
 ## Prerequisite
 
-Package **`maxEff`** requires R version 4.5.0 (released 2025-04-11) or higher ([macOS](https://cran.r-project.org/bin/macosx/), [Windows](https://cran.r-project.org/bin/windows/base/)). An Integrated Development Environment (IDE), e.g., [RStudio](https://posit.co/download/rstudio-desktop/) or [Positron](https://positron.posit.co/download.html), is not required, but highly recommended. This vignette is created under `r R.version$version.string` using packages **`knitr`** [@knitr, v`r packageVersion('knitr')`], **`quarto`** [@quarto, v`r packageVersion('quarto')` with [Quarto](https://quarto.org/docs/get-started/) v`r quarto::quarto_version()`] and **`rmarkdown`** [@rmarkdown, v`r packageVersion('rmarkdown')`].
+Packages **`groupedHyperframe`** and **`maxEff`** require R version 4.5.0 (released 2025-04-11) or higher ([macOS](https://cran.r-project.org/bin/macosx/), [Windows](https://cran.r-project.org/bin/windows/base/)). An Integrated Development Environment (IDE), e.g., [RStudio](https://posit.co/download/rstudio-desktop/) or [Positron](https://positron.posit.co/download.html), is not required, but highly recommended. This vignette is created under `r R.version$version.string` using packages **`knitr`** [@knitr, v`r packageVersion('knitr')`], **`quarto`** [@quarto, v`r packageVersion('quarto')` with [Quarto](https://quarto.org/docs/get-started/) v`r quarto::quarto_version()`] and **`rmarkdown`** [@rmarkdown, v`r packageVersion('rmarkdown')`].
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Environment on author's computer"
 Sys.info()[c('sysname', 'release', 'machine')]
 R.version
-```
-
-Package **`groupedHyperframe`** requires the development versions of the **`spatstat.*`** family of packages.
-
-```{r}
-#| eval: false
-remotes::install_github('spatstat/spatstat', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.data', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.explore', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.geom', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.linnet', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.model', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.random', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.sparse', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.univar', upgrade = 'always')
-remotes::install_github('spatstat/spatstat.utils', upgrade = 'always')
 ```
 
 Experimental (and maybe unstable) features are released *extremely frequently* to [Github](https://github.com/tingtingzhan/maxEff). [Active developers should use the Github version; suggestions and bug reports are welcome!]{style="background-color: #FFFF00"} Stable releases to [CRAN](https://CRAN.R-project.org/package=maxEff) are typically updated every 2 to 3 months, or when the authors have an upcoming manuscript in the peer-reviewing process.
@@ -95,28 +83,22 @@ utils::install.packages('groupedHyperframe') # Developers, do NOT use!!
 utils::install.packages('maxEff') # Developers, do NOT use!!
 ```
 
-
-
-
 ## Getting Started
 
 Examples in this vignette require that the `search` path has
 
 ```{r setup}
 library(maxEff)
+library(groupedHyperframe)
 library(survival)
 ```
 
-
-As of package **`spatstat.explore`** [@spatstat15, v`r packageVersion('spatstat.explore')`] and **`pROC`** [@pROC, v`r packageVersion('pROC')`], we have a function name clash between `spatstat.explore::plot.roc()` and `pROC::plot.roc()` when loading both packages **`groupedHyperframe`** (which `Imports` package **`spatstat.explore`**) and **`maxEff`** (which `Imports` package **`caret`** which `Imports` package **`pROC`**).  This function name clash is potentially hazardous as the `S3` classes `spatstat.explore::roc` and `pROC::roc` are totally different.
-
-
+As of package **`spatstat.explore`** [@spatstat15, v`r packageVersion('spatstat.explore')`] and **`pROC`** [@pROC, v`r packageVersion('pROC')`], we have a function name clash between `spatstat.explore::plot.roc()` and `pROC::plot.roc()` when loading both packages **`groupedHyperframe`** (which `Imports` package **`spatstat.explore`**) and **`maxEff`** (which `Imports` package **`caret`** which `Imports` package **`pROC`**). This function name clash is potentially hazardous as the `S3` classes `spatstat.explore::roc` and `pROC::roc` are totally different.
 
 ```{r}
 #| echo: false
 #options(mc.cores = 1L) # for CRAN submission
 ```
-
 
 ## Acknowledgement
 
@@ -125,46 +107,34 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 -   R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X))
 -   R01CA253977 (H. Rui and I. Chervoneva).
 
-
-
 # Data Preparation
 
 <!--Data set `Ki67` in package **`groupedHyperframe`** is a `groupedHyperframe`.-->
 
 ```{r}
-Ki67g = groupedHyperframe::Ki67 |>
-  grouped_ppp(formula = logKi67 ~ . | patientID/tissueID, data = _)
+Ki67q = groupedHyperframe::Ki67 |>
+  within.data.frame(expr = {
+    x = y = NULL
+  }) |>
+  as.groupedHyperframe(group = ~ patientID/tissueID) |>
+  aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'A `groupedHyperframe` *`Ki67g`*'
-Ki67g
-```
-
-
-
-```{r}
-s = Ki67g |>
-  aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
+#| code-summary: 'A `hyperframe` *`Ki67q`* with aggregated quantiles'
+Ki67q |>
+  head()
 ```
 
 Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`logKi67.quantile`*. Users are encouraged to learn more about `groupedHyperframe` class and function `aggregate_quantile()` from package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe).
 
-```{r}
-#| code-fold: true
-#| code-summary: 'A `groupedHyperframe` *`s`* with aggregated quantiles'
-s |>
-  head()
-```
-
-
 Partition into a training (80%) and test (20%) set.
 
 ```{r}
-set.seed(32); id = sample.int(n = nrow(s), size = nrow(s)*.8) |> sort.int()
-s0 = s[id, , drop = FALSE] # training set
-s1 = s[-id, , drop = FALSE] # test set
+set.seed(32); id = sample.int(n = nrow(Ki67q), size = nrow(Ki67q)*.8) |> sort.int()
+s0 = Ki67q[id, , drop = FALSE] # training set
+s1 = Ki67q[-id, , drop = FALSE] # test set
 ```
 
 Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set `s0`.
@@ -235,14 +205,14 @@ m2
 To find the selected additional logical predictor,
 
 ```{r}
-s |> 
+Ki67q |> 
   with(ee = m2[[1L]] |> attr(which = 'x')) |> # ?spatstat.geom::with.hyperframe
   m2[[1L]]() |>
   head(n = 20L)
 ```
 
 ```{r}
-s |> 
+Ki67q |> 
   with(ee = m2[[2L]] |> attr(which = 'x')) |> # ?spatstat.geom::with.hyperframe
   m2[[2L]]() |>
   head(n = 20L)
