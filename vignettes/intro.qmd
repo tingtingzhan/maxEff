@@ -37,7 +37,7 @@ This vignette of package **`maxEff`** ([Github](https://github.com/tingtingzhan/
 
 R terminology might be different from that of mathematics and statistics. Please refer to Appendix @sec-terms for explanation and reference of the terms and abbreviations used in this vignette.
 
-Package **`maxEff`** `Depends` packages
+Package **`maxEff`** `Depends` on packages
 
 -   `r '\U1f5dd'` **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), key suggest, for the data structure of grouped hyper data frame
 
@@ -133,8 +133,16 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 
 ```{r}
 Ki67g = groupedHyperframe::Ki67 |>
-  grouped_ppp(formula = logKi67 ~ PFS + Tstage + adj_rad + adj_chemo + histology + Her2 + HR + node + race + age | patientID/tissueID, data = _)
+  grouped_ppp(formula = logKi67 ~ . | patientID/tissueID, data = _)
 ```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'A `groupedHyperframe` *`Ki67g`*'
+Ki67g
+```
+
+
 
 ```{r}
 s = Ki67g |>
@@ -142,6 +150,14 @@ s = Ki67g |>
 ```
 
 Candidate of additional predictors are stored in a `numeric`-`hypercolumn` *`logKi67.quantile`*. Users are encouraged to learn more about `groupedHyperframe` class and function `aggregate_quantile()` from package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe).
+
+```{r}
+#| code-fold: true
+#| code-summary: 'A `groupedHyperframe` *`s`* with aggregated quantiles'
+s |>
+  head()
+```
+
 
 Partition into a training (80%) and test (20%) set.
 
