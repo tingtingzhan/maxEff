@@ -185,11 +185,16 @@ set.seed(42); m1 = m |>
 
 The pipeline above consists of three steps
 
-1.  Function `add_numeric()` analyzes the `numeric`-hypercolumn *`logKi67.quantile`*, considers each `slice` as a `numeric` predictor, and `update`s the starting model *`m`* with each one of them respectively. Function `add_numeric()` returns an `add_numeric` object, which is a `listof` objects with an internal class `'add_numeric_'`.
+1.  Function `add_numeric()` 
+    * considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* (see function `groupedHyperframe::t.vectorlist()` and/or package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`*) as an additional `numeric` predictor;
+    * `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
+    * returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`.
 
-2.  The `S3` method dispatch `sort_by.add_()` sorts the `add_numeric` object by the `abs`olute value of the regression coefficient (i.e., effect size) of the additioanal numeric predictor.
+2.  The `S3` method dispatch `sort_by.add_()` 
+    * sorts the input `'add_numeric'` object by the `abs`olute values of the regression coefficients (i.e., effect size) of the additional `numeric` predictors;
+    * returns an `'add_numeric'` object
 
-3.  The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the object returned from the previous step.
+3.  The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input `'add_numeric'` object.
 
 The `S3` method dispatch `print.add_()`
 
@@ -369,18 +374,6 @@ set.seed(15); id0 = y |>
   caret::createDataPartition(times = 1L, p = .5)
 table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 ```
-
-## `slices()` 
-
-Function `slices()` is an internal tool to extract the "slices" from a `listof` of equi-`length` `vector`s.
-
-Function `spatstat.geom::with.hyperframe()` provides an elegant and idiot-proof user interface for this purpose, but it is too slow in a batch process.  
-
-```{r}
-z1 = s0 |>
-  spatstat.geom::with.hyperframe(expr = logKi67.quantile['0.98'])
-```
-
 
 
 
