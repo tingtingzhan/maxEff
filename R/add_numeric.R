@@ -40,12 +40,14 @@ add_numeric <- function(
   y <- tmp$y
   data_ <- tmp$data # 'data.frame'
   x_ <- tmp$x_
-  
+  xval <- tmp$xval
+
   out <- x_ |>
-    # lapply(FUN = \(x.) { 
-    mclapply(mc.cores = mc.cores, FUN = \(x.) {
+    seq_along() |>  
+    mclapply(mc.cores = mc.cores, FUN = \(i) {
       # (x. = x_[[1L]])
-      data_$x. <- with(data = data, ee = x.) # ?spatstat.geom::with.hyperframe
+      x. <- x_[[i]]
+      data_$x. <- xval[[i]]
       m_ <- update(start.model, formula. = . ~ . + x., data = data_)
       cf_ <- m_$coefficients[length(m_$coefficients)]
       attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_

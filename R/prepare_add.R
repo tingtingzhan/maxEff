@@ -1,5 +1,6 @@
 
 #' @importFrom spatstat.geom is.hyperframe
+#' @importFrom groupedHyperframe t.vectorlist
 .prepare_add_ <- function(start.model, x, data, envir = parent.frame(), ...) {
   
   fom0 <- formula(start.model)
@@ -32,10 +33,14 @@
     })
   names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   
+  xval <- X |> 
+    t.vectorlist()
+  
   return(list(
     y = y,
     data = unclass(data)$df,
-    x_ = x_
+    x_ = x_,
+    xval = xval
   ))
   
 }

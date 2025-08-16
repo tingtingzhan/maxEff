@@ -113,6 +113,8 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 
 [Point user to `groupedHyperframe` vignette, section *Publications*.]{style="background-color: yellow"}
 
+[Copy language from `hyper.gam` vignette, section *Quantile Index*, subsection *Compute Aggregated Quantiles*.]{style="background-color: yellow"}
+
 ```{r}
 Ki67q = groupedHyperframe::Ki67 |>
   within.data.frame(expr = {
@@ -131,6 +133,10 @@ Ki67q |>
 
 ## Spatial Example
 
+[Compose some English.]{style="background-color: yellow"}
+
+[And share with `hyper.gam` vignette, section *Spatial Index*.]{style="background-color: yellow"}
+
 ```{r}
 Ki67s = groupedHyperframe::Ki67 |>
   grouped_ppp(formula = logKi67 ~ . | patientID/tissueID) |>
@@ -145,7 +151,6 @@ Ki67s |>
   head()
 ```
 
-
 # Data Partition
 
 Partition into a training (80%) and test (20%) set.
@@ -156,26 +161,39 @@ s0 = Ki67q[id, , drop = FALSE] # training set
 s1 = Ki67q[-id, , drop = FALSE] # test set
 ```
 
-Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set `s0`.
+Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set `s0`. As of package **`spatstat.geom`** v`r packageVersion('spatstat.geom')`, function `spatstat.geom::as.data.frame.hyperframe()` warns on hypercolumns that aren't able to be converted to a `data.frame`. Therefore, user should use `suppressWarnings()` or set `#| warning: false` in R markdown code–chunk.
 
 ```{r}
-suppressWarnings(m <- coxph(PFS ~ Tstage, data = s0))
+#| warning: false
+m = coxph(PFS ~ Tstage, data = s0)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: Starting `coxph` model *`m`*
 summary(m)
 ```
 
-# 🚧 Additional `numeric` Predictor
-
-Function `add_numeric()` treats each additional predictor as a numeric variable, and `update`s the starting model with each additional predictor. Function `add_numeric()` returns an `add_numeric` object, which is a `listof` objects with an internal class `'add_numeric_'`.
-
-The `S3` method dispatch `sort_by.add_()` sorts the `add_numeric` object by the `abs`olute value of the regression coefficient (i.e., effect size) of the additioanal numeric predictor.
-
-The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the object returned from the previous step.
+# 🚧 Adding `numeric` Predictor
 
 ```{r}
 set.seed(42); m1 = m |>
   add_numeric(x = ~ logKi67.quantile) |>
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
+```
+
+The pipeline above consists of three steps
+
+1.  Function `add_numeric()` analyzes the `numeric`-hypercolumn *`logKi67.quantile`*, considers each `slice` as a `numeric` predictor, and `update`s the starting model *`m`* with each one of them respectively. Function `add_numeric()` returns an `add_numeric` object, which is a `listof` objects with an internal class `'add_numeric_'`.
+
+2.  The `S3` method dispatch `sort_by.add_()` sorts the `add_numeric` object by the `abs`olute value of the regression coefficient (i.e., effect size) of the additioanal numeric predictor.
+
+3.  The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the object returned from the previous step.
+
+The `S3` method dispatch `print.add_()`
+
+```{r}
 m1
 ```
 
@@ -352,14 +370,28 @@ set.seed(15); id0 = y |>
 table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 ```
 
+## `slices()` 
+
+Function `slices()` is an internal tool to extract the "slices" from a `listof` of equi-`length` `vector`s.
+
+Function `spatstat.geom::with.hyperframe()` provides an elegant and idiot-proof user interface for this purpose, but it is too slow in a batch process.  
+
+```{r}
+z1 = s0 |>
+  spatstat.geom::with.hyperframe(expr = logKi67.quantile['0.98'])
+```
+
+
+
+
 ## Terms & Abbreviations {#sec-terms}
 
 | Term / Abbreviation | Description |
 |------------------------------------|------------------------------------|
+| CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
-| CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | [`createDataPartition`](https://search.r-project.org/CRAN/refmans/caret/html/createDataPartition.html) | Test vs. training data set partition, from package **`caret`** [@caret] |
 | [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) | Factor, or categorical variable |
 | [`function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
@@ -379,6 +411,7 @@ table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 | `S4`, `generic`, `methods` | `S4` object oriented system, [`isS4`](https://search.r-project.org/R/refmans/base/html/isS4.html); [`setClass`](https://search.r-project.org/R/refmans/methods/html/setClass.html); [`setMethod`](https://search.r-project.org/R/refmans/methods/html/setMethod.html); [`getMethod`](https://search.r-project.org/R/refmans/methods/html/getMethod.html); <https://adv-r.hadley.nz/s4.html> |
 | [`sort_by`](https://search.r-project.org/R/refmans/base/html/sort_by.html) | Sort an object by some criterion, `maxEff::sort_by.add_` |
 | [`subset`](https://search.r-project.org/R/refmans/base/html/subset.html) | Subsets of object by conditions, `maxEff::subset.add_dummy` |
+| [`suppressWarnings`](https://search.r-project.org/R/refmans/base/html/warning.html) | Suppress warning messages |
 | [`Surv`](https://search.r-project.org/CRAN/refmans/survival/html/Surv.html) | Survival, i.e., time-to-event, object, from package **`survival`** [@survival] |
 | [`update`](https://search.r-project.org/R/refmans/stats/html/update.html) | Update and re-fit a model call |
 
