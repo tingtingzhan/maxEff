@@ -177,7 +177,7 @@ summary(m)
 # 🚧 Adding `numeric` Predictor
 
 ```{r}
-set.seed(42); m1 = m |>
+m1 = m |>
   add_numeric(x = ~ logKi67.quantile) |>
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
