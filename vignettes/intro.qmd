@@ -213,13 +213,18 @@ s0 |>
   head()
 ```
 
-The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*.
+The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*.  The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that we use the workhorse function `stats:::update.default()`.
 
 ```{r}
-a0 |> 
+a1 = a0 |> 
   predict(newdata = s1)
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`a1`*' 
+a1
+```
 
 
 # Adding `logical` Predictor

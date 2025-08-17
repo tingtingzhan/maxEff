@@ -114,6 +114,7 @@ print.add_numeric <- function(x, ...) {
 #' Function [predict.add_numeric()] returns a \link[stats]{listof} regression models.
 #' 
 #' @keywords internal
+#' @name predict_add_numeric
 #' @importFrom stats predict
 #' @export predict.add_numeric
 #' @export
@@ -126,8 +127,9 @@ predict.add_numeric <- function(object, ...) {
   return(ret)
 }
 
-
-
+#' @rdname predict_add_numeric
+#' @importFrom stats predict update
+#' @export predict.add_numeric_
 #' @export
 predict.add_numeric_ <- function(object, newdata, ...) {
   
@@ -135,8 +137,9 @@ predict.add_numeric_ <- function(object, newdata, ...) {
   newd <- unclass(newdata)$df
   newd$x. <- with(data = newdata, ee = object) # ?spatstat.geom::with.hyperframe
   
-  m_ <- attr(object, which = 'model', exact = TRUE)
-  suppressWarnings(update(m_, data = newd))
+  object |>
+    attr(which = 'model', exact = TRUE) |>
+    update(data = newd)
   
 }
 
