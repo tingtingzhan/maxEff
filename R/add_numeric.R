@@ -64,15 +64,18 @@ add_numeric <- function(
 
 #' @title [labels.add_numeric]
 #' 
-#' @param x a [add_numeric] object
+#' @param object a [add_numeric] object
 #' 
 #' @param ... ..
+#' 
+#' @returns
+#' Function [labels.add_numeric()] returns a \link[base]{character} \link[base]{vector}.
 #' 
 #' @keywords internal
 #' @export labels.add_numeric
 #' @export
-labels.add_numeric <- function(x, ...) {
-  x |>
+labels.add_numeric <- function(object, ...) {
+  object |>
     vapply(FUN = deparse1, FUN.VALUE = '')
 }
 

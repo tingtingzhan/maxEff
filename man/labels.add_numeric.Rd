@@ -4,12 +4,15 @@
 \alias{labels.add_numeric}
 \title{\link{labels.add_numeric}}
 \usage{
-\method{labels}{add_numeric}(x, ...)
+\method{labels}{add_numeric}(object, ...)
 }
 \arguments{
-\item{x}{a \link{add_numeric} object}
+\item{object}{a \link{add_numeric} object}
 
 \item{...}{..}
+}
+\value{
+Function \code{\link[=labels.add_numeric]{labels.add_numeric()}} returns a \link[base]{character} \link[base]{vector}.
 }
 \description{
 \link{labels.add_numeric}
