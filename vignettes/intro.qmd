@@ -45,7 +45,7 @@ R terminology might be different from that of mathematics and statistics. Please
 Package **`maxEff`** `Imports` packages
 
 -   `r '\U1f5dd'` **`caret`** [@caret, v`r packageVersion('caret')`], for data partition
--   **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), for function `t.vectorlist()`
+-   `r '\U1f5dd'` **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), key dependency, for function `t.vectorlist()`
 -   **`parallel`** shipped with `r R.version$version.string`, for parallel computing
 -   `r '\U1f5dd'` **`rpart`** [@rpart, v`r packageVersion('rpart')`], key dependency, for recursive partitioning
 -   `r '\U1f5dd'` **`spatstat.geom`** [@spatstat15, dev v`r packageVersion('spatstat.geom')`], key dependency, for `hyperframe` data structure
