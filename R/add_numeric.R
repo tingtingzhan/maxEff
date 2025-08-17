@@ -82,24 +82,6 @@ print.add_numeric <- function(x, ...) {
 
 
 
-# @title [print.add_numeric_]
-# @param x a `add_numeric_` object
-# @param ... ..
-# @note
-# don't do this.  tzh want ?base::print.default to inspect.
-# @keywords internal
-# @export print.add_numeric_
-# @export
-#print.add_numeric_ <- function(x, ...) {
-#  # 'add_numeric_' object is `language` with a bunch of attributes
-#  x |>
-#    deparse1() |>
-#    cat('\n')
-#}
-
-
-
-
 #' @title Regression Models with Optimal Dichotomizing Predictors
 #' 
 #' @description

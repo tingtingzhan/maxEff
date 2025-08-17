@@ -185,7 +185,7 @@ First, function `add_numeric()`
 
 -   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor.  Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
 -   `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
--   returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`. The `'add_numeric'` inherits from class `'add_'`.
+-   returns an `'add_numeric'` object, which inherits from class `'add_'`.  This is a `listof` objects with internal class `'add_numeric_'` (see Appendix @sec-add_numeric_). 
 
 Second, the `S3` method dispatch `sort_by.add_()` 
 
@@ -224,7 +224,7 @@ m1[1L] |> predict(newdata = s1)
 
 ## Naive Practice
 
-Function `add_dummy()` partitions each additional `numeric` predictor into a logical variable using function `node1()`, and `update`s the starting model by adding in each of the dichotomized `logical` predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` `node1` objects.
+Function `add_dummy()` partitions each additional `numeric` predictor into a logical variable using function `node1()`, and `update`s the starting model by adding in each of the dichotomized `logical` predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` `node1` objects (see Appendix @sec-node1).
 
 The `S3` method dispatch `subset.add_dummy()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor.
 
@@ -379,26 +379,40 @@ fn0 |> get_cutoff()
 
 ## `statusPartition()` {#sec-statusPartition}
 
-Function `statusPartition()` partitions stratified a `survival::Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more partitioned data set being degenerate due to the fact that all subjects in that partition being censored. Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
+Function `statusPartition()` partitions stratified a `survival::Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored. 
 
 ```{r}
-y = survival::capacitor |> 
+capacitor_failure = survival::capacitor |> 
   with(expr = Surv(time, status))
 ```
 
 ```{r}
-#| label: statusPartition
-set.seed(15); id = y |>
-  statusPartition(times = 1L, p = .5)
-table(y[id[[1L]], 2L]) / table(y[,2L]) # balanced by survival status
+#| code-fold: true
+#| code-summary: '`Surv` object *`capacitor_failure`*'
+capacitor_failure
 ```
+
 
 ```{r}
-set.seed(15); id0 = y |>
-  caret::createDataPartition(times = 1L, p = .5)
-table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
+#| label: statusPartition
+set.seed(15); id = capacitor_failure |>
+  statusPartition(times = 1L, p = .5)
+table(capacitor_failure[id[[1L]], 2L]) / table(capacitor_failure[,2L]) # balanced by survival status
 ```
 
+Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
+
+```{r}
+#| code-fold: true
+#| code-summary: '`caret::createDataPartition()`: *not* balanced by survival status'
+set.seed(15); id0 = capacitor_failure |>
+  caret::createDataPartition(times = 1L, p = .5)
+table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
+```
+
+## Internal Class `'add_numeric_'` {#sec-add_numeric_}
+
+🚧 This section is under construction.
 
 
 ## Terms & Abbreviations {#sec-terms}
