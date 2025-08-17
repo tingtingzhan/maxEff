@@ -48,7 +48,7 @@
 #' @keywords internal
 #' @name add_dummy
 #' @importFrom caret createDataPartition
-#' @importFrom parallel mclapply detectCores
+#' @importFrom parallel mclapply
 #' @importFrom stats formula quantile
 #' @export
 add_dummy_partition <- function(
@@ -73,8 +73,8 @@ add_dummy_partition <- function(
   
   out <- x_ |>
     seq_along() |>
-    #mclapply(mc.cores = mc.cores, FUN = \(i) { 
-    lapply(FUN = \(i) { # debugging
+    mclapply(mc.cores = mc.cores, FUN = \(i) { 
+    #lapply(FUN = \(i) { # debugging
       tmp_ <- ids |>
         lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
       tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
@@ -87,11 +87,6 @@ add_dummy_partition <- function(
       return(tmp[[order(effsize)[id]]])  
     })
 
-  names(out) <- paste0(
-    names(x_), 
-    vapply(out, FUN = labels.node1, FUN.VALUE = '')
-  )
-  
   class(out) <- c('add_dummy', 'add_', class(out))
   return(invisible(out))
   
@@ -139,7 +134,7 @@ add_dummy <- function(
       
       rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
         node1()
-      formals(rule)$newx <- x. # wow!
+      formals(rule)$newx <- x.
 
       data_$x. <- rule(xval) # partition rule applied to complete data
       suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
@@ -151,16 +146,36 @@ add_dummy <- function(
       return(rule)
     })
   
-  names(out) <- paste0(
-    names(x_), 
-    vapply(out, FUN = labels.node1, FUN.VALUE = '')
-  )
-  
   class(out) <- c('add_dummy', 'add_', 'listof')
   return(out)
 
 }
 
+
+
+
+
+#' @title [print.add_dummy]
+#' 
+#' @param x an object returned from functions 
+#' [add_dummy_partition()] or [add_dummy()]
+#' 
+#' @param ... additional parameters, currently not in use
+#' 
+#' @details
+#' ..
+#' 
+#' @returns
+#' Function [print.add_dummy()] does not have a returned value
+#' 
+#' @keywords internal
+#' @export print.add_dummy
+#' @export
+print.add_dummy <- function(x, ...) {
+  x |>
+    vapply(FUN = labels.node1, FUN.VALUE = '') |>
+    cat(sep = '\n')
+}
 
 
 
@@ -213,7 +228,8 @@ subset.add_dummy <- function(x, subset, ...) {
 #' @export
 predict.add_dummy <- function(object, ...) {
   # think about changing this to [update.add_dummy()] too 
-  ret <- object |> lapply(FUN = update.node1, ...)
+  ret <- object |> 
+    lapply(FUN = update.node1, ...)
   class(ret) <- 'listof'
   return(ret)
 }

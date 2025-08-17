@@ -21,10 +21,5 @@ Dichotomize via 1st Node of Recursive Partitioning
 }
 \note{
 In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
-
-Function \link[rpart]{rpart} is quite slow.
-}
-\examples{
-# See intro vignette, section Appendix, subsection node1()
 }
 \keyword{internal}

@@ -15,19 +15,14 @@ bibliography: maxEff.bib
 knitr:
   opts_chunk: 
     collapse: true
-    comment: "#>" 
+    comment: "#" 
 vignette: >
   %\VignetteIndexEntry{intro}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-library(knitr)
-opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+```{r}
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
@@ -202,7 +197,7 @@ Second, the `S3` method dispatch `sort_by.add_()`
 
 Third, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input `'add_numeric'` object.
 
-The `S3` method dispatch `print.add_()`
+The `S3` method dispatch `print.add_numeric()`
 
 ```{r}
 m1
@@ -303,8 +298,7 @@ m3[1L] |> predict(newdata = s1)
 
 Function `node1()` dichotomizes a single `numeric` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
 
--   the use of function `node1()`,
--   the `S3` class `'node1'`, and
+-   the use of function `node1()`, and
 -   the `S3` method dispatches to the class `'node1'`
 
 using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
@@ -317,7 +311,7 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
-We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival among the first 140 patients (training set).  In the following call to function `rpart::rpart()`,
+We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival among the first 140 patients of the training set *`stagec0`*.  In the following call to function `rpart::rpart()`,
 
 -   parameter `cp = .Machine$double.eps` ensures at least one node/split of the partitioning tree.
 -   parameter `maxdepth = 2L` reduces the computation cost as we need only the first node. 
@@ -343,40 +337,47 @@ Function `node1()` creates a **dichotomizing rule** of the numeric variable *`ag
 
 ```{r}
 #| label: node1
-fn1 = rp0 |>
+fn0 = rp0 |>
   node1()
 ```
 
-The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn1`*,
-
-```{r}
-fn1
-```
-
-Dichotomizing rule *`fn1`* should be used as any R `function`.
+Dichotomizing rule *`fn0`* should be used as any R `function`.
 
 ```{r}
 set.seed(35); rnorm(6, mean = 53.5) |> 
-  fn1()
+  fn0()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomize the numeric variable *`age`* in the test set, using the dichotomizing rule *`fn1`* determined by the training set.
+
+The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn0`*,
+
+```{r}
+fn0
+```
+
+The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule.
+
+```{r}
+fn0 |> 
+  labels()
+```
+
+The `S3` method dispatch `predict.node1()` dichotomize the numeric variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`fn0`* determined by the training set *`stagec0`*.
 
 ```{r}
 data.frame(
   stagec1$age,
-  Dichotomized = fn1 |> predict(newdata = stagec1),
+  Dichotomized = fn0 |> predict(newdata = stagec1),
   check.names = FALSE
 )
 ```
 
-Developers may obtain the `numeric` cutoff value of the dichotomizing rule *`fn1`*, or a brief text of to describe it, for further analysis.
+Developers may obtain the `numeric` cutoff value of the dichotomizing rule *`fn0`*.
 
 ```{r}
 #| code-fold: true
 #| code-summary: 'R code: subject to change!'
-fn1 |> get_cutoff()
-fn1 |> labels()
+fn0 |> get_cutoff()
 ```
 
 ## `statusPartition()` {#sec-statusPartition}
@@ -418,7 +419,7 @@ table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 | [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame |
 | [`head`](https://search.r-project.org/R/refmans/utils/html/head.html) | First parts of an object |
 | `hypercolumns`, [`hyperframe`](https://search.r-project.org/CRAN/refmans/spatstat.geom/html/hyperframe.html) | (Hyper columns of) hyper data frame, from package **`spatstat.geom`** [@spatstat05] |
-| [`labels`](https://search.r-project.org/R/refmans/base/html/labels.html) | Labels from object, `maxEff::labels.node1` |
+| [`labels`](https://search.r-project.org/R/refmans/base/html/labels.html) | Labels from object |
 | [`levels`](https://search.r-project.org/R/refmans/base/html/levels.html) | Levels of a [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) |
 | [`listof`](https://search.r-project.org/R/refmans/stats/html/listof.html) | List of objects |
 | `logistic` | Logistic regression model, `stats::glm(., family = binomial(\'logit\'))` |

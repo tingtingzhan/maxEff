@@ -69,7 +69,6 @@ splitd <- function(start.model, x_, x, data, id, ...) {
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
   attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
   # class(rule) <- c('splitd', class(rule)) # removed Spring 2025!!!
-  # [predict.splitd()] will become [update.node1()] !!!
   return(rule)
 }
 
@@ -105,16 +104,14 @@ splitd <- function(start.model, x_, x, data, id, ...) {
 #' @importFrom stats update
 #' @export update.node1
 #' @export
-# was named [predict.node1()]
 update.node1 <- function(object, newdata, ...) {
   
   if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
   
   newd <- unclass(newdata)$df
   
-  newd$x. <- formals(object)$newx |>
-    with(data = newdata, ee = _) |> # ?spatstat.geom::with.hyperframe
-    object() # dichotomize!
+  newd$x. <- object |>
+    predict.node1(newdata = newdata)
   
   object |>
     attr(which = 'model', exact = TRUE) |> 

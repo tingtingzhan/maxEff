@@ -25,7 +25,7 @@
 #' which is a \link[stats]{listof} objects with an internal class `'add_numeric_'`.
 #' 
 #' @keywords internal
-#' @importFrom parallel mclapply detectCores
+#' @importFrom parallel mclapply
 #' @importFrom stats formula update
 #' @export
 add_numeric <- function(
@@ -56,14 +56,46 @@ add_numeric <- function(
       return(x.)
     }) # 'list'
   
-  # just to beautify!!
-  names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
-  
   class(out) <- c('add_numeric', 'add_', 'listof', class(out))
   return(invisible(out))
   
 }
 
+
+
+#' @title [print.add_numeric]
+#' 
+#' @param x a [add_numeric] object
+#' 
+#' @param ... ..
+#' 
+#' @keywords internal
+#' @export print.add_numeric
+#' @export
+print.add_numeric <- function(x, ...) {
+  x |>
+    vapply(FUN = deparse1, FUN.VALUE = '') |>
+    cat(sep = '\n')
+}
+
+
+
+
+
+# @title [print.add_numeric_]
+# @param x a `add_numeric_` object
+# @param ... ..
+# @note
+# don't do this.  tzh want ?base::print.default to inspect.
+# @keywords internal
+# @export print.add_numeric_
+# @export
+#print.add_numeric_ <- function(x, ...) {
+#  # 'add_numeric_' object is `language` with a bunch of attributes
+#  x |>
+#    deparse1() |>
+#    cat('\n')
+#}
 
 
 
@@ -85,7 +117,8 @@ add_numeric <- function(
 #' @export predict.add_numeric
 #' @export
 predict.add_numeric <- function(object, ...) {
-  ret <- object |> lapply(FUN = predict.add_numeric_, ...)
+  ret <- object |> 
+    lapply(FUN = predict.add_numeric_, ...)
   class(ret) <- 'listof'
   return(ret)
 }

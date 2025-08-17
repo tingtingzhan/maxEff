@@ -1,6 +1,4 @@
 
-
-
 #' @title Dichotomize via 1st Node of Recursive Partitioning
 #' 
 #' @param x an \link[rpart]{rpart.object}
@@ -15,16 +13,9 @@
 #' @note
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
 #' 
-#' Function \link[rpart]{rpart} is quite slow.
-#' 
-#' @examples
-#' # See intro vignette, section Appendix, subsection node1()
 #' @keywords internal
 #' @export
-node1 <- function(
-    x, 
-    ...
-) {
+node1 <- function(x, ...) {
   
   s <- x$splits
   if (!length(s)) {
@@ -58,8 +49,8 @@ node1 <- function(
     quote(if (all(ret, na.rm = TRUE) || !any(ret, na.rm = TRUE)) warning('Dichotomized value is all-0 or all-1')),
     quote(return(ret))
   )
-  fn <- as.function.default(fn_)
   
+  fn <- as.function.default(fn_)
   class(fn) <- c('node1', class(fn))
   return(fn)
 }
@@ -83,11 +74,15 @@ predict.node1 <- function(object, newdata, ...) {
   if (inherits(newdata, what = 'data.frame')) {
     
     formals(object)$newx |> 
-      call(name = 'object', newx = _) |>
-      eval(envir = newdata)
-    
+      eval(envir = newdata) |>
+      object()
+
   } else if (inherits(newdata, what = 'hyperframe')) {
-    stop('be careful with spatstat.geom::with.hyperframe')
+    
+    formals(object)$newx |>
+      with(data = newdata, ee = _) |> # ?spatstat.geom::with.hyperframe
+      object()
+    
   }
   
 }
@@ -135,8 +130,11 @@ get_cutoff.node1 <- function(x) {
 #' @export labels.node1
 #' @export
 labels.node1 <- function(object, ...) {
-  (body(object)[[2L]][[3L]][[2L]][c(1L,3L)]) |>
+  z1 <- formals(object)$newx |> 
     deparse1()
+  z2 <- (body(object)[[2L]][[3L]][[2L]][c(1L,3L)]) |>
+    deparse1()
+  paste0(z1, z2)
 }
 
 

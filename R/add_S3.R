@@ -14,7 +14,7 @@
 
 
 
-#' @title S3 Method Dispatches to `'add_'` Class
+#' @title [sort_by.add_]
 #' 
 #' @param x an object returned from functions 
 #' [add_dummy_partition()], [add_dummy()] or [add_numeric()]
@@ -22,31 +22,6 @@
 #' @param y \link[base]{language}, see function \link[base]{sort_by}
 #' 
 #' @param ... additional parameters of S3 generic \link[base]{sort_by}, etc.
-#' 
-#' @details
-#' ..
-#' 
-#' @returns
-#' Function [print.add_()] does not have a returned value
-#' 
-#' @name S3_add_
-#' @keywords internal
-#' @export print.add_
-#' @export
-print.add_ <- function(x, ...) {
-  cat(names(x), sep = '\n')
-  return(invisible())
-}
-
-
-
-# @export
-#print.add_numeric_ <- function(x, ...) {
-  # does tzh want to write this?
-#}
-
-
-#' @rdname S3_add_
 #' 
 #' @details
 #' Function [sort_by.add_()] sorts the elements of an `'add_'` object by a certain criterion `y`.
