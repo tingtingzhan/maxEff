@@ -138,6 +138,7 @@ Ki67q |>
 [And share with `hyper.gam` vignette, section *Spatial Index*.]{style="background-color: yellow"}
 
 ```{r}
+#| eval: false
 Ki67s = groupedHyperframe::Ki67 |>
   grouped_ppp(formula = logKi67 ~ . | patientID/tissueID) |>
   Emark_(r = seq.int(from = 0, to = 100)) |>
@@ -145,6 +146,7 @@ Ki67s = groupedHyperframe::Ki67 |>
 ```
 
 ```{r}
+#| eval: false
 #| code-fold: true
 #| code-summary: 'A `hyperframe` *`Ki67s`* with aggregated `Emark`'
 Ki67s |>
@@ -187,16 +189,18 @@ m1 = m |>
 
 The pipeline above consists of three steps
 
-1.  Function `add_numeric()` 
-    * considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* (see function `groupedHyperframe::t.vectorlist()` and/or package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`*) as an additional `numeric` predictor;
-    * `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
-    * returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`. The `'add_numeric'` inherits from class `'add_'`.
+First, function `add_numeric()` 
 
-2.  The `S3` method dispatch `sort_by.add_()` 
-    * sorts the input `'add_numeric'` object by the `abs`olute values of the regression coefficients (i.e., effect size) of the additional `numeric` predictors;
-    * returns an `'add_numeric'` object
+-   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor.  Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
+-   `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
+-   returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`. The `'add_numeric'` inherits from class `'add_'`.
 
-3.  The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input `'add_numeric'` object.
+Second, the `S3` method dispatch `sort_by.add_()` 
+
+-   sorts the input `'add_numeric'` object by the `abs`olute values of the regression coefficients (i.e., effect size) of the additional `numeric` predictors;
+-   returns an `'add_numeric'` object
+
+Third, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input `'add_numeric'` object.
 
 The `S3` method dispatch `print.add_()`
 
@@ -224,9 +228,9 @@ The S3 method dispatch `predict.add_numeric()` uses model `m1` on the test set `
 m1[1L] |> predict(newdata = s1)
 ```
 
-# 🚧 Additional `logical` Predictor
+# Adding `logical` Predictor
 
-## 🚧 `add_dummy()`: Naive Practice
+## Naive Practice
 
 Function `add_dummy()` partitions each additional `numeric` predictor into a logical variable using function `node1()`, and `update`s the starting model by adding in each of the dichotomized `logical` predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` `node1` objects.
 
@@ -237,7 +241,8 @@ The `S3` method dispatch `sort_by.add_()` sorts the `'add_dummy'` object by the 
 The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the object returned from the previous step.
 
 ```{r}
-set.seed(14); m2 = m |>
+#| label: add_dummy
+m2 = m |>
   add_dummy(x = ~ logKi67.quantile) |>
   subset(subset = p1 > .05 & p1 < .95) |> 
   # need a [unique.add_dummy()] !!!!
@@ -250,14 +255,14 @@ To find the selected additional logical predictor,
 
 ```{r}
 Ki67q |> 
-  with(ee = m2[[1L]] |> attr(which = 'x')) |> # ?spatstat.geom::with.hyperframe
+  with(ee = formals(m2[[1L]])$newx) |> # ?spatstat.geom::with.hyperframe
   m2[[1L]]() |>
   head(n = 20L)
 ```
 
 ```{r}
 Ki67q |> 
-  with(ee = m2[[2L]] |> attr(which = 'x')) |> # ?spatstat.geom::with.hyperframe
+  with(ee = formals(m2[[2L]])$newx) |> # ?spatstat.geom::with.hyperframe
   m2[[2L]]() |>
   head(n = 20L)
 ```
@@ -268,7 +273,7 @@ The S3 method generic `predict.add_dummy()` uses model `m2` on the test set `s1`
 m2[1L] |> predict(newdata = s1)
 ```
 
-## 🚧 `add_dummy_partition()`: via Repeated Partitions
+## via Repeated Partitions
 
 Function `add_dummy_partition()` partitions each additional `numeric` predictor into a `logical` variable in the following steps.
 
@@ -279,6 +284,7 @@ Function `add_dummy_partition()` partitions each additional `numeric` predictor 
 Function `add_dummy_partition()` also returns an `'add_dummy'` object.
 
 ```{r}
+#| label: add_dummy_partition
 set.seed(83); m3 = m |> 
   add_dummy_partition(~ logKi67.quantile, times = 20L) |>
   subset(subset = p1 > .15 & p1 < .85) |>
@@ -303,7 +309,7 @@ Function `node1()` dichotomizes a single `numeric` `vector` based on the first n
 
 using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
 
-Data example `rpart::stagec` contains 146 patients with stage C prostate cancer. We dichotomize the numeric variable *`age`* based on the recursive partitioning model with the endpoint of progression-free survival among the first 140 patients (training set). Note that the parameter `cp = .Machine$double.eps` of function `rpart::rpart()` ensures at least one node/split of the partitioning tree.
+Data example `rpart::stagec` contains 146 patients with stage C prostate cancer. 
 
 ```{r}
 data(stagec, package = 'rpart')
@@ -311,20 +317,37 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
+We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival among the first 140 patients (training set).  In the following call to function `rpart::rpart()`,
+
+-   parameter `cp = .Machine$double.eps` ensures at least one node/split of the partitioning tree.
+-   parameter `maxdepth = 2L` reduces the computation cost as we need only the first node. 
+
 ```{r}
-fn1 = rpart::rpart(
+#| label: rpart
+rp0 = rpart::rpart(
   formula = survival::Surv(pgtime, pgstat) ~ age, 
   data = stagec0, 
-  cp = .Machine$double.eps
-) |>
+  cp = .Machine$double.eps,
+  maxdepth = 2L
+)
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Recursive partitioning tree *`rp0`*'
+rp0
+```
+
+Function `node1()` creates a **dichotomizing rule** of the numeric variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which `inherits` from the class `'function'`.  The `name` of the numeric variable, e.g., *`age`*, is stored as the `formals` argument of parameter *`newx`*.
+
+```{r}
+#| label: node1
+fn1 = rp0 |>
   node1()
 ```
 
-Function `node1()` creates a **dichotomizing rule** of the numeric variable *`age`*. Function `node1()` returns an object of class `'node1'`, which `inherits` from the class **`function`**, with additional `attributes`
-
--   `attr(, 'x')`, the `name` of the numeric variable, e.g., *`age`*, that is dichotomized
-
-The `S3` method dispatch `print.node1()` displays the dichomizing rule as a `function` with minimal aesthetic touches,
+The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn1`*,
 
 ```{r}
 fn1
@@ -366,6 +389,7 @@ y = survival::capacitor |>
 ```
 
 ```{r}
+#| label: statusPartition
 set.seed(15); id = y |>
   statusPartition(times = 1L, p = .5)
 table(y[id[[1L]], 2L]) / table(y[,2L]) # balanced by survival status
@@ -389,6 +413,7 @@ table(y[id0[[1L]], 2L]) / table(y[,2L]) # *not* balanced by survival status
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
 | [`createDataPartition`](https://search.r-project.org/CRAN/refmans/caret/html/createDataPartition.html) | Test vs. training data set partition, from package **`caret`** [@caret] |
 | [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) | Factor, or categorical variable |
+| [`formals`](https://search.r-project.org/R/refmans/base/html/formals.html) | Formal arguments |
 | [`function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
 | [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame |
 | [`head`](https://search.r-project.org/R/refmans/utils/html/head.html) | First parts of an object |

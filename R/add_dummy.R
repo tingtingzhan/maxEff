@@ -64,17 +64,19 @@ add_dummy_partition <- function(
   y <- tmp$y
   #data <- tmp$data # not here!
   x_ <- tmp$x_
-  
+  xval <- tmp$xval
+
   ids <- if (inherits(y, what = 'Surv')) {
     statusPartition(y = y, times = times, ...)
   } else createDataPartition(y = y, times = times, groups = 2L, ...)
   # using same split for all predictors
   
   out <- x_ |>
-    mclapply(FUN = \(x.) { 
-      # (x. = x_[[1L]])
+    seq_along() |>
+    #mclapply(mc.cores = mc.cores, FUN = \(i) { 
+    lapply(FUN = \(i) { # debugging
       tmp_ <- ids |>
-        lapply(FUN = splitd, start.model = start.model, x_ = x., data = data)
+        lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
       tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
       
       effsize <- tmp |> 
@@ -83,9 +85,12 @@ add_dummy_partition <- function(
         seq_along() |> 
         quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
       return(tmp[[order(effsize)[id]]])  
-    }, mc.cores = mc.cores)
+    })
 
-  names(out) <- paste0(names(out), vapply(out, FUN = labels.node1, FUN.VALUE = ''))
+  names(out) <- paste0(
+    names(x_), 
+    vapply(out, FUN = labels.node1, FUN.VALUE = '')
+  )
   
   class(out) <- c('add_dummy', 'add_', class(out))
   return(invisible(out))
@@ -123,28 +128,33 @@ add_dummy <- function(
   tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
   y <- tmp$y
   data_ <- tmp$data
+  x_ <- tmp$x_
+  xval <- tmp$xval
   
-  out <- tmp$x_ |> 
-    mclapply(FUN = \(x.) {
-      # (x. = tmp$x_[[1L]])
-      xval <- with(data = data, ee = x.) # ?spatstat.geom::with.hyperframe
+  out <- x_ |>
+    seq_along() |>  
+    mclapply(mc.cores = mc.cores, FUN = \(i) {
+      x. <- x_[[i]]
+      xval <- xval[[i]]
       
       rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
-        node1() # before 2025-07-16
-        # node1(data.name = x.) # don't do this yet..
-      attr(rule, which = 'x') <- x. # 2025-07-15
+        node1()
+      formals(rule)$newx <- x. # wow!
 
       data_$x. <- rule(xval) # partition rule applied to complete data
       suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
-      cf_ <- m_$coefficients[length(m_$coefficients)]
+      cf <- m_$coefficients
+      cf_ <- cf[length(cf)]
       attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
       attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-      
       attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
       return(rule)
-    }, mc.cores = mc.cores)
+    })
   
-  names(out) <- paste0(names(out), vapply(out, FUN = labels.node1, FUN.VALUE = ''))
+  names(out) <- paste0(
+    names(x_), 
+    vapply(out, FUN = labels.node1, FUN.VALUE = '')
+  )
   
   class(out) <- c('add_dummy', 'add_', 'listof')
   return(out)

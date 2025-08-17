@@ -8,7 +8,9 @@
 #' 
 #' @param x_ \link[base]{language}
 #' 
-#' @param data \link[base]{data.frame}
+#' @param x \link[base]{numeric} \link[base]{vector}
+#' 
+#' @param data \link[spatstat.geom]{hyperframe}
 #' 
 #' @param id \link[base]{logical} \link[base]{vector}, indices of training (`TRUE`) and test (`FALSE`) subjects 
 #' 
@@ -38,17 +40,16 @@
 #' @importFrom rpart rpart
 #' @importFrom stats update
 #' @export
-splitd <- function(start.model, x_, data, id, ...) {
+splitd <- function(start.model, x_, x, data, id, ...) {
   
   y <- start.model$y
   
   data_df <- unclass(data)$df
   
-  x <- with(data = data, ee = x_) # ?spatstat.geom::with.hyperframe
-  
   # `id`: training set
   rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
     node1()
+  formals(rule)$newx <- x_
   
   # `-id`: test set (`id` is `integer`)
   y_ <- y[-id]
@@ -60,13 +61,10 @@ splitd <- function(start.model, x_, data, id, ...) {
   
   suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
 
-  cf_ <- m_$coefficients[length(m_$coefficients)]
+  cf <- m_$coefficients
+  cf_ <- cf[length(cf)]
   
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
-  
-  # might need to change after 2025-07-16 change in [node1()]
-  attr(rule, which = 'x') <- x_
-  # after might need to change 
   
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
   attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
@@ -114,16 +112,7 @@ update.node1 <- function(object, newdata, ...) {
   
   newd <- unclass(newdata)$df
   
-  #with(data = newdata, expr = object()) # does not work!! why??
-  
-  #with(data = newdata, expr = {
-  #  object(logMarker.E.cumtrapz["140"])
-  #}) # works
-  
-  # may be my idea is not great..
-  
-  newd$x. <- object |>
-    attr(which = 'x', exact = TRUE) |> # a 'langugage'!
+  newd$x. <- formals(object)$newx |>
     with(data = newdata, ee = _) |> # ?spatstat.geom::with.hyperframe
     object() # dichotomize!
   

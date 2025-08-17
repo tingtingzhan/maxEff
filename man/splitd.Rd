@@ -4,14 +4,16 @@
 \alias{splitd}
 \title{Split-Dichotomized Regression Model}
 \usage{
-splitd(start.model, x_, data, id, ...)
+splitd(start.model, x_, x, data, id, ...)
 }
 \arguments{
 \item{start.model}{a regression model}
 
 \item{x_}{\link[base]{language}}
 
-\item{data}{\link[base]{data.frame}}
+\item{x}{\link[base]{numeric} \link[base]{vector}}
+
+\item{data}{\link[spatstat.geom]{hyperframe}}
 
 \item{id}{\link[base]{logical} \link[base]{vector}, indices of training (\code{TRUE}) and test (\code{FALSE}) subjects}
 

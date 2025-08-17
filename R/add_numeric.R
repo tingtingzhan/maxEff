@@ -48,7 +48,8 @@ add_numeric <- function(
       x. <- x_[[i]]
       data_$x. <- xval[[i]]
       m_ <- update(start.model, formula. = . ~ . + x., data = data_)
-      cf_ <- m_$coefficients[length(m_$coefficients)]
+      cf <- m_$coefficients
+      cf_ <- cf[length(cf)]
       attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
       attr(x., which = 'model') <- m_ # needed for [predict.*]
       class(x.) <- c('add_numeric_', class(x.))
@@ -58,8 +59,7 @@ add_numeric <- function(
   # just to beautify!!
   names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   
-  #class(out) <- c('add_numeric', 'add_', class(out))
-  class(out) <- c('add_numeric', 'add_', 'listof')
+  class(out) <- c('add_numeric', 'add_', 'listof', class(out))
   return(invisible(out))
   
 }

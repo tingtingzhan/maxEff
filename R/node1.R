@@ -47,7 +47,11 @@ node1 <- function(
   
   nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
   
-  fn_ <- alist(newx = )
+  fn_ <- rownames(s)[1L] |> 
+    as.symbol() |>
+    call(name = 'alist', newx = _) |> 
+    eval()
+  
   fn_[[2L]] <- call(
     name = '{',
     call(name = '<-', quote(ret), call(name = '(', nd1)),
@@ -55,9 +59,6 @@ node1 <- function(
     quote(return(ret))
   )
   fn <- as.function.default(fn_)
-  
-  attr(fn, which = 'x') <- rownames(s)[1L] |> 
-    as.symbol()
   
   class(fn) <- c('node1', class(fn))
   return(fn)
@@ -80,46 +81,18 @@ node1 <- function(
 predict.node1 <- function(object, newdata, ...) {
   
   if (inherits(newdata, what = 'data.frame')) {
-    cl <- call(name = 'object', attr(object, which = 'x', exact = TRUE))
-    return(with.default(data = newdata, expr = eval(cl)))
-  }
-  
-  if (inherits(newdata, what = 'hyperframe')) {
+    
+    formals(object)$newx |> 
+      call(name = 'object', newx = _) |>
+      eval(envir = newdata)
+    
+  } else if (inherits(newdata, what = 'hyperframe')) {
     stop('be careful with spatstat.geom::with.hyperframe')
   }
   
 }
 
 
-
-#' @export
-print.node1 <- function(x, ...) {
-  
-  attr(x, which = 'x', exact = TRUE) |>
-    deparse1() |>
-    sprintf(fmt = 'Dichotomizing Rule (%s) via Recursive Partitioning:\n\n') |>
-    cat()
-  
-  x0 <- unclass(x)
-  attributes(x0) <- NULL
-  
-  # environment(x0) <- globalenv() 
-  # suppresses <environment: > line, but does write to .GlobalEnv
-  # do NOT do this!!
-  
-  print(x0)
-  
-  # all below: TO BE REMOVED!!!
-  #atr <- attributes(x)
-  #atr$class <- NULL # don't want to print
-  #if (!length(atr)) return(invisible())
-  
-  #cat('\nDevelopers, use\n')
-  #if (length(atr$p1)) cat('\nattr(.,\'p1\') to see the mean of dichotomized value in training, or test (if available), data\n')
-  #if (length(atr$effsize)) cat('\nattr(.,\'effsize\') to see the regression coefficient, i.e., effect size, of the dichotomized variable in training, or test (if available), data\n')
-  #if (length(atr$model)) cat('\nattr(.,\'model\') to see the regression model in training, or test (if available), data\n\n')
-  
-}
 
 
 
