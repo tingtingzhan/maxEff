@@ -161,19 +161,19 @@ Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the
 
 ```{r}
 #| warning: false
-m = coxph(PFS ~ Tstage, data = s0)
+m0 = coxph(PFS ~ Tstage, data = s0)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: Starting `coxph` model *`m`*
-summary(m)
+#| code-summary: Starting `coxph` model *`m0`*
+summary(m0)
 ```
 
 # Adding `numeric` Predictor
 
 ```{r}
-m1 = m |>
+a0 = m0 |>
   add_numeric(x = ~ logKi67.quantile) |>
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
@@ -184,41 +184,43 @@ The pipeline above consists of three steps
 First, function `add_numeric()` 
 
 -   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor.  Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
--   `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
+-   `update`s the starting model *`m0`* with each one of the additional `numeric` predictors, respectively;
 -   returns an `'add_numeric'` object, which inherits from class `'add_'`.  This is a `listof` objects with internal class `'add_numeric_'` (see Appendix @sec-add_numeric_). 
 
-Second, the `S3` method dispatch `sort_by.add_()` 
+Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute values of the regression coefficients (i.e., effect size `effsize`) of the additional `numeric` predictors.
 
--   sorts the input `'add_numeric'` object by the `abs`olute values of the regression coefficients (i.e., effect size) of the additional `numeric` predictors;
--   returns an `'add_numeric'` object
+Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-Third, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input `'add_numeric'` object.
-
-The `S3` method dispatch `print.add_numeric()`
+The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors.  Developers may pass these calls to parameter `ee` of function `spatstat.geom::with.hyperframe()` for further analysis.
 
 ```{r}
-m1
+a0
 ```
 
-To find the selected additional numeric predictor,
-
 ```{r}
+#| code-fold: true
+#| code-summary: 'Developers: retrieve the 1st selected `numeric` predictor'
 s0 |>
-  with(ee = m1[[1L]]) |> # ?spatstat.geom::with.hyperframe
+  with(ee = a0[[1L]]) |> # ?spatstat.geom::with.hyperframe
   head()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: 'Developers: retrieve the 2nd selected `numeric` predictor'
 s0 |>
-  with(ee = m1[[2L]]) |> # ?spatstat.geom::with.hyperframe
+  with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
   head()
 ```
 
-The S3 method dispatch `predict.add_numeric()` uses model `m1` on the test set `s1`.
+The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*.
 
 ```{r}
-m1[1L] |> predict(newdata = s1)
+a0 |> 
+  predict(newdata = s1)
 ```
+
+
 
 # Adding `logical` Predictor
 
@@ -234,35 +236,35 @@ The `S3` method dispatch `utils:::head.default()` chooses the top `n` element fr
 
 ```{r}
 #| label: add_dummy
-m2 = m |>
+b0 = m0 |>
   add_dummy(x = ~ logKi67.quantile) |>
   subset(subset = p1 > .05 & p1 < .95) |> 
   # need a [unique.add_dummy()] !!!!
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
-m2
+b0
 ```
 
 To find the selected additional logical predictor,
 
 ```{r}
 Ki67q |> 
-  with(ee = formals(m2[[1L]])$newx) |> # ?spatstat.geom::with.hyperframe
-  m2[[1L]]() |>
+  with(ee = formals(b0[[1L]])$newx) |> # ?spatstat.geom::with.hyperframe
+  b0[[1L]]() |>
   head(n = 20L)
 ```
 
 ```{r}
 Ki67q |> 
-  with(ee = formals(m2[[2L]])$newx) |> # ?spatstat.geom::with.hyperframe
-  m2[[2L]]() |>
+  with(ee = formals(b0[[2L]])$newx) |> # ?spatstat.geom::with.hyperframe
+  b0[[2L]]() |>
   head(n = 20L)
 ```
 
-The S3 method generic `predict.add_dummy()` uses model `m2` on the test set `s1`.
+The S3 method generic `predict.add_dummy()` uses model `b0` on the test set `s1`.
 
 ```{r}
-m2[1L] |> predict(newdata = s1)
+b0[1L] |> predict(newdata = s1)
 ```
 
 ## via Repeated Partitions
@@ -277,16 +279,16 @@ Function `add_dummy_partition()` also returns an `'add_dummy'` object.
 
 ```{r}
 #| label: add_dummy_partition
-set.seed(83); m3 = m |> 
+set.seed(83); c0 = m0 |> 
   add_dummy_partition(~ logKi67.quantile, times = 20L) |>
   subset(subset = p1 > .15 & p1 < .85) |>
   sort_by(y = abs(effsize), decreasing = TRUE) |>
   head(n = 2L)
-m3
+c0
 ```
 
 ```{r}
-m3[1L] |> predict(newdata = s1)
+c0[1L] |> predict(newdata = s1)
 ```
 
 # Appendix

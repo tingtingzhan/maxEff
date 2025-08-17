@@ -62,6 +62,22 @@ add_numeric <- function(
 }
 
 
+#' @title [labels.add_numeric]
+#' 
+#' @param x a [add_numeric] object
+#' 
+#' @param ... ..
+#' 
+#' @keywords internal
+#' @export labels.add_numeric
+#' @export
+labels.add_numeric <- function(x, ...) {
+  x |>
+    vapply(FUN = deparse1, FUN.VALUE = '')
+}
+
+
+
 
 #' @title [print.add_numeric]
 #' 
@@ -74,7 +90,7 @@ add_numeric <- function(
 #' @export
 print.add_numeric <- function(x, ...) {
   x |>
-    vapply(FUN = deparse1, FUN.VALUE = '') |>
+    labels.add_numeric() |>
     cat(sep = '\n')
 }
 
@@ -101,6 +117,8 @@ print.add_numeric <- function(x, ...) {
 predict.add_numeric <- function(object, ...) {
   ret <- object |> 
     lapply(FUN = predict.add_numeric_, ...)
+  names(ret) <- object |>
+    labels.add_numeric()
   class(ret) <- 'listof'
   return(ret)
 }
