@@ -87,7 +87,7 @@ add_dummy_partition <- function(
       return(tmp[[order(effsize)[id]]])  
     })
 
-  class(out) <- c('add_dummy', 'add_', class(out))
+  class(out) <- c('add_dummy', 'add_', 'listof', class(out))
   return(invisible(out))
   
 }
@@ -126,30 +126,62 @@ add_dummy <- function(
   x_ <- tmp$x_
   xval <- tmp$xval
   
-  out <- x_ |>
-    seq_along() |>  
+  sq <- x_ |>
+    seq_along()
+  
+  # all `rule`s
+  rule. <- sq |>  
     mclapply(mc.cores = mc.cores, FUN = \(i) {
-      x. <- x_[[i]]
-      xval <- xval[[i]]
-      
-      rule <- rpart(formula = y ~ xval, cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
-        node1()
-      formals(rule)$newx <- x.
-
-      data_$x. <- rule(xval) # partition rule applied to complete data
-      suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
+      rpart(formula = y ~ xval[[i]], cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
+        node1(nm = x_[[i]])
+    })
+  
+  # all dichotomized predictors
+  x. <- sq |> 
+    mclapply(mc.cores = mc.cores, FUN = \(i) {
+      rule.[[i]](xval[[i]]) # partition rule applied to complete data
+    })
+  
+  # only choose unique dichotomized predictors!!!
+  out <- sq[!duplicated.default(x.)] |>  
+    mclapply(mc.cores = mc.cores, FUN = \(i) {
+    #lapply(FUN = \(i) {
+      data_$x. <- x.[[i]]
+      m_ <- update(start.model, formula. = . ~ . + x., data = data_)
       cf <- m_$coefficients
       cf_ <- cf[length(cf)]
+      rule <- rule.[[i]]
       attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
       attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-      attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
+      attr(rule, which = 'model') <- m_ # only model formula needed for [predict.add_dummy_]!!!
+      class(rule) <- c('add_dummy_', class(rule))
       return(rule)
     })
   
-  class(out) <- c('add_dummy', 'add_', 'listof')
+  class(out) <- c('add_dummy', 'add_', 'listof', class(out))
   return(out)
 
 }
+
+
+
+#' @title [labels.add_dummy]
+#' 
+#' @param object a [add_dummy] object
+#' 
+#' @param ... ..
+#' 
+#' @returns
+#' Function [labels.add_dummy()] returns a \link[base]{character} \link[base]{vector}.
+#' 
+#' @keywords internal
+#' @export labels.add_dummy
+#' @export
+labels.add_dummy <- function(object, ...) {
+  object |>
+    vapply(FUN = labels.node1, FUN.VALUE = '')
+}
+
 
 
 
@@ -173,15 +205,27 @@ add_dummy <- function(
 #' @export
 print.add_dummy <- function(x, ...) {
   x |>
-    vapply(FUN = labels.node1, FUN.VALUE = '') |>
+    labels.add_dummy() |>
     cat(sep = '\n')
 }
 
 
 
 
-
-
+if (FALSE) {
+  unique.add_dummy <- function(x, ...) {
+    i = 1L
+    cf <- x |> 
+      seq_along() |>
+      lapply(FUN = \(i) {
+        x[[i]] |>
+          attr(which = 'model', exact = TRUE) |>
+          coef()
+      })
+    
+  }
+  
+}
 
 
 
@@ -191,11 +235,11 @@ print.add_dummy <- function(x, ...) {
 
 #' @title S3 Method Dispatches to `'add_dummy'` Class
 #' 
-#' @param x,object an object returned from functions [add_dummy_partition()] or [add_dummy()]
+#' @param x an object returned from functions [add_dummy_partition()] or [add_dummy()]
 #' 
 #' @param subset \link[base]{language}
 #' 
-#' @param ... additional parameters of function [update.node1()], e.g., `newdata`
+#' @param ... additional parameters of function [predict.add_dummy_()], e.g., `newdata`
 #' 
 #' @details
 #' Function [subset.add_dummy()], default subset `(p1>.15 & p1<.85)`.
@@ -205,7 +249,6 @@ print.add_dummy <- function(x, ...) {
 #' Function [subset.add_dummy()] returns a [add_dummy()] object.
 #' 
 #' @keywords internal
-#' @name S3_add_dummy
 #' @export subset.add_dummy
 #' @export
 subset.add_dummy <- function(x, subset, ...) {
@@ -218,20 +261,54 @@ subset.add_dummy <- function(x, subset, ...) {
 
 
 
-#' @rdname S3_add_dummy
+
+#' @title Regression Models with Optimal Dichotomizing Predictors
+#' 
+#' @description
+#' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
+#' 
+#' @param object an `add_dummy_` object, as an element of the \link[stats]{listof} return from functions [add_dummy()] or [add_dummy_partition()]
+#' 
+#' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
+#' 
+#' @param ... additional parameters, currently not in use
 #' 
 #' @returns
 #' Function [predict.add_dummy()] returns a \link[stats]{listof} regression models.
 #' 
-#' @importFrom stats predict
+#' @keywords internal
+#' @name predict_add_dummy
 #' @export predict.add_dummy
 #' @export
 predict.add_dummy <- function(object, ...) {
-  # think about changing this to [update.add_dummy()] too 
   ret <- object |> 
-    lapply(FUN = update.node1, ...)
+    lapply(FUN = predict.add_dummy_, ...)
+  names(ret) <- object |>
+    labels.add_dummy()
   class(ret) <- 'listof'
   return(ret)
 }
 
 
+#' @rdname predict_add_dummy
+#' 
+#' @returns
+#' Function [predict.add_dummy_()] returns a updated regression model.
+#' 
+#' @importFrom stats predict update
+#' @export predict.add_dummy_
+#' @export
+predict.add_dummy_ <- function(object, newdata, ...) {
+  
+  if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
+  
+  newd <- unclass(newdata)$df
+  
+  newd$x. <- object |>
+    predict.node1(newdata = newdata)
+  
+  object |>
+    attr(which = 'model', exact = TRUE) |> 
+    update(data = newd)
+  
+}

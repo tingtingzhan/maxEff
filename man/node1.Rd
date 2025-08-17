@@ -4,10 +4,12 @@
 \alias{node1}
 \title{Dichotomize via 1st Node of Recursive Partitioning}
 \usage{
-node1(x, ...)
+node1(object, nm = as.symbol(rownames(s)[1L]), ...)
 }
 \arguments{
-\item{x}{an \link[rpart]{rpart.object}}
+\item{object}{an \link[rpart]{rpart.object}}
+
+\item{nm}{\link[base]{symbol}, or \link[base]{name}, of the variable being partitioned}
 
 \item{...}{additional parameters, currently not in use}
 }

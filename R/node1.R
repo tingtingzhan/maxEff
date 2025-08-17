@@ -1,7 +1,9 @@
 
 #' @title Dichotomize via 1st Node of Recursive Partitioning
 #' 
-#' @param x an \link[rpart]{rpart.object}
+#' @param object an \link[rpart]{rpart.object}
+#' 
+#' @param nm \link[base]{symbol}, or \link[base]{name}, of the variable being partitioned
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -15,16 +17,16 @@
 #' 
 #' @keywords internal
 #' @export
-node1 <- function(x, ...) {
+node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
   
-  s <- x$splits
+  s <- object$splits
   if (!length(s)) {
-    if (x$control$cp > .Machine$double.eps) {
+    if (object$control$cp > .Machine$double.eps) {
       stop('re-run rpart(., cp = .Machine$double.eps) to force a split')
     } else stop('really?')
   }
   
-  labs <- labels(x) # ?rpart:::labels.rpart
+  labs <- labels(object) # ?rpart:::labels.rpart
   nd1 <- labs[2L] |> # first node!!!
     str2lang() 
   
@@ -38,8 +40,7 @@ node1 <- function(x, ...) {
   
   nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
   
-  fn_ <- rownames(s)[1L] |> 
-    as.symbol() |>
+  fn_ <- nm |>
     call(name = 'alist', newx = _) |> 
     eval()
   

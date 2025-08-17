@@ -185,7 +185,7 @@ First, function `add_numeric()`
 
 -   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor.  Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
 -   `update`s the starting model *`m0`* with each one of the additional `numeric` predictors, respectively;
--   returns an `'add_numeric'` object, which inherits from class `'add_'`.  This is a `listof` objects with internal class `'add_numeric_'` (see Appendix @sec-add_numeric_). 
+-   returns an `'add_numeric'` object, which inherits from class `'add_'`.  This is a `listof` objects with internal class `'add_numeric_'`, see Appendix @sec-add_numeric_. 
 
 Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute values of the regression coefficients (i.e., effect size `effsize`) of the additional `numeric` predictors.
 
@@ -231,48 +231,77 @@ a1
 
 ## Naive Practice
 
-Function `add_dummy()` partitions each additional `numeric` predictor into a logical variable using function `node1()`, and `update`s the starting model by adding in each of the dichotomized `logical` predictor. Function `add_dummy()` returns an `'add_dummy'` object, which is a `listof` `node1` objects (see Appendix @sec-node1).
-
-The `S3` method dispatch `subset.add_dummy()` subsets the the `'add_dummy'` object by the balance of partition of the additional predictor.
-
-The `S3` method dispatch `sort_by.add_()` sorts the `'add_dummy'` object by the `abs`olute value of regression coefficient (i.e., effect size) of the additional logical predictor.
-
-The `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the object returned from the previous step.
-
 ```{r}
 #| label: add_dummy
 b0 = m0 |>
   add_dummy(x = ~ logKi67.quantile) |>
   subset(subset = p1 > .05 & p1 < .95) |> 
-  # need a [unique.add_dummy()] !!!!
   sort_by(y = abs(effsize)) |>
   head(n = 2L)
+```
+
+The pipeline above consists of four steps
+
+First, function `add_dummy()` 
+
+-   dichotomizes each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* into a `logical` variable, see Appendix @sec-node1;
+-   remove the `duplicated` `logical` variables
+-   `update`s the starting model *`m0`* with each one of the additional `logical` predictors, respectively;
+-   returns an `'add_dummy'` object, which inherits from class `'add_'`.  This is a `listof` objects with internal class `add_dummy_`, see Appendix @sec-add_dummy_.
+
+Second, the `S3` method dispatch `subset.add_dummy()` subsets the input by the balance of the partition of the additional `logical` predictor.
+
+Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute value of regression coefficient (i.e., effect size) of the additional `logical` predictor.
+
+Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
+
+The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors.  Developers may pass these calls to parameter `ee` of function `spatstat.geom::with.hyperframe()` for further analysis.
+
+```{r}
 b0
 ```
 
-To find the selected additional logical predictor,
 
 ```{r}
-Ki67q |> 
-  with(ee = formals(b0[[1L]])$newx) |> # ?spatstat.geom::with.hyperframe
-  b0[[1L]]() |>
-  head(n = 20L)
+#| code-fold: true
+#| code-summary: 'Developers: retrieve the 1st selected `logical` predictor'
+s0 |> 
+  with(ee = str2lang(labels(b0[[1L]]))) |> # ?spatstat.geom::with.hyperframe
+  table()
 ```
 
 ```{r}
-Ki67q |> 
-  with(ee = formals(b0[[2L]])$newx) |> # ?spatstat.geom::with.hyperframe
-  b0[[2L]]() |>
-  head(n = 20L)
+#| code-fold: true
+#| code-summary: 'Developers: retrieve the 2nd selected `logical` predictor'
+s0 |> 
+  with(ee = str2lang(labels(b0[[2L]]))) |> # ?spatstat.geom::with.hyperframe
+  table()
 ```
 
 The S3 method generic `predict.add_dummy()` uses model `b0` on the test set `s1`.
 
 ```{r}
-b0[1L] |> predict(newdata = s1)
+b1 = b0 |> 
+  predict(newdata = s1)
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`b1`*' 
+b1
+```
+
+
 ## via Repeated Partitions
+
+```{r}
+#| label: add_dummy_partition
+set.seed(83); c0 = m0 |> 
+  add_dummy_partition(~ logKi67.quantile, times = 20L) |>
+  subset(subset = p1 > .15 & p1 < .85) |>
+  sort_by(y = abs(effsize), decreasing = TRUE) |>
+  head(n = 2L)
+```
 
 Function `add_dummy_partition()` partitions each additional `numeric` predictor into a `logical` variable in the following steps.
 
@@ -283,14 +312,9 @@ Function `add_dummy_partition()` partitions each additional `numeric` predictor 
 Function `add_dummy_partition()` also returns an `'add_dummy'` object.
 
 ```{r}
-#| label: add_dummy_partition
-set.seed(83); c0 = m0 |> 
-  add_dummy_partition(~ logKi67.quantile, times = 20L) |>
-  subset(subset = p1 > .15 & p1 < .85) |>
-  sort_by(y = abs(effsize), decreasing = TRUE) |>
-  head(n = 2L)
 c0
 ```
+
 
 ```{r}
 c0[1L] |> predict(newdata = s1)
@@ -417,9 +441,57 @@ set.seed(15); id0 = capacitor_failure |>
 table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
 ```
 
-## Internal Class `'add_numeric_'` {#sec-add_numeric_}
+## Class `'add_numeric_'` {#sec-add_numeric_}
 
-🚧 This section is under construction.
+The internal class `'add_numeric_'` inherits from class `'call'`, with additional `attributes`
+
+-   `attr(., 'effsize')`, a `numeric` scalar, the regression coefficient, i.e., effect size, of the additional `numeric` predictor 
+-   `attr(., 'model')`, the regression model with additional `numeric` predictor 
+
+The `S3` method dispatch `predict.add_numeric_()` is the workhorse of the `S3` method dispatch `predict.add_numeric()`.
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`a1`*: 1st element'
+a11 = a0[[1L]] |> 
+  predict(newdata = s1)
+stopifnot(identical(a1[[1L]], a11))
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`a1`*: 2nd element'
+a12 = a0[[2L]] |> 
+  predict(newdata = s1)
+stopifnot(identical(a1[[2L]], a12))  
+```
+
+
+## Class `'add_dummy_'` {#sec-add_dummy_}
+
+The internal class `'add_dummy_'` inherits from class `'node1'` (see Appendix @sec-node1), with additional `attributes`
+
+-   `attr(., 'p1')`, a `numeric` scalar between 0 and 1, the `TRUE` probability of the additional `logical` predictor in the training set 
+-   `attr(., 'effsize')`, a `numeric` scalar, the regression coefficient, i.e., effect size, of the additional `logical` predictor 
+-   `attr(., 'model')`, the regression model with additional `logical` predictor 
+
+The `S3` method dispatch `predict.add_dummy_()` is the workhorse of the `S3` method dispatch `predict.add_dummy()`.
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`b1`*: 1st element'
+b11 = b0[[1L]] |> 
+  predict(newdata = s1)
+stopifnot(identical(b1[[1L]], b11))
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Predicted models *`b1`*: 2nd element'
+b12 = b0[[2L]] |> 
+  predict(newdata = s1)
+stopifnot(identical(b1[[2L]], b12))  
+```
 
 
 ## Terms & Abbreviations {#sec-terms}
@@ -429,8 +501,10 @@ table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
+| [`call`](https://search.r-project.org/R/refmans/base/html/call.html) | Unevaluated expression |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
 | [`createDataPartition`](https://search.r-project.org/CRAN/refmans/caret/html/createDataPartition.html) | Test vs. training data set partition, from package **`caret`** [@caret] |
+| [`duplicated`](https://search.r-project.org/R/refmans/base/html/duplicated.html) | Duplicate dlements |
 | [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) | Factor, or categorical variable |
 | [`formals`](https://search.r-project.org/R/refmans/base/html/formals.html) | Formal arguments |
 | [`function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
@@ -449,6 +523,7 @@ table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
 | `S3`, `generic`, [`methods`](https://search.r-project.org/R/refmans/utils/html/methods.html) | `S3` object oriented system, [`UseMethod`](https://search.r-project.org/R/refmans/base/html/UseMethod.html); [`getS3method`](https://search.r-project.org/R/refmans/utils/html/getS3method.html); <https://adv-r.hadley.nz/s3.html> |
 | `S4`, `generic`, `methods` | `S4` object oriented system, [`isS4`](https://search.r-project.org/R/refmans/base/html/isS4.html); [`setClass`](https://search.r-project.org/R/refmans/methods/html/setClass.html); [`setMethod`](https://search.r-project.org/R/refmans/methods/html/setMethod.html); [`getMethod`](https://search.r-project.org/R/refmans/methods/html/getMethod.html); <https://adv-r.hadley.nz/s4.html> |
 | [`sort_by`](https://search.r-project.org/R/refmans/base/html/sort_by.html) | Sort an object by some criterion, `maxEff::sort_by.add_` |
+| [`str2lang`](https://search.r-project.org/R/refmans/base/html/str2lang.html) | To [`parse`](https://search.r-project.org/R/refmans/base/html/parse.html) R [`expression`](https://search.r-project.org/R/refmans/base/html/expression.html)s |
 | [`subset`](https://search.r-project.org/R/refmans/base/html/subset.html) | Subsets of object by conditions, `maxEff::subset.add_dummy` |
 | [`suppressWarnings`](https://search.r-project.org/R/refmans/base/html/warning.html) | Suppress warning messages |
 | [`Surv`](https://search.r-project.org/CRAN/refmans/survival/html/Surv.html) | Survival, i.e., time-to-event, object, from package **`survival`** [@survival] |

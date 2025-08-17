@@ -48,8 +48,7 @@ splitd <- function(start.model, x_, x, data, id, ...) {
   
   # `id`: training set
   rule <- rpart(formula = y[id] ~ x[id], cp = .Machine$double.eps, maxdepth = 2L) |>
-    node1()
-  formals(rule)$newx <- x_
+    node1(nm = x_)
   
   # `-id`: test set (`id` is `integer`)
   y_ <- y[-id]
@@ -59,7 +58,7 @@ splitd <- function(start.model, x_, x, data, id, ...) {
   if ('x.' %in% names(data_df)) stop('do not allow `x.` as an original column in `data`')
   data_$x. <- dx_
   
-  suppressWarnings(m_ <- update(start.model, formula. = . ~ . + x., data = data_))
+  m_ <- update(start.model, formula. = . ~ . + x., data = data_)
 
   cf <- m_$coefficients
   cf_ <- cf[length(cf)]
@@ -67,55 +66,10 @@ splitd <- function(start.model, x_, x, data, id, ...) {
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
   
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-  attr(rule, which = 'model') <- m_ # only model formula needed for [update.node1]!!!
+  attr(rule, which = 'model') <- m_ # only model formula needed for [predict.add_dummy_]!!!
   # class(rule) <- c('splitd', class(rule)) # removed Spring 2025!!!
   return(rule)
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#' @title Regression Models with Optimal Dichotomizing Predictors
-#' 
-#' @description
-#' Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).
-#' 
-#' @param object an [node1] object, as an element of the \link[stats]{listof} return from functions [add_dummy()] or [add_dummy_partition()]
-#' 
-#' @param newdata \link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used
-#' 
-#' @param ... additional parameters, currently not in use
-#' 
-#' @returns
-#' Function [update.node1()] returns a updated regression model.
-#' 
-#' @keywords internal
-#' @importFrom stats update
-#' @export update.node1
-#' @export
-update.node1 <- function(object, newdata, ...) {
-  
-  if ('x.' %in% names(newdata)) stop('do not allow existing name `x.` in `newdata`')
-  
-  newd <- unclass(newdata)$df
-  
-  newd$x. <- object |>
-    predict.node1(newdata = newdata)
-  
-  object |>
-    attr(which = 'model', exact = TRUE) |> 
-    update(data = newd) |> 
-    suppressWarnings()
-  
-}
