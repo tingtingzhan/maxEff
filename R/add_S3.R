@@ -27,7 +27,7 @@
 #' ..
 #' 
 #' @returns
-#' Function [print.add_] does not have a returned value
+#' Function [print.add_()] does not have a returned value
 #' 
 #' @name S3_add_
 #' @keywords internal
@@ -38,6 +38,12 @@ print.add_ <- function(x, ...) {
   return(invisible())
 }
 
+
+
+# @export
+#print.add_numeric_ <- function(x, ...) {
+  # does tzh want to write this?
+#}
 
 
 #' @rdname S3_add_

@@ -45,13 +45,13 @@ R terminology might be different from that of mathematics and statistics. Please
 Package **`maxEff`** `Imports` packages
 
 -   `r '\U1f5dd'` **`caret`** [@caret, v`r packageVersion('caret')`], for data partition
+-   **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), for function `t.vectorlist()`
 -   **`parallel`** shipped with `r R.version$version.string`, for parallel computing
 -   `r '\U1f5dd'` **`rpart`** [@rpart, v`r packageVersion('rpart')`], key dependency, for recursive partitioning
 -   `r '\U1f5dd'` **`spatstat.geom`** [@spatstat15, dev v`r packageVersion('spatstat.geom')`], key dependency, for `hyperframe` data structure
 
 Package **`maxEff`** `Suggests` packages
 
--   **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), for data preparation
 -   `r '\U1f5dd'` **`survival`** [@survival, v`r packageVersion('survival')`], key suggest, <!--for function `survival:::as.data.frame.Surv()`--> to help `hyperframe` understand `Surv` object
 
 Package **`groupedHyperframe`** dependencies are outlined in its separate vignette ([CRAN](https://cran.r-project.org/package=groupedHyperframe/vignettes/groupedHyperframe.html), [RPubs](https://rpubs.com/tingtingzhan/groupedHyperframe)).
@@ -161,6 +161,8 @@ s0 = Ki67q[id, , drop = FALSE] # training set
 s1 = Ki67q[-id, , drop = FALSE] # test set
 ```
 
+# Starting Model
+
 Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set `s0`. As of package **`spatstat.geom`** v`r packageVersion('spatstat.geom')`, function `spatstat.geom::as.data.frame.hyperframe()` warns on hypercolumns that aren't able to be converted to a `data.frame`. Therefore, user should use `suppressWarnings()` or set `#| warning: false` in R markdown code–chunk.
 
 ```{r}
@@ -174,7 +176,7 @@ m = coxph(PFS ~ Tstage, data = s0)
 summary(m)
 ```
 
-# 🚧 Adding `numeric` Predictor
+# Adding `numeric` Predictor
 
 ```{r}
 m1 = m |>
@@ -188,7 +190,7 @@ The pipeline above consists of three steps
 1.  Function `add_numeric()` 
     * considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* (see function `groupedHyperframe::t.vectorlist()` and/or package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`*) as an additional `numeric` predictor;
     * `update`s the starting model *`m`* with each one of the additional `numeric` predictors, respectively;
-    * returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`.
+    * returns an `'add_numeric'` object, which is a `listof` objects with internal class `'add_numeric_'`. The `'add_numeric'` inherits from class `'add_'`.
 
 2.  The `S3` method dispatch `sort_by.add_()` 
     * sorts the input `'add_numeric'` object by the `abs`olute values of the regression coefficients (i.e., effect size) of the additional `numeric` predictors;

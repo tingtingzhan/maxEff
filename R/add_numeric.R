@@ -45,7 +45,6 @@ add_numeric <- function(
   out <- x_ |>
     seq_along() |>  
     mclapply(mc.cores = mc.cores, FUN = \(i) {
-      # (x. = x_[[1L]])
       x. <- x_[[i]]
       data_$x. <- xval[[i]]
       m_ <- update(start.model, formula. = . ~ . + x., data = data_)
@@ -54,7 +53,7 @@ add_numeric <- function(
       attr(x., which = 'model') <- m_ # needed for [predict.*]
       class(x.) <- c('add_numeric_', class(x.))
       return(x.)
-    }) # class is 'list'
+    }) # 'list'
   
   # just to beautify!!
   names(out) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')

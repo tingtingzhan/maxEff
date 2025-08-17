@@ -19,7 +19,7 @@
 \item{y}{\link[base]{language}, see function \link[base]{sort_by}}
 }
 \value{
-Function \link{print.add_} does not have a returned value
+Function \code{\link[=print.add_]{print.add_()}} does not have a returned value
 
 Function \code{\link[=sort_by.add_]{sort_by.add_()}} returns an object of the same \link[base]{class} as input \code{x}.
 }
