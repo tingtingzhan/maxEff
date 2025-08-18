@@ -602,25 +602,25 @@ The `S3` method dispatch `base::print.default()` displays each regression model 
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`b0`*: 1st element'
+#| code-summary: 'Training models *`b0`* in training set *`s0`*: 1st element'
 b0[[1L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`b0`*: 2nd element'
+#| code-summary: 'Training models *`b0`* in training set *`s0`*: 2nd element'
 b0[[2L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`c0`*: 1st element'
+#| code-summary: 'Training models *`c0`* in test-subset of training set *`s0`*: 1st element'
 c0[[1L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`c0`*: 2nd element'
+#| code-summary: 'Training models *`c0`* in test-subset of training set *`s0`*: 2nd element'
 c0[[2L]]
 ```
 
