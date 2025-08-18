@@ -384,7 +384,7 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
-We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival among the first 140 patients of the training set *`stagec0`*. In the following call to function `rpart::rpart()`,
+We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*. In the following call to function `rpart::rpart()`,
 
 -   parameter `cp = .Machine$double.eps` ensures at least one node/split of the partitioning tree.
 -   parameter `maxdepth = 2L` reduces the computation cost as we need only the first node.
@@ -405,7 +405,7 @@ rp0 = rpart::rpart(
 rp0
 ```
 
-Function `node1()` creates a **dichotomizing rule** of the numeric variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which `inherits` from the class `'function'`.
+Function `node1()` creates a **dichotomizing rule** of the numeric variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a `closure` that consists of a `function` and the `environment` in which it was created.
 
 ```{r}
 #| label: node1
@@ -420,17 +420,20 @@ set.seed(35); rnorm(6, mean = 53.5) |>
   fn0()
 ```
 
-The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn0`*,
+The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn0`* and its `environment`,
 
 ```{r}
 fn0
 ```
 
-The `name` of the numeric variable, e.g., *`age`*, is stored as the `formals` argument of parameter *`newx`*. This is an advanced R programming trick; `eval`uating *`fn0()`* discovers variable *`age`* in `.GlobalEnv` or `environment(fn0)`, but not anywhere else!
+The `name` of the numeric variable, e.g., *`age`*, is stored as the `formals` argument of parameter *`newx`*. This is an advanced R programming trick.  The `eval`uation of the dichotomizing rule discovers the variable *`age`* in 
+
+-   the global environment `.GlobalEnv`
+-   the enclosure `environment` of the dichotomizing rule, if its `parent.env` is a `namespace` or the `.GlobalEnv`
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: put variable *`age`* in `.GlobalEnv`'
+#| code-summary: 'Advanced trick: `.GlobalEnv`'
 age = stagec1$age
 fn0()
 rm(age)
@@ -439,42 +442,54 @@ rm(age)
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: put variable *`age`* in *`environment(fn0)`*'
+#| code-summary: 'Advanced trick: *`environment(fn0)`*, child of package `namespace`'
 (ev = environment(fn0))
+parent.env(ev)
+stopifnot(isNamespace(parent.env(ev)))
 ls(envir = ev)
 assign(x = 'age', value = stagec1$age, envir = ev)
 fn0()
 rm(list = 'age', envir = ev)
 ls(envir = ev)
+rm(ev)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: put variable *`age`* in `new.env()`, **and** make it the `environment` of the dichotomizing rule '
-(ev_a = new.env())
+#| code-summary: 'Advanced trick: `new.env()`, child of `.GlobalEnv`'
+ev_a = new.env()
+parent.env(ev_a)
 assign(x = 'age', value = stagec1$age, envir = ev_a)
 ls(envir = ev_a)
 fn0_a = fn0
 environment(fn0_a) = ev_a
 fn0_a()
-tryCatch(eval(fn0(), envir = ev_a), error = identity)
-tryCatch(eval(fn0(), enclos = ev_a), error = identity)
-rm(list = ls(envir = ev_a), envir = ev_a)
-rm(ev_a)
-rm(fn0_a)
+rm(ev_a, fn0_a)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced fact: be careful with `base::as.environment()`!'
-(ev_b = as.environment(list(age = stagec1$age)))
-ls(envir = ev_b)
+#| code-summary: 'Advanced fact: be careful with `as.environment()`, child of `emptyenv()` !'
+ev_b = stagec1 |>
+  as.environment()
+parent.env(ev_b)
 fn0_b = fn0
 environment(fn0_b) = ev_b
-tryCatch(fn0_b(), error = identity) # um.. why?
-rm(list = ls(envir = ev_b), envir = ev_b)
-rm(ev_b)
-rm(fn0_b)
+tryCatch(fn0_b(), error = identity)
+rm(ev_b, fn0_b)
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Advanced trick: `list2env(., parent = .GlobalEnv)`'
+ev_c = stagec1 |> 
+  list2env(parent = .GlobalEnv) 
+parent.env(ev_c)
+fn0_c = fn0
+environment(fn0_c) = ev_c
+fn0_c()
+rm(ev_c, fn0_c)
 ```
 
 
@@ -649,24 +664,30 @@ stopifnot(identical(c1[[2L]], c12))
 |------------------------------------|------------------------------------|
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
+| [`::`](https://search.r-project.org/R/refmans/base/html/ns-dblcolon.html) | Explicitly-[namespace](https://search.r-project.org/R/refmans/base/html/ns-reflect.html)d function or object |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`call`](https://search.r-project.org/R/refmans/base/html/call.html) | Unevaluated expression |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
 | [`createDataPartition`](https://search.r-project.org/CRAN/refmans/caret/html/createDataPartition.html) | Test vs. training data set partition, from package **`caret`** [@caret] |
 | [`duplicated`](https://search.r-project.org/R/refmans/base/html/duplicated.html) | Duplicate elements |
+| [`emptyenv`](https://search.r-project.org/R/refmans/base/html/environment.html) | Empty environment |
+| [`environment`](https://search.r-project.org/R/refmans/base/html/environment.html) | Environment |
 | [`eval`](https://search.r-project.org/R/refmans/base/html/eval.html) | Evaluate an [`expression`](https://search.r-project.org/R/refmans/base/html/expression.html) |
 | [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) | Factor, or categorical variable |
 | [`formals`](https://search.r-project.org/R/refmans/base/html/formals.html) | Formal arguments |
-| [`function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
+| [`closure`, `function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
+| [`.GlobalEnv`](https://search.r-project.org/R/refmans/base/html/environment.html) | Global environment |
 | [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame |
 | [`head`](https://search.r-project.org/R/refmans/utils/html/head.html) | First parts of an object |
 | `hypercolumns`, [`hyperframe`](https://search.r-project.org/CRAN/refmans/spatstat.geom/html/hyperframe.html) | (Hyper columns of) hyper data frame, from package **`spatstat.geom`** [@spatstat05] |
 | [`labels`](https://search.r-project.org/R/refmans/base/html/labels.html) | Labels from object |
 | [`levels`](https://search.r-project.org/R/refmans/base/html/levels.html) | Levels of a [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) |
+| [`list2env`](https://search.r-project.org/R/refmans/stats/html/list2env.html) | Convert a [`list`](https://search.r-project.org/R/refmans/base/html/list.html) to [`environment`](https://search.r-project.org/R/refmans/base/html/environment.html) |
 | [`listof`](https://search.r-project.org/R/refmans/stats/html/listof.html) | List of objects |
 | `logistic` | Logistic regression model, `stats::glm(., family = binomial(\'logit\'))` |
 | [`matrix`](https://search.r-project.org/R/refmans/base/html/matrix.html) | Matrix |
 | [`median`](https://search.r-project.org/R/refmans/stats/html/median.html) | Median value |
+| [`parent.env`](https://search.r-project.org/R/refmans/base/html/environment.html) | Parent environment |
 | `PFS` | Progression/recurrence free survival, <https://en.wikipedia.org/wiki/Progression-free_survival> |
 | [`predict`](https://search.r-project.org/R/refmans/stats/html/predict.html) | Model prediction, `maxEff::predict.add_numeric`; `maxEff::predict.add_dummy` |
 | [`quantile`](https://search.r-project.org/R/refmans/stats/html/quantile.html) | Quantile |
