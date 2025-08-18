@@ -35,7 +35,9 @@
 #' @export
 sort_by.add_ <- function(x, y, ...) {
   effsize <- vapply(x, FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
-  o <- substitute(y) |> eval() |> order(...) # ?base::order
+  o <- substitute(y) |> 
+    eval() |> 
+    order(...) # ?base::order
   x[o]
 }
 

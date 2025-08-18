@@ -51,9 +51,17 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
     quote(return(ret))
   )
   
-  fn <- as.function.default(fn_)
-  class(fn) <- c('node1', class(fn))
-  return(fn)
+  
+  .fn <- as.function.default(fn_)
+
+  class(.fn) <- c('node1', class(.fn))
+  
+  # clean the future envir of `fn` as much as possible
+  rm(list = c(
+    'fn_', 'labs', 'nd1', 'nm', 'object', 's'
+  ), envir = environment(.fn))
+  
+  return(.fn)
 }
 
 
