@@ -314,16 +314,16 @@ First, function `add_dummy_partition()` creates a dichotomizing rule for each ad
 
 1.  Generates twenty (`20L`) partitions of the training set *`s0`* using functions `caret::createDataPartition()` or `statusPartition()` (Appendix @sec-statusPartition) at `.8` vs. `.2=(1-.8)` ratio.
 2.  For the $i$-th partition $(i=1,\cdots,20)$ of the training set *`s0`*, 
-    * creates a dichotomizing rule of the `numeric` predictor in the [$i$-th training subset of *`s0`*]{style="background-color: yellow"} using function `node1()` (Appendix @sec-node1);
-    * applies such dichotomizing rule to the `numeric` predictor in the [$i$-th test subset of *`s0`*]{style="background-color: yellow"};
-    * `update`s the starting model *`m0`* with the [$i$-th test subset of *`s0`*]{style="background-color: yellow"}, as well as the `logical` predictor from the previous step;
+    * creates a dichotomizing rule of the `numeric` predictor in the [$i$-th training-subset of *`s0`*]{style="background-color: yellow"} using function `node1()` (Appendix @sec-node1);
+    * applies such dichotomizing rule to the `numeric` predictor in the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"};
+    * `update`s the starting model *`m0`* with the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"}, as well as the `logical` predictor from the previous step;
     * records the estimated regression coefficients, i.e., effect size `effsize`, of the `logical` predictor.
-3.  Selects the dichotomizing rule based on the partition with the `median` effect size of the `logical` predictor in [their own, specific test subset of *`s0`*]{style="background-color: yellow"}.
+3.  Selects the dichotomizing rule based on the partition with the `median` effect size of the `logical` predictor in [their own, specific test-subset of *`s0`*]{style="background-color: yellow"}.
 4.  Returns an `'add_dummy'` object.
 
-Second, the `S3` method dispatch `subset.add_dummy()` subsets the input by the balance of the partition of the additional `logical` predictor in [their own, specific test subset of *`s0`*]{style="background-color: yellow"}.
+Second, the `S3` method dispatch `subset.add_dummy()` subsets the input by the balance of the partition of the additional `logical` predictor in [their own, specific test-subset of *`s0`*]{style="background-color: yellow"}.
 
-Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute value of regression coefficients, i.e., effect size `effsize`, of the additional `logical` predictor in [their own, specific test subset of *`s0`*]{style="background-color: yellow"}.
+Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute value of regression coefficients, i.e., effect size `effsize`, of the additional `logical` predictor in [their own, specific test-subset of *`s0`*]{style="background-color: yellow"}.
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
