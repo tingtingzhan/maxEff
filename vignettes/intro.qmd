@@ -665,6 +665,7 @@ stopifnot(identical(c1[[2L]], c12))
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`::`](https://search.r-project.org/R/refmans/base/html/ns-dblcolon.html) | Explicitly-[namespace](https://search.r-project.org/R/refmans/base/html/ns-reflect.html)d function or object |
+| [`as.environment`](https://search.r-project.org/R/refmans/base/html/as.environment.html) | Convert an object to an environment |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`call`](https://search.r-project.org/R/refmans/base/html/call.html) | Unevaluated expression |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
@@ -676,8 +677,8 @@ stopifnot(identical(c1[[2L]], c12))
 | [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) | Factor, or categorical variable |
 | [`formals`](https://search.r-project.org/R/refmans/base/html/formals.html) | Formal arguments |
 | [`closure`, `function`](https://search.r-project.org/R/refmans/base/html/function.html) | R function |
-| [`.GlobalEnv`](https://search.r-project.org/R/refmans/base/html/environment.html) | Global environment |
-| [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame |
+| [`globalenv`, `.GlobalEnv`](https://search.r-project.org/R/refmans/base/html/environment.html) | Global environment |
+| [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame, from package **`groupedHyperframe`** [@groupedHyperframe] |
 | [`head`](https://search.r-project.org/R/refmans/utils/html/head.html) | First parts of an object |
 | `hypercolumns`, [`hyperframe`](https://search.r-project.org/CRAN/refmans/spatstat.geom/html/hyperframe.html) | (Hyper columns of) hyper data frame, from package **`spatstat.geom`** [@spatstat05] |
 | [`labels`](https://search.r-project.org/R/refmans/base/html/labels.html) | Labels from object |
