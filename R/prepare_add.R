@@ -1,6 +1,7 @@
 
 #' @importFrom spatstat.geom is.hyperframe
 #' @importFrom groupedHyperframe t.vectorlist
+#' @importFrom stats formula
 .prepare_add_ <- function(start.model, x, data, envir = parent.frame(), ...) {
   
   fom0 <- formula(start.model)

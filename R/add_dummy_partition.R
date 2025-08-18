@@ -1,4 +1,73 @@
 
+
+#' @title Additional \link[base]{logical} Predictor via Repeated Partitioning
+#' 
+#' @param start.model a regression model, e.g., 
+#' \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.
+#' 
+#' @param x one-sided \link[stats]{formula},
+#' \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{matrix} column in `data`
+#' 
+#' @param data (optional) \link[base]{data.frame} in the model \link[base]{call} of `start.model`
+#' 
+#' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
+#' 
+#' @param times,... additional parameters of function \link[caret]{createDataPartition} or [statusPartition()]
+#' 
+#' @returns 
+#' Function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`.
+#' 
+#' @keywords internal
+#' @importFrom caret createDataPartition
+#' @importFrom parallel mclapply
+#' @importFrom stats quantile
+#' @export
+add_dummy_partition <- function(
+    start.model, 
+    x,
+    data = eval(start.model$call$data),
+    times, 
+    mc.cores = getOption('mc.cores'), 
+    ...
+) {
+  
+  tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
+  y <- tmp$y
+  #data <- tmp$data # not here!
+  x_ <- tmp$x_
+  xval <- tmp$xval
+  
+  ids <- if (inherits(y, what = 'Surv')) {
+    statusPartition(y = y, times = times, ...)
+  } else createDataPartition(y = y, times = times, groups = 2L, ...)
+  # using same split for all predictors
+  
+  out <- x_ |>
+    seq_along() |>
+    mclapply(mc.cores = mc.cores, FUN = \(i) { 
+      #lapply(FUN = \(i) { # debugging
+      tmp_ <- ids |>
+        lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
+      tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
+      
+      effsize <- tmp |> 
+        vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
+      id <- tmp |> 
+        seq_along() |> 
+        quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
+      return(tmp[[order(effsize)[id]]])  
+    })
+  
+  class(out) <- c('add_dummy', 'add_', 'listof', class(out))
+  return(invisible(out))
+  
+}
+
+
+
+
+
+
 #' @title Split-Dichotomized Regression Model
 #' 
 #' @description
@@ -64,10 +133,10 @@ splitd <- function(start.model, x_, x, data, id, ...) {
   cf_ <- cf[length(cf)]
   
   attr(rule, which = 'p1') <- mean.default(dx_, na.rm = TRUE)
-  
   attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
   attr(rule, which = 'model') <- m_ # only model formula needed for [predict.add_dummy_]!!!
-  # class(rule) <- c('splitd', class(rule)) # removed Spring 2025!!!
+  
+  class(rule) <- c('add_dummy_', class(rule))
   return(rule)
 }
 

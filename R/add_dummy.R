@@ -1,21 +1,6 @@
 
 
-
-# ## Dichotomizing Predictor(s) via Dichotomizing Split Sample [splitDichotom]
-#
-# Pipeline `splitDichotom |> subset |> sort_by |> head` identifies 
-# the optimal dichotomizing predictors using repeated sample splits on the *training set*.
-# 
-# Function [predict.splitDichotom] .. testing set
-# 
-
-
-
-
-#' @title Additional Predictor as \link[base]{logical}
-#' 
-#' @description
-#' Additional predictor as \link[base]{logical}.
+#' @title Additional \link[base]{logical} Predictor
 #' 
 #' @param start.model a regression model, e.g., 
 #' \link[stats]{lm}, \link[stats]{glm}, or \link[survival]{coxph}, etc.
@@ -27,88 +12,11 @@
 #' 
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
-#' @param times,... additional parameters of function [statusPartition()] for function [add_dummy_partition].
-#' For function [add_dummy()], these parameters are not in use
-#' 
-#' @details
-#' Function [add_dummy_partition()] partitions each additional \link[base]{numeric} predictor 
-#' into a \link[base]{logical} variable in the following steps.
-#' \enumerate{
-#' \item {Generate multiple, i.e., repeated, partitions via functions \link[caret]{createDataPartition} or [statusPartition()].}
-#' \item {For each partition, create a dichotomizing rule (via function `node1()`) on the training set. 
-#' Apply this dichotomizing rule on the test set and obtain the estimated regression coefficient (i.e., effect size) 
-#' of the additional \link[base]{logical} predictor.}
-#' \item {Among all partitions, select the one with median effect size of the additional \link[base]{logical} predictor.}
-#' }
-#' 
-#' 
-#' @returns 
-#' Function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`, which is a \link[stats]{listof} [node1] objects.
+#' @returns
+#' Function [add_dummy()] returns an object of class `'add_dummy'`.
 #' 
 #' @keywords internal
-#' @name add_dummy
-#' @importFrom caret createDataPartition
 #' @importFrom parallel mclapply
-#' @importFrom stats formula quantile
-#' @export
-add_dummy_partition <- function(
-    start.model, 
-    x,
-    data = eval(start.model$call$data),
-    times, 
-    mc.cores = getOption('mc.cores'), 
-    ...
-) {
-  
-  tmp <- .prepare_add_(start.model = start.model, x = x, data = data)
-  y <- tmp$y
-  #data <- tmp$data # not here!
-  x_ <- tmp$x_
-  xval <- tmp$xval
-
-  ids <- if (inherits(y, what = 'Surv')) {
-    statusPartition(y = y, times = times, ...)
-  } else createDataPartition(y = y, times = times, groups = 2L, ...)
-  # using same split for all predictors
-  
-  out <- x_ |>
-    seq_along() |>
-    mclapply(mc.cores = mc.cores, FUN = \(i) { 
-    #lapply(FUN = \(i) { # debugging
-      tmp_ <- ids |>
-        lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
-      tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
-      
-      effsize <- tmp |> 
-        vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
-      id <- tmp |> 
-        seq_along() |> 
-        quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
-      return(tmp[[order(effsize)[id]]])  
-    })
-
-  class(out) <- c('add_dummy', 'add_', 'listof', class(out))
-  return(invisible(out))
-  
-}
-
-
-
-
-
-
-#' @rdname add_dummy
-#' 
-#' @details 
-#' Function [add_dummy()] partitions each additional 
-#' \link[base]{numeric} predictor into a \link[base]{logical} variable 
-#' using function [node1()], 
-#' then \link[stats]{update}s the starting model by adding in each of the dichotomized 
-#' \link[base]{logical} predictor. 
-#' 
-#' @returns
-#' Function [add_dummy()] returns an object of class `'add_dummy'`, 
-#' which is a \link[stats]{listof} [node1] objects.
 #' @importFrom rpart rpart
 #' @importFrom stats update
 #' @export
@@ -162,6 +70,16 @@ add_dummy <- function(
   return(out)
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

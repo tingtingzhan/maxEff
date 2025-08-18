@@ -26,7 +26,7 @@
 #' 
 #' @keywords internal
 #' @importFrom parallel mclapply
-#' @importFrom stats formula update
+#' @importFrom stats update
 #' @export
 add_numeric <- function(
     start.model, 
