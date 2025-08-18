@@ -663,6 +663,7 @@ stopifnot(identical(c1[[2L]], c12))
 | Term / Abbreviation | Description |
 |------------------------------------|------------------------------------|
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
+| `Depends`, `Imports`, `Suggests`, `Enhances` | [*Writing R Extensions*, Section 1.1.3 *Package Dependencies*](https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Package-Dependencies) |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`::`](https://search.r-project.org/R/refmans/base/html/ns-dblcolon.html) | Explicitly-[namespace](https://search.r-project.org/R/refmans/base/html/ns-reflect.html)d function or object |
 | [`as.environment`](https://search.r-project.org/R/refmans/base/html/as.environment.html) | Convert an object to an environment |
