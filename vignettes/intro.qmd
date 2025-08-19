@@ -335,7 +335,7 @@ Function `node1()` dichotomizes a single `numeric` `vector` based on the first n
 -   the use of function `node1()`, and
 -   the `S3` method dispatches to the class `'node1'`
 
-using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
+using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call the objects and functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
 
 Data example `rpart::stagec` contains 146 patients with [Stage C prostate cancer](https://www.cancer.org/cancer/types/prostate-cancer/detection-diagnosis-staging/staging.html).
 
@@ -345,7 +345,7 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
-We create a recursive partitioning model of the numeric variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*. In the following call to function `rpart::rpart()`,
+We create a recursive partitioning model of the `numeric` variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*. In the following call to function `rpart::rpart()`,
 
 -   parameter `cp = .Machine$double.eps` ensures at least one node/split of the partitioning tree.
 -   parameter `maxdepth = 2L` reduces the computation cost as we need only the first node.
@@ -362,32 +362,32 @@ rp0 = rpart::rpart(
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Recursive partitioning tree *`rp0`*'
+#| code-summary: 'Recursive partitioning tree *`rp0`* from package **`rpart`**'
 rp0
 ```
 
-Function `node1()` creates a **dichotomizing rule** of the numeric variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a `closure` that consists of a `function` and the `environment` in which it was created.
+Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeric` variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a `closure` that consists of a `function` and the `environment` in which it was created.
 
 ```{r}
 #| label: node1
-fn0 = rp0 |>
+D0 = rp0 |>
   node1()
 ```
 
-Dichotomizing rule *`fn0`* should be used as any R `function`.
+Dichotomizing rule *`D0`* should be used as an R `function`.
 
 ```{r}
-set.seed(35); rnorm(6, mean = 53.5) |> 
-  fn0()
+set.seed(35); rnorm(n = 6L, mean = 53.5) |> 
+  D0()
 ```
 
-The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`fn0`* and its `environment`,
+The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`D0`* and its enclosure `environment`,
 
 ```{r}
-fn0
+D0
 ```
 
-The `name` of the numeric variable, e.g., *`age`*, is stored as the `formals` argument of parameter *`newx`*. This is an advanced R programming trick.  The `eval`uation of the dichotomizing rule discovers the variable *`age`* in 
+The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick.  The `eval`uation of the dichotomizing rule discovers the variable *`age`* in 
 
 -   the global environment `.GlobalEnv`
 -   the enclosure `environment` of the dichotomizing rule, if its `parent.env` is a `namespace` or the `.GlobalEnv`
@@ -396,49 +396,36 @@ The `name` of the numeric variable, e.g., *`age`*, is stored as the `formals` ar
 #| code-fold: true
 #| code-summary: 'Advanced trick: `.GlobalEnv`'
 age = stagec1$age
-fn0()
+D0()
 rm(age)
 ```
 
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: *`environment(fn0)`*, child of package `namespace`'
-(ev = environment(fn0))
+#| code-summary: 'Advanced trick: *`environment(D0)`*, child of package `namespace`'
+(ev = environment(D0))
 parent.env(ev)
 stopifnot(isNamespace(parent.env(ev)))
 ls(envir = ev)
 assign(x = 'age', value = stagec1$age, envir = ev)
-fn0()
-rm(list = 'age', envir = ev)
-ls(envir = ev)
+D0()
 rm(ev)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: `new.env()`, child of `.GlobalEnv`'
-ev_a = new.env()
+#| code-summary: 'Advanced trick: `new.env(parent = .GlobalEnv)`'
+ev_a = new.env(parent = .GlobalEnv)
 parent.env(ev_a)
 assign(x = 'age', value = stagec1$age, envir = ev_a)
 ls(envir = ev_a)
-fn0_a = fn0
-environment(fn0_a) = ev_a
-fn0_a()
-rm(ev_a, fn0_a)
+D0a = D0
+environment(D0a) = ev_a
+D0a()
+rm(ev_a, D0a)
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: 'Advanced fact: be careful with `as.environment()`, child of `emptyenv()` !'
-ev_b = stagec1 |>
-  as.environment()
-parent.env(ev_b)
-fn0_b = fn0
-environment(fn0_b) = ev_b
-tryCatch(fn0_b(), error = identity)
-rm(ev_b, fn0_b)
-```
 
 
 ```{r}
@@ -447,10 +434,22 @@ rm(ev_b, fn0_b)
 ev_c = stagec1 |> 
   list2env(parent = .GlobalEnv) 
 parent.env(ev_c)
-fn0_c = fn0
-environment(fn0_c) = ev_c
-fn0_c()
-rm(ev_c, fn0_c)
+D0c = D0
+environment(D0c) = ev_c
+D0c()
+rm(ev_c, D0c)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'Advanced fact: be careful with `as.environment()`, child of `emptyenv()` !'
+ev_b = stagec1 |>
+  as.environment()
+parent.env(ev_b)
+D0b = D0
+environment(D0b) = ev_b
+tryCatch(D0b(), error = identity)
+rm(ev_b, D0b)
 ```
 
 
@@ -458,26 +457,25 @@ rm(ev_c, fn0_c)
 The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule.
 
 ```{r}
-fn0 |> 
+D0 |> 
   labels()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomize the numeric variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`fn0`* determined by the training set *`stagec0`*.
+The `S3` method dispatch `predict.node1()` dichotomize the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0`* determined by the training set *`stagec0`*.
 
 ```{r}
-data.frame(
-  stagec1$age,
-  Dichotomized = fn0 |> predict(newdata = stagec1),
-  check.names = FALSE
-)
+stagec1$age
+D0 |> 
+  predict(newdata = stagec1)
 ```
 
-Developers may obtain the `numeric` cutoff value of the dichotomizing rule *`fn0`*.
+The (tentatively named) `S3` method dispatch `get_cutoff.node1()` returns the `numeric` cutoff value of the dichotomizing rule *`D0`*.
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'R code: subject to change!'
-fn0 |> get_cutoff()
+#| code-summary: 'Subject to change: get `numeric` cutoff value'
+D0 |> 
+  get_cutoff()
 ```
 
 ## `statusPartition()` {#sec-statusPartition}
@@ -499,7 +497,8 @@ capacitor_failure
 #| label: statusPartition
 set.seed(15); id = capacitor_failure |>
   statusPartition(times = 1L, p = .5)
-table(capacitor_failure[id[[1L]], 2L]) / table(capacitor_failure[,2L]) # balanced by survival status
+capacitor_failure[id[[1L]], 2L] |> 
+  table() # balanced by survival status
 ```
 
 Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
@@ -509,7 +508,8 @@ Function `statusPartition()` is an extension of the very popular function `caret
 #| code-summary: '`caret::createDataPartition()`: *not* balanced by survival status'
 set.seed(15); id0 = capacitor_failure |>
   caret::createDataPartition(times = 1L, p = .5)
-table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
+capacitor_failure[id0[[1L]], 2L] |> 
+  table()
 ```
 
 ## Class `'add_numeric_'` {#sec-add_numeric_}
@@ -730,19 +730,19 @@ stopifnot(identical(c1[[2L]], c12))
 | [`levels`](https://search.r-project.org/R/refmans/base/html/levels.html) | Levels of a [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) |
 | [`list2env`](https://search.r-project.org/R/refmans/stats/html/list2env.html) | Convert a [`list`](https://search.r-project.org/R/refmans/base/html/list.html) to [`environment`](https://search.r-project.org/R/refmans/base/html/environment.html) |
 | [`listof`](https://search.r-project.org/R/refmans/stats/html/listof.html) | List of objects |
-| `logistic` | Logistic regression model, `stats::glm(., family = binomial(\'logit\'))` |
+| `logistic` | Logistic regression model, `stats::glm(., family = binomial('logit'))` |
 | [`matrix`](https://search.r-project.org/R/refmans/base/html/matrix.html) | Matrix |
 | [`median`](https://search.r-project.org/R/refmans/stats/html/median.html) | Median value |
 | [`parent.env`](https://search.r-project.org/R/refmans/base/html/environment.html) | Parent environment |
 | `PFS` | Progression/recurrence free survival, <https://en.wikipedia.org/wiki/Progression-free_survival> |
-| [`predict`](https://search.r-project.org/R/refmans/stats/html/predict.html) | Model prediction, `maxEff::predict.add_numeric`; `maxEff::predict.add_dummy` |
+| [`predict`](https://search.r-project.org/R/refmans/stats/html/predict.html) | Model prediction |
 | [`quantile`](https://search.r-project.org/R/refmans/stats/html/quantile.html) | Quantile |
 | [`rpart`](https://search.r-project.org/CRAN/refmans/rpart/html/rpart.html), [`rpart.object`](https://search.r-project.org/CRAN/refmans/rpart/html/rpart.object.html), `node` | Recursive partitioning and regression trees |
 | `S3`, `generic`, [`methods`](https://search.r-project.org/R/refmans/utils/html/methods.html) | `S3` object oriented system, [`UseMethod`](https://search.r-project.org/R/refmans/base/html/UseMethod.html); [`getS3method`](https://search.r-project.org/R/refmans/utils/html/getS3method.html); <https://adv-r.hadley.nz/s3.html> |
 | `S4`, `generic`, `methods` | `S4` object oriented system, [`isS4`](https://search.r-project.org/R/refmans/base/html/isS4.html); [`setClass`](https://search.r-project.org/R/refmans/methods/html/setClass.html); [`setMethod`](https://search.r-project.org/R/refmans/methods/html/setMethod.html); [`getMethod`](https://search.r-project.org/R/refmans/methods/html/getMethod.html); <https://adv-r.hadley.nz/s4.html> |
-| [`sort_by`](https://search.r-project.org/R/refmans/base/html/sort_by.html) | Sort an object by some criterion, `maxEff::sort_by.add_` |
+| [`sort_by`](https://search.r-project.org/R/refmans/base/html/sort_by.html) | Sort an object by some criterion |
 | [`str2lang`](https://search.r-project.org/R/refmans/base/html/str2lang.html) | To [`parse`](https://search.r-project.org/R/refmans/base/html/parse.html) R [`expression`](https://search.r-project.org/R/refmans/base/html/expression.html)s |
-| [`subset`](https://search.r-project.org/R/refmans/base/html/subset.html) | Subsets of object by conditions, `maxEff::subset.add_dummy` |
+| [`subset`](https://search.r-project.org/R/refmans/base/html/subset.html) | Subsets of object by conditions |
 | [`suppressWarnings`](https://search.r-project.org/R/refmans/base/html/warning.html) | Suppress warning messages |
 | [`Surv`](https://search.r-project.org/CRAN/refmans/survival/html/Surv.html) | Survival, i.e., time-to-event, object, from package **`survival`** [@survival] |
 | [`table`](https://search.r-project.org/R/refmans/base/html/table.html) | Cross tabulation |

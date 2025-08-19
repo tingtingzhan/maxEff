@@ -47,21 +47,25 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
   fn_[[2L]] <- call(
     name = '{',
     call(name = '<-', quote(ret), call(name = '(', nd1)),
-    quote(if (all(ret, na.rm = TRUE) || !any(ret, na.rm = TRUE)) warning('Dichotomized value is all-0 or all-1')),
+    call(name = '<-', quote(ret0), call(name = 'na.omit', quote(ret))),
+    quote(if ((length(ret0) > 1L) && (all(ret0) || !any(ret0))) warning('Dichotomized values are all-0 or all-1')),
     quote(return(ret))
   )
   
+  .fn <- fn_ |> 
+    # as.function.default(envir = new.env()) |> # NO!! read ?base::new.env very carefully! Default creates a child of current environment
+    as.function.default()
+  # prefix dot (.) will not show up in ls(., all.names = FALSE)
   
-  .fn <- as.function.default(fn_)
-
-  class(.fn) <- c('node1', class(.fn))
-  
-  # clean the future envir of `fn` as much as possible
+  # clean the enclosure envir of `fn` as much as possible
   rm(list = c(
+    # '.fn', # no!! otherwise nothing to return ..
     'fn_', 'labs', 'nd1', 'nm', 'object', 's'
   ), envir = environment(.fn))
   
+  class(.fn) <- c('node1', class(.fn))
   return(.fn)
+  
 }
 
 
