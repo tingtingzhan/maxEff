@@ -32,7 +32,6 @@
     lapply(FUN = \(j) {
       call(name = '[', x., j)
     })
-  names(x_) <- vapply(x_, FUN = deparse1, FUN.VALUE = '')
   
   xval <- X |> 
     t.vectorlist()

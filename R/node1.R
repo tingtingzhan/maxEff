@@ -76,6 +76,7 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
 #' 
 #' @keywords internal
 #' @importFrom stats predict
+#' @importFrom spatstat.geom with.hyperframe
 #' @export predict.node1
 #' @export
 predict.node1 <- function(object, newdata, ...) {
@@ -89,7 +90,7 @@ predict.node1 <- function(object, newdata, ...) {
   } else if (inherits(newdata, what = 'hyperframe')) {
     
     formals(object)$newx |>
-      with(data = newdata, ee = _) |> # ?spatstat.geom::with.hyperframe
+      with.hyperframe(data = newdata, ee = _) |>
       object()
     
   }
