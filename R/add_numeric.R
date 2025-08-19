@@ -62,6 +62,10 @@ add_numeric <- function(
 }
 
 
+
+# tzh's [predict.*] only needs model call, not the full model!!
+
+
 #' @title [labels.add_numeric]
 #' 
 #' @param object a [add_numeric] object

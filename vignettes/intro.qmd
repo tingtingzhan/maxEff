@@ -187,41 +187,25 @@ a0 = m0 |>
   head(n = 2L)
 ```
 
-The pipeline above consists of three steps
+The pipeline above consists of three steps.
 
 First, function `add_numeric()`
 
 -   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor. Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
 -   `update`s the starting model *`m0`* with each one of the additional `numeric` predictors, respectively;
--   returns an `'add_numeric'` object, which inherits from class `'add_'`. This is a `listof` objects with internal class `'add_numeric_'`, see Appendix @sec-add_numeric_.
+-   returns an `'add_numeric'` object, which `inherits` from class `'add_'`. This is a `listof` objects with internal class `'add_numeric_'`, see Appendix @sec-add_numeric_.
 
 Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute values of the regression coefficients, i.e., effect size `effsize`, of the additional `numeric` predictors.
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
+The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors. 
 
 ```{r}
 a0
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 1st selected `numeric` predictor'
-s0 |>
-  with(ee = a0[[1L]]) |> # ?spatstat.geom::with.hyperframe
-  head()
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 2nd selected `numeric` predictor'
-s0 |>
-  with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
-  head()
-```
-
-The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that we use the workhorse `S3` method dispatch `stats:::update.default()`.
+The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that the workhorse function is the `S3` method dispatch `stats:::update.default()`.
 
 ```{r}
 a1 = a0 |> 
@@ -233,6 +217,9 @@ a1 = a0 |>
 #| code-summary: 'Predicted models *`a1`*' 
 a1
 ```
+
+Developers are encouraged to learn more about advanced usage of the class `'add_numeric_'` in Appendix @sec-add_numeric_.
+
 
 # Adding `logical` Predictor
 
@@ -254,7 +241,7 @@ First, function `add_dummy()`
 -   dichotomizes each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* into a `logical` variable, see Appendix @sec-node1;
 -   remove the `duplicated` `logical` variables
 -   `update`s the starting model *`m0`* with each one of the additional `logical` predictors, respectively;
--   returns an `'add_dummy'` object, which inherits from class `'add_'`. This is a `listof` objects with internal class `add_dummy_`, see Appendix @sec-add_dummy_.
+-   returns an `'add_dummy'` object, which `inherits` from class `'add_'`. This is a `listof` objects with internal class `add_dummy_`, see Appendix @sec-add_dummy_.
 
 Second, the `S3` method dispatch `subset.add_dummy()` subsets the input by the balance of the partition of the additional `logical` predictor.
 
@@ -262,26 +249,10 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
+The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. 
 
 ```{r}
 b0
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 1st selected `logical` predictor'
-s0 |> 
-  with(ee = str2lang(labels(b0[[1L]]))) |> # ?spatstat.geom::with.hyperframe
-  table()
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 2nd selected `logical` predictor'
-s0 |> 
-  with(ee = str2lang(labels(b0[[2L]]))) |> # ?spatstat.geom::with.hyperframe
-  table()
 ```
 
 The S3 method generic `predict.add_dummy()` uses model *`b0`* on the test set *`s1`*.
@@ -296,6 +267,9 @@ b1 = b0 |>
 #| code-summary: 'Predicted models *`b1`*' 
 b1
 ```
+
+Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
+
 
 ## via Repeated Partitions
 
@@ -327,28 +301,12 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-
-Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
+Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. 
 
 ```{r}
 c0
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 1st selected `logical` predictor via repeated partitions'
-s0 |> 
-  with(ee = str2lang(labels(c0[[1L]]))) |> # ?spatstat.geom::with.hyperframe
-  table()
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'Developers: retrieve the 2nd selected `logical` predictor via repeated partitions'
-s0 |> 
-  with(ee = str2lang(labels(c0[[2L]]))) |> # ?spatstat.geom::with.hyperframe
-  table()
-```
 
 Similar to @sec-add_dummy, the S3 method generic `predict.add_dummy()` uses model *`c0`* on the test set *`s1`*.
 
@@ -363,9 +321,12 @@ c1 = c0 |>
 c1
 ```
 
+Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
 
 
 # Appendix
+
+We cover some minor and/or experimental features in the appendix, in order not to interrupt the main narrative of this vignette.
 
 ## `node1()` {#sec-node1}
 
@@ -553,12 +514,12 @@ table(capacitor_failure[id0[[1L]], 2L]) / table(capacitor_failure[,2L])
 
 ## Class `'add_numeric_'` {#sec-add_numeric_}
 
-The internal class `'add_numeric_'` inherits from class `'call'`, with additional `attributes`
+The internal class `'add_numeric_'` `inherits` from class `'call'`, with additional `attributes`
 
 -   `attr(., 'effsize')`, a `numeric` scalar, regression coefficients, i.e., effect size `effsize`, of the additional `numeric` predictor
 -   `attr(., 'model')`, the regression model with additional `numeric` predictor
 
-The `S3` method dispatch `base::print.default()` displays each regression model with additional `numeric` predictor.
+The `S3` method dispatch `base::print.default()` displays each `'add_numeric_'` object.
 
 ```{r}
 #| code-fold: true
@@ -571,6 +532,31 @@ a0[[1L]]
 #| code-summary: 'Training models *`a0`*: 2nd element'
 a0[[2L]]
 ```
+
+Developers may obtain the selected `numeric` predictors by passing these `call`s to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
+
+```{r}
+#| code-fold: true
+#| code-summary: '1st selected `numeric` predictor'
+s0 |>
+  with(ee = a0[[1L]]) |> # ?spatstat.geom::with.hyperframe
+  summary.default()
+s1 |>
+  with(ee = a0[[1L]]) |> # ?spatstat.geom::with.hyperframe
+  summary.default()
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: '2nd selected `numeric` predictor'
+s0 |>
+  with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
+  summary.default()
+s1 |>
+  with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
+  summary.default()
+```
+
 
 The `S3` method dispatch `predict.add_numeric_()` is the workhorse of the `S3` method dispatch `predict.add_numeric()`.
 
@@ -592,13 +578,13 @@ stopifnot(identical(a1[[2L]], a12))
 
 ## Class `'add_dummy_'` {#sec-add_dummy_}
 
-The internal class `'add_dummy_'` inherits from class `'node1'` (see Appendix @sec-node1), with additional `attributes`
+The internal class `'add_dummy_'` `inherits` from class `'node1'` (see Appendix @sec-node1), with additional `attributes`
 
 -   `attr(., 'p1')`, a `numeric` scalar between 0 and 1, the `TRUE` probability of the additional `logical` predictor in the training set
 -   `attr(., 'effsize')`, a `numeric` scalar, the regression coefficients, i.e., effect size `effsize`, of the additional `logical` predictor
 -   `attr(., 'model')`, the regression model with additional `logical` predictor
 
-The `S3` method dispatch `base::print.default()` displays each regression model with additional `logical` predictor.
+The `S3` method dispatch `base::print.default()` displays each `'add_dummy_'` object.
 
 ```{r}
 #| code-fold: true
@@ -623,6 +609,62 @@ c0[[1L]]
 #| code-summary: 'Training models *`c0`* in test-subset of training set *`s0`*: 2nd element'
 c0[[2L]]
 ```
+
+The `S3` method dispatch `predict.node1()` evaluates a dichotomizing rule in a `hyperframe`.  Note that user must call the `S3` method dispatch `predict.node1()` explicitly, otherwise the `S3` generic `stats::predict()` would dispatch to `predict.add_dummy_()`.
+
+```{r}
+#| code-fold: true
+#| code-summary: '1st selected `logical` predictor'
+b0[[1L]] |> 
+  predict.node1(newdata = s0) |>
+  table() |> 
+  addmargins()  
+b0[[1L]] |> 
+  predict.node1(newdata = s1) |>
+  table() |> 
+  addmargins()
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: '2nd selected `logical` predictor'
+b0[[2L]] |> 
+  predict.node1(newdata = s0) |>
+  table() |> 
+  addmargins() 
+b0[[2L]] |> 
+  predict.node1(newdata = s1) |>
+  table() |> 
+  addmargins()  
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: '1st selected `logical` predictor via repeated partitions'
+c0[[1L]] |>
+  predict.node1(newdata = s0) |>
+  table() |> 
+  addmargins()
+c0[[1L]] |>
+  predict.node1(newdata = s1) |>
+  table() |> 
+  addmargins()
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: '2nd selected `logical` predictor via repeated partitions'
+c0[[2L]] |>
+  predict.node1(newdata = s0) |>
+  table() |> 
+  addmargins()
+c0[[2L]] |>
+  predict.node1(newdata = s1) |>
+  table() |> 
+  addmargins()
+```
+
 
 The `S3` method dispatch `predict.add_dummy_()` is the workhorse of the `S3` method dispatch `predict.add_dummy()`.
 
@@ -666,6 +708,7 @@ stopifnot(identical(c1[[2L]], c12))
 | `Depends`, `Imports`, `Suggests`, `Enhances` | [*Writing R Extensions*, Section 1.1.3 *Package Dependencies*](https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Package-Dependencies) |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
 | [`::`](https://search.r-project.org/R/refmans/base/html/ns-dblcolon.html) | Explicitly-[namespace](https://search.r-project.org/R/refmans/base/html/ns-reflect.html)d function or object |
+| [`addmargins`](https://search.r-project.org/R/refmans/stats/html/addmargins.html) | Add margins to [`array`](https://search.r-project.org/R/refmans/base/html/array.html)s |
 | [`as.environment`](https://search.r-project.org/R/refmans/base/html/as.environment.html) | Convert an object to an environment |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`call`](https://search.r-project.org/R/refmans/base/html/call.html) | Unevaluated expression |
@@ -682,6 +725,7 @@ stopifnot(identical(c1[[2L]], c12))
 | [`groupedHyperframe`](https://CRAN.R-project.org/package=groupedHyperframe) | Grouped hyper data frame, from package **`groupedHyperframe`** [@groupedHyperframe] |
 | [`head`](https://search.r-project.org/R/refmans/utils/html/head.html) | First parts of an object |
 | `hypercolumns`, [`hyperframe`](https://search.r-project.org/CRAN/refmans/spatstat.geom/html/hyperframe.html) | (Hyper columns of) hyper data frame, from package **`spatstat.geom`** [@spatstat05] |
+| [`inherits`](https://search.r-project.org/R/refmans/base/html/class.html) | Class inheritance |
 | [`labels`](https://search.r-project.org/R/refmans/base/html/labels.html) | Labels from object |
 | [`levels`](https://search.r-project.org/R/refmans/base/html/levels.html) | Levels of a [`factor`](https://search.r-project.org/R/refmans/base/html/factor.html) |
 | [`list2env`](https://search.r-project.org/R/refmans/stats/html/list2env.html) | Convert a [`list`](https://search.r-project.org/R/refmans/base/html/list.html) to [`environment`](https://search.r-project.org/R/refmans/base/html/environment.html) |
@@ -701,6 +745,7 @@ stopifnot(identical(c1[[2L]], c12))
 | [`subset`](https://search.r-project.org/R/refmans/base/html/subset.html) | Subsets of object by conditions, `maxEff::subset.add_dummy` |
 | [`suppressWarnings`](https://search.r-project.org/R/refmans/base/html/warning.html) | Suppress warning messages |
 | [`Surv`](https://search.r-project.org/CRAN/refmans/survival/html/Surv.html) | Survival, i.e., time-to-event, object, from package **`survival`** [@survival] |
+| [`table`](https://search.r-project.org/R/refmans/base/html/table.html) | Cross tabulation |
 | [`update`](https://search.r-project.org/R/refmans/stats/html/update.html) | Update and re-fit a model call |
 
 # References
