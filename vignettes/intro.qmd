@@ -36,7 +36,7 @@ R terminology might be different from that of mathematics and statistics. Please
 Package **`maxEff`** `Imports` packages
 
 -   `r '\U1f5dd'` **`caret`** [@caret, v`r packageVersion('caret')`], for data partition
--   `r '\U1f5dd'` **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), key dependency, for function `t.vectorlist()`
+-   `r '\U1f5dd'` **`groupedHyperframe`** (dev v`r packageVersion('groupedHyperframe')`), key dependency, for `S3` method dispatch `t.vectorlist()`
 -   **`parallel`** shipped with `r R.version$version.string`, for parallel computing
 -   `r '\U1f5dd'` **`rpart`** [@rpart, v`r packageVersion('rpart')`], key dependency, for recursive partitioning
 -   `r '\U1f5dd'` **`spatstat.geom`** [@spatstat15, dev v`r packageVersion('spatstat.geom')`], key dependency, for `hyperframe` data structure
@@ -165,7 +165,7 @@ dim(s1)
 
 # Starting Model
 
-Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set `s0`. As of package **`spatstat.geom`** v`r packageVersion('spatstat.geom')`, function `spatstat.geom::as.data.frame.hyperframe()` warns on hypercolumns that aren't able to be converted to a `data.frame`. Therefore, user should use `suppressWarnings()` or set `#| warning: false` in R markdown code–chunk.
+Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set *`s0`*. As of package **`spatstat.geom`** v`r packageVersion('spatstat.geom')`, the `S3` method dispatch `spatstat.geom::as.data.frame.hyperframe()` warns on hypercolumns that aren't able to be converted to a `data.frame`. Therefore, user should use `suppressWarnings()` or set `#| warning: false` in R markdown code–chunk.
 
 ```{r}
 #| warning: false
@@ -199,7 +199,7 @@ Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`ol
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors. Developers may pass these calls to parameter `ee` of function `spatstat.geom::with.hyperframe()` for further analysis.
+The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
 
 ```{r}
 a0
@@ -221,7 +221,7 @@ s0 |>
   head()
 ```
 
-The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that we use the workhorse function `stats:::update.default()`.
+The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that we use the workhorse `S3` method dispatch `stats:::update.default()`.
 
 ```{r}
 a1 = a0 |> 
@@ -262,7 +262,7 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of function `spatstat.geom::with.hyperframe()` for further analysis.
+The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
 
 ```{r}
 b0
@@ -328,7 +328,7 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
 
-Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of function `spatstat.geom::with.hyperframe()` for further analysis.
+Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. Developers may pass these calls to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
 
 ```{r}
 c0
