@@ -205,7 +205,7 @@ The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selec
 a0
 ```
 
-The S3 method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The authors categorize this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that the workhorse function is the `S3` method dispatch `stats:::update.default()`.
+The `S3` method dispatch `predict.add_numeric()` applies the starting model structure in *`m0`*, as well as the additional `numeric` predictors selected by *`a0`*, on the test set *`s1`*. The author categorizes this functionality under the `S3` generic `stats::predict()`, instead of `stats::update()`, to emphasize that this "update" is on a `newdata`, even that the workhorse function is the `S3` method dispatch `stats:::update.default()`.
 
 ```{r}
 a1 = a0 |> 
@@ -239,7 +239,7 @@ The pipeline above consists of four steps.
 First, function `add_dummy()`
 
 -   dichotomizes each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* into a `logical` variable, see Appendix @sec-node1;
--   remove the `duplicated` `logical` variables
+-   removes the `duplicated` `logical` variables;
 -   `update`s the starting model *`m0`* with each one of the additional `logical` predictors, respectively;
 -   returns an `'add_dummy'` object, which `inherits` from class `'add_'`. This is a `listof` objects with internal class `add_dummy_`, see Appendix @sec-add_dummy_.
 
@@ -255,7 +255,8 @@ The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selecte
 b0
 ```
 
-The S3 method generic `predict.add_dummy()` uses model *`b0`* on the test set *`s1`*.
+The `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`b0`*, on the test set *`s1`*. 
+
 
 ```{r}
 b1 = b0 |> 
@@ -308,7 +309,8 @@ c0
 ```
 
 
-Similar to @sec-add_dummy, the S3 method generic `predict.add_dummy()` uses model *`c0`* on the test set *`s1`*.
+Similar to @sec-add_dummy, the `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`c0`*, on the test set *`s1`*. 
+
 
 ```{r}
 c1 = c0 |> 
@@ -333,7 +335,7 @@ We cover some minor and/or experimental features in the appendix, in order not t
 Function `node1()` dichotomizes a single `numeric` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
 
 -   the use of function `node1()`, and
--   the `S3` method dispatches to the class `'node1'`
+-   the `S3` method dispatches `predict.node1()` and `labels.node1()`
 
 using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call the objects and functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
 
@@ -345,10 +347,10 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
-We create a recursive partitioning model of the `numeric` variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*. In the following call to function `rpart::rpart()`,
+Function `rpart::rpart()` creates a recursive partitioning model of the `numeric` variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*, with
 
--   parameter `cp = .Machine$double.eps` ensures at least one node/split of the partitioning tree.
--   parameter `maxdepth = 2L` reduces the computation cost as we need only the first node.
+-   parameter `cp = .Machine$double.eps`, to ensure at least one node/split of the partitioning tree.
+-   parameter `maxdepth = 2L`, to reduce the computation cost as we need only the first node.
 
 ```{r}
 #| label: rpart
@@ -461,7 +463,7 @@ D0 |>
   labels()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomize the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0`* determined by the training set *`stagec0`*.
+The `S3` method dispatch `predict.node1()` dichotomizes the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0`* determined by the training set *`stagec0`*.
 
 ```{r}
 stagec1$age
@@ -480,7 +482,12 @@ D0 |>
 
 ## `statusPartition()` {#sec-statusPartition}
 
-Function `statusPartition()` partitions stratified a `survival::Surv` object based on its survival status, to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored.
+Function `statusPartition()` 
+
+1.  splits a `left`-censored `survival::Surv` object by its survival status, i.e., observed vs. `left`-censored;
+2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets
+
+Function `statusPartition()` intends to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored.
 
 ```{r}
 capacitor_failure = survival::capacitor |> 
@@ -489,13 +496,13 @@ capacitor_failure = survival::capacitor |>
 
 ```{r}
 #| code-fold: true
-#| code-summary: '`Surv` object *`capacitor_failure`*'
+#| code-summary: 'A `left`-censored `Surv` object *`capacitor_failure`*'
 capacitor_failure
 ```
 
 ```{r}
 #| label: statusPartition
-set.seed(15); id = capacitor_failure |>
+set.seed(12); id = capacitor_failure |>
   statusPartition(times = 1L, p = .5)
 capacitor_failure[id[[1L]], 2L] |> 
   table() # balanced by survival status
@@ -506,7 +513,7 @@ Function `statusPartition()` is an extension of the very popular function `caret
 ```{r}
 #| code-fold: true
 #| code-summary: '`caret::createDataPartition()`: *not* balanced by survival status'
-set.seed(15); id0 = capacitor_failure |>
+set.seed(12); id0 = capacitor_failure |>
   caret::createDataPartition(times = 1L, p = .5)
 capacitor_failure[id0[[1L]], 2L] |> 
   table()
@@ -533,7 +540,7 @@ a0[[1L]]
 a0[[2L]]
 ```
 
-Developers may obtain the selected `numeric` predictors by passing these `call`s to parameter `ee` of the `S3` method dispatch `spatstat.geom::with.hyperframe()` for further analysis.
+The `S3` method dispatch `spatstat.geom::with.hyperframe()` obtains the selected `numeric` predictors by passing the `call` to parameter `ee`.
 
 ```{r}
 #| code-fold: true
