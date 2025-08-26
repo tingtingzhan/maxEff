@@ -393,7 +393,7 @@ D0
 The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick.  The `eval`uation of the dichotomizing rule discovers the variable *`age`* in 
 
 -   the global environment `.GlobalEnv`
--   the enclosure `environment` of the dichotomizing rule, if its `parent.env` is a `namespace` or the `.GlobalEnv`
+-   the enclosure `environment` of the dichotomizing rule, if its `parent.env`ironment is a `namespace` or the `.GlobalEnv`
 
 ```{r}
 #| code-fold: true
@@ -708,7 +708,7 @@ c12 = c0[[2L]] |>
 stopifnot(identical(c1[[2L]], c12))  
 ```
 
-## Terms & Abbreviations {#sec-terms}
+# Terms & Abbreviations {#sec-terms}
 
 | Term / Abbreviation | Description |
 |------------------------------------|------------------------------------|
