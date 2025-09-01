@@ -163,7 +163,6 @@ dim(s0)
 dim(s1)
 ```
 
-
 # Starting Model
 
 Let's consider a starting model of endpoint `PFS` with predictor `Tstage` on the training set *`s0`*. As of package **`spatstat.geom`** v`r packageVersion('spatstat.geom')`, the `S3` method dispatch `spatstat.geom::as.data.frame.hyperframe()` warns on hypercolumns that aren't able to be converted to a `data.frame`. Therefore, user should use `suppressWarnings()` or set `#| warning: false` in R markdown code–chunk.
@@ -200,7 +199,7 @@ Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`ol
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors. 
+The `S3` method dispatch `print.add_numeric()` displays the `call`s to the selected `numeric` predictors.
 
 ```{r}
 a0
@@ -220,7 +219,6 @@ a1
 ```
 
 Developers are encouraged to learn more about advanced usage of the class `'add_numeric_'` in Appendix @sec-add_numeric_.
-
 
 # Adding `logical` Predictor
 
@@ -250,14 +248,13 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. 
+The `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors.
 
 ```{r}
 b0
 ```
 
-The `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`b0`*, on the test set *`s1`*. 
-
+The `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`b0`*, on the test set *`s1`*.
 
 ```{r}
 b1 = b0 |> 
@@ -272,7 +269,6 @@ b1
 
 Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
 
-
 ## via Repeated Partitions
 
 ```{r}
@@ -284,16 +280,16 @@ set.seed(83); c0 = m0 |>
   head(n = 2L)
 ```
 
-The pipeline above consists of four steps. 
+The pipeline above consists of four steps.
 
 First, function `add_dummy_partition()` creates a dichotomizing rule for each additional `numeric` predictor in the following steps.
 
 1.  Generates twenty (`20L`) partitions of the training set *`s0`* using functions `caret::createDataPartition()` or `statusPartition()` (Appendix @sec-statusPartition) at `.8` vs. `.2=(1-.8)` ratio.
-2.  For the $i$-th partition $(i=1,\cdots,20)$ of the training set *`s0`*, 
-    * creates a dichotomizing rule of the `numeric` predictor in the [$i$-th training-subset of *`s0`*]{style="background-color: yellow"} using function `node1()` (Appendix @sec-node1);
-    * applies such dichotomizing rule to the `numeric` predictor in the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"};
-    * `update`s the starting model *`m0`* with the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"}, as well as the `logical` predictor from the previous step;
-    * records the estimated regression coefficients, i.e., effect size `effsize`, of the `logical` predictor.
+2.  For the $i$-th partition $(i=1,\cdots,20)$ of the training set *`s0`*,
+    -   creates a dichotomizing rule of the `numeric` predictor in the [$i$-th training-subset of *`s0`*]{style="background-color: yellow"} using function `node1()` (Appendix @sec-node1);
+    -   applies such dichotomizing rule to the `numeric` predictor in the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"};
+    -   `update`s the starting model *`m0`* with the [$i$-th test-subset of *`s0`*]{style="background-color: yellow"}, as well as the `logical` predictor from the previous step;
+    -   records the estimated regression coefficients, i.e., effect size `effsize`, of the `logical` predictor.
 3.  Selects the dichotomizing rule based on the partition with the `median` effect size of the `logical` predictor in [their own, specific test-subset of *`s0`*]{style="background-color: yellow"}.
 4.  Returns an `'add_dummy'` object.
 
@@ -303,15 +299,13 @@ Third, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olu
 
 Lastly, the `S3` method dispatch `utils:::head.default()` chooses the top `n` element from the input.
 
-Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors. 
+Similar to @sec-add_dummy, the `S3` method dispatch `print.add_dummy()` displays the `call`s to the selected `logical` predictors.
 
 ```{r}
 c0
 ```
 
-
-Similar to @sec-add_dummy, the `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`c0`*, on the test set *`s1`*. 
-
+Similar to @sec-add_dummy, the `S3` method generic `predict.add_dummy()` applies the starting model structure in *`m0`*, as well as the additional `logical` predictors selected by *`c0`*, on the test set *`s1`*.
 
 ```{r}
 c1 = c0 |> 
@@ -326,10 +320,19 @@ c1
 
 Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
 
-
 # Appendix
 
-We cover some minor and/or experimental features in the appendix, in order not to interrupt the main narrative of this vignette.
+Technical details, as well as the minor and/or experimental features, are covered in the Appendix, in order not to interrupt the main narrative of this vignette.
+
+All R code-chunks are folded in the Appendix, for ease of navigation. They are categorized as
+
+-   **Data**, to create an R object for further operations.
+-   **Review**, to demonstrate functions shipped with vanilla `r R.version.string`, or from other packages.
+-   **Example**, to demonstrate functions from package **`maxEff`**.
+-   **Advanced**, for experts in R.
+-   **Figure**, to create a `ggplot`.
+-   **Workaround**, to provide alternative solutions to a problem.
+
 
 ## `node1()` {#sec-node1}
 
@@ -340,9 +343,11 @@ Function `node1()` dichotomizes a single `numeric` `vector` based on the first n
 
 using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call the objects and functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
 
-Data example `rpart::stagec` contains 146 patients with [Stage C prostate cancer](https://www.cancer.org/cancer/types/prostate-cancer/detection-diagnosis-staging/staging.html).
+Data set *`stagec`* from package **`rpart`** contains 146 subjects with [Stage C prostate cancer](https://www.cancer.org/cancer/types/prostate-cancer/detection-diagnosis-staging/staging.html).  We use the first 140 subjects as the training set, and the last 6 subjects as the test set.
 
 ```{r}
+#| code-fold: true
+#| code-summary: '**Data**: training set *`stagec0`* and test set *`stagec1`*'
 data(stagec, package = 'rpart')
 stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
@@ -355,17 +360,14 @@ Function `rpart::rpart()` creates a recursive partitioning model of the `numeric
 
 ```{r}
 #| label: rpart
+#| code-fold: true
+#| code-summary: '**Review**: `rpart::rpart()`'
 rp0 = rpart::rpart(
   formula = survival::Surv(pgtime, pgstat) ~ age, 
   data = stagec0, 
   cp = .Machine$double.eps,
   maxdepth = 2L
 )
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'Recursive partitioning tree *`rp0`* from package **`rpart`**'
 rp0
 ```
 
@@ -373,6 +375,8 @@ Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeri
 
 ```{r}
 #| label: node1
+#| code-fold: true
+#| code-summary: '**Example**: `node1()`'
 D0 = rp0 |>
   node1()
 ```
@@ -380,6 +384,8 @@ D0 = rp0 |>
 Dichotomizing rule *`D0`* should be used as an R `function`.
 
 ```{r}
+#| code-fold: true
+#| code-summary: '**Example**: application of dichotomizing rule *`D0`*'
 set.seed(35); rnorm(n = 6L, mean = 53.5) |> 
   D0()
 ```
@@ -387,79 +393,91 @@ set.seed(35); rnorm(n = 6L, mean = 53.5) |>
 The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`D0`* and its enclosure `environment`,
 
 ```{r}
+#| code-fold: true
+#| code-summary: '**Review**: `base::print.function()`'
 D0
 ```
 
-The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick.  The `eval`uation of the dichotomizing rule discovers the variable *`age`* in 
+The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick. The `eval`uation of the dichotomizing rule discovers the variable *`age`* in
 
 -   the global environment `.GlobalEnv`
 -   the enclosure `environment` of the dichotomizing rule, if its `parent.env`ironment is a `namespace` or the `.GlobalEnv`
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: `.GlobalEnv`'
+#| code-summary: '**Advanced**: `eval`uate in `.GlobalEnv`'
 age = stagec1$age
 D0()
 rm(age)
 ```
 
-
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: *`environment(D0)`*, child of package `namespace`'
-(ev = environment(D0))
+#| code-summary: '**Advanced**: `eval`uate in *`environment(D0)`*, child of package `namespace`'
+ev = environment(D0)
 parent.env(ev)
 stopifnot(isNamespace(parent.env(ev)))
 ls(envir = ev)
 assign(x = 'age', value = stagec1$age, envir = ev)
 D0()
+rm(age, envir = ev)
+ls(envir = environment(D0))
 rm(ev)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: `new.env(parent = .GlobalEnv)`'
-ev_a = new.env(parent = .GlobalEnv)
-parent.env(ev_a)
-assign(x = 'age', value = stagec1$age, envir = ev_a)
-ls(envir = ev_a)
-D0a = D0
-environment(D0a) = ev_a
-D0a()
-rm(ev_a, D0a)
+#| code-summary: '**Advanced**: `eval`uate in `new.env(parent = .GlobalEnv)`'
+ev = new.env(parent = .GlobalEnv)
+parent.env(ev)
+assign(x = 'age', value = stagec1$age, envir = ev)
+ls(envir = ev)
+D0. = D0
+environment(D0.) = ev
+D0.()
+tryCatch(expr = {
+  as.function(D0, envir = ev)()
+}, error = identity)
+tryCatch(expr = {
+  eval(D0(), envir = ev)
+}, error = identity)
+tryCatch(expr = {
+  eval(D0(), enclos = ev)
+}, error = identity)  
+rm(ev, D0.)
 ```
-
-
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced trick: `list2env(., parent = .GlobalEnv)`'
-ev_c = stagec1 |> 
+#| code-summary: '**Advanced**: `eval`uate in `list2env(., parent = .GlobalEnv)`'
+ev = stagec1 |> 
   list2env(parent = .GlobalEnv) 
-parent.env(ev_c)
-D0c = D0
-environment(D0c) = ev_c
-D0c()
-rm(ev_c, D0c)
+parent.env(ev)
+D0. = D0
+environment(D0.) = ev
+D0.()
+rm(ev, D0.)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Advanced fact: be careful with `as.environment()`, child of `emptyenv()` !'
-ev_b = stagec1 |>
+#| code-summary: '**Advanced**: do **not** `eval`uate in `as.environment()`, child of `emptyenv()` !'
+ev = stagec1 |>
   as.environment()
-parent.env(ev_b)
-D0b = D0
-environment(D0b) = ev_b
-tryCatch(D0b(), error = identity)
-rm(ev_b, D0b)
+parent.env(ev)
+D0. = D0
+environment(D0.) = ev
+tryCatch(expr = {
+  D0.()
+}, error = identity)
+rm(ev, D0.)
 ```
-
-
 
 The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule.
 
 ```{r}
+#| code-fold: true
+#| code-summary: '**Example**: `labels.node1()`'
 D0 |> 
   labels()
 ```
@@ -467,6 +485,8 @@ D0 |>
 The `S3` method dispatch `predict.node1()` dichotomizes the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0`* determined by the training set *`stagec0`*.
 
 ```{r}
+#| code-fold: true
+#| code-summary: '**Example**: `predict.node1()`'
 stagec1$age
 D0 |> 
   predict(newdata = stagec1)
@@ -476,44 +496,48 @@ The (tentatively named) `S3` method dispatch `get_cutoff.node1()` returns the `n
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Subject to change: get `numeric` cutoff value'
+#| code-summary: '**Example**: get_cutoff.node1()'
 D0 |> 
   get_cutoff()
 ```
 
 ## `statusPartition()` {#sec-statusPartition}
 
-Function `statusPartition()` 
+Function `statusPartition()`
 
 1.  splits a `left`-censored `survival::Surv` object by its survival status, i.e., observed vs. `left`-censored;
 2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets
 
-Function `statusPartition()` intends to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored.
-
-```{r}
-capacitor_failure = survival::capacitor |> 
-  with(expr = Surv(time, status))
-```
-
 ```{r}
 #| code-fold: true
-#| code-summary: 'A `left`-censored `Surv` object *`capacitor_failure`*'
+#| code-summary: '**Data**: `left`-censored `Surv` object *`capacitor_failure`*'
+capacitor_failure = survival::capacitor |> 
+  with(expr = Surv(time, status))
 capacitor_failure
 ```
 
+
+
+Function `statusPartition()` intends to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored.
+
+
 ```{r}
 #| label: statusPartition
+#| code-fold: true
+#| code-summary: '**Example**: `statusPartition()`'
 set.seed(12); id = capacitor_failure |>
   statusPartition(times = 1L, p = .5)
 capacitor_failure[id[[1L]], 2L] |> 
   table() # balanced by survival status
 ```
 
+
 Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
+
 
 ```{r}
 #| code-fold: true
-#| code-summary: '`caret::createDataPartition()`: *not* balanced by survival status'
+#| code-summary: '**Review**: `caret::createDataPartition()`, *not* balanced by survival status'
 set.seed(12); id0 = capacitor_failure |>
   caret::createDataPartition(times = 1L, p = .5)
 capacitor_failure[id0[[1L]], 2L] |> 
@@ -531,13 +555,13 @@ The `S3` method dispatch `base::print.default()` displays each `'add_numeric_'` 
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`a0`*: 1st element'
+#| code-summary: '**Example**: training models *`a0`*, 1st element'
 a0[[1L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`a0`*: 2nd element'
+#| code-summary: '**Example**: training models *`a0`*, 2nd element'
 a0[[2L]]
 ```
 
@@ -545,7 +569,7 @@ The `S3` method dispatch `spatstat.geom::with.hyperframe()` obtains the selected
 
 ```{r}
 #| code-fold: true
-#| code-summary: '1st selected `numeric` predictor'
+#| code-summary: '**Example**: 1st selected `numeric` predictor'
 s0 |>
   with(ee = a0[[1L]]) |> # ?spatstat.geom::with.hyperframe
   summary.default()
@@ -556,7 +580,7 @@ s1 |>
 
 ```{r}
 #| code-fold: true
-#| code-summary: '2nd selected `numeric` predictor'
+#| code-summary: '**Example**: 2nd selected `numeric` predictor'
 s0 |>
   with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
   summary.default()
@@ -564,13 +588,12 @@ s1 |>
   with(ee = a0[[2L]]) |> # ?spatstat.geom::with.hyperframe
   summary.default()
 ```
-
 
 The `S3` method dispatch `predict.add_numeric_()` is the workhorse of the `S3` method dispatch `predict.add_numeric()`.
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`a1`*: 1st element'
+#| code-summary: '**Example**: `predict.add_numeric_()`; predicted models *`a1`*, 1st element'
 a11 = a0[[1L]] |> 
   predict(newdata = s1)
 stopifnot(identical(a1[[1L]], a11))
@@ -578,7 +601,7 @@ stopifnot(identical(a1[[1L]], a11))
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`a1`*: 2nd element'
+#| code-summary: '**Example**: `predict.add_numeric_()`; predicted models *`a1`*, 2nd element'
 a12 = a0[[2L]] |> 
   predict(newdata = s1)
 stopifnot(identical(a1[[2L]], a12))  
@@ -596,33 +619,33 @@ The `S3` method dispatch `base::print.default()` displays each `'add_dummy_'` ob
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`b0`* in training set *`s0`*: 1st element'
+#| code-summary: '**Example**: training models *`b0`* in training set *`s0`*: 1st element'
 b0[[1L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`b0`* in training set *`s0`*: 2nd element'
+#| code-summary: '**Example**: training models *`b0`* in training set *`s0`*: 2nd element'
 b0[[2L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`c0`* in test-subset of training set *`s0`*: 1st element'
+#| code-summary: '**Example**: training models *`c0`* in test-subset of training set *`s0`*: 1st element'
 c0[[1L]]
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Training models *`c0`* in test-subset of training set *`s0`*: 2nd element'
+#| code-summary: '**Example**: training models *`c0`* in test-subset of training set *`s0`*: 2nd element'
 c0[[2L]]
 ```
 
-The `S3` method dispatch `predict.node1()` evaluates a dichotomizing rule in a `hyperframe`.  Note that user must call the `S3` method dispatch `predict.node1()` explicitly, otherwise the `S3` generic `stats::predict()` would dispatch to `predict.add_dummy_()`.
+The `S3` method dispatch `predict.node1()` evaluates a dichotomizing rule in a `hyperframe`. Note that user must call the `S3` method dispatch `predict.node1()` explicitly, otherwise the `S3` generic `stats::predict()` would dispatch to `predict.add_dummy_()`.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '1st selected `logical` predictor'
+#| code-summary: '**Example**: `predict.node1()`; 1st selected `logical` predictor'
 b0[[1L]] |> 
   predict.node1(newdata = s0) |>
   table() |> 
@@ -635,7 +658,7 @@ b0[[1L]] |>
 
 ```{r}
 #| code-fold: true
-#| code-summary: '2nd selected `logical` predictor'
+#| code-summary: '**Example**: `predict.node1()`; 2nd selected `logical` predictor'
 b0[[2L]] |> 
   predict.node1(newdata = s0) |>
   table() |> 
@@ -646,10 +669,9 @@ b0[[2L]] |>
   addmargins()  
 ```
 
-
 ```{r}
 #| code-fold: true
-#| code-summary: '1st selected `logical` predictor via repeated partitions'
+#| code-summary: '**Example**: `predict.node1()`; 1st selected `logical` predictor via repeated partitions'
 c0[[1L]] |>
   predict.node1(newdata = s0) |>
   table() |> 
@@ -662,7 +684,7 @@ c0[[1L]] |>
 
 ```{r}
 #| code-fold: true
-#| code-summary: '2nd selected `logical` predictor via repeated partitions'
+#| code-summary: '**Example**: `predict.node1()`; 2nd selected `logical` predictor via repeated partitions'
 c0[[2L]] |>
   predict.node1(newdata = s0) |>
   table() |> 
@@ -672,13 +694,12 @@ c0[[2L]] |>
   table() |> 
   addmargins()
 ```
-
 
 The `S3` method dispatch `predict.add_dummy_()` is the workhorse of the `S3` method dispatch `predict.add_dummy()`.
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`b1`*: 1st element'
+#| code-summary: '**Example**: `predict.add_dummy_()`; predicted models *`b1`*: 1st element'
 b11 = b0[[1L]] |> 
   predict(newdata = s1)
 stopifnot(identical(b1[[1L]], b11))
@@ -686,7 +707,7 @@ stopifnot(identical(b1[[1L]], b11))
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`b1`*: 2nd element'
+#| code-summary: '**Example**: `predict.add_dummy_()`; predicted models *`b1`*: 2nd element'
 b12 = b0[[2L]] |> 
   predict(newdata = s1)
 stopifnot(identical(b1[[2L]], b12))  
@@ -694,7 +715,7 @@ stopifnot(identical(b1[[2L]], b12))
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`c1`*: 1st element'
+#| code-summary: '**Example**: `predict.add_dummy_()`; predicted models *`c1`*: 1st element'
 c11 = c0[[1L]] |> 
   predict(newdata = s1)
 stopifnot(identical(c1[[1L]], c11))
@@ -702,7 +723,7 @@ stopifnot(identical(c1[[1L]], c11))
 
 ```{r}
 #| code-fold: true
-#| code-summary: 'Predicted models *`c1`*: 2nd element'
+#| code-summary: '**Example**: `predict.add_dummy_()`; predicted models *`c1`*: 2nd element'
 c12 = c0[[2L]] |> 
   predict(newdata = s1)
 stopifnot(identical(c1[[2L]], c12))  
@@ -710,8 +731,14 @@ stopifnot(identical(c1[[2L]], c12))
 
 # Terms & Abbreviations {#sec-terms}
 
+@tbl-Rterm presents a comprehensive glossary of R terms and abbreviations used in this vignette.  
+
+R terminology and nomenclature could be *drastically different* from that of mathematics and statistics.  Users are *strongly advised* to read closely from the links in @tbl-Rterm, which point to webpages on [search.r-project.org](https://search.r-project.org), [cran.r-project.org](https://cran.r-project.org), and [en.wikipedia.org](https://en.wikipedia.org).
+
+
+
 | Term / Abbreviation | Description |
-|------------------------------------|------------------------------------|
+|:----|:----|
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | `Depends`, `Imports`, `Suggests`, `Enhances` | [*Writing R Extensions*, Section 1.1.3 *Package Dependencies*](https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Package-Dependencies) |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
@@ -755,6 +782,11 @@ stopifnot(identical(c1[[2L]], c12))
 | [`Surv`](https://search.r-project.org/CRAN/refmans/survival/html/Surv.html) | Survival, i.e., time-to-event, object, from package **`survival`** [@survival] |
 | [`table`](https://search.r-project.org/R/refmans/base/html/table.html) | Cross tabulation |
 | [`update`](https://search.r-project.org/R/refmans/stats/html/update.html) | Update and re-fit a model call |
+
+: Terms & Abbreviations in R {#tbl-Rterm}
+
+
+
 
 # References
 
