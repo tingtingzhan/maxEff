@@ -329,7 +329,7 @@ All R code-chunks are folded in the Appendix, for ease of navigation. They are c
 -   **Data**, to create an R object for further operations.
 -   **Review**, to demonstrate functions shipped with vanilla `r R.version.string`, or from other packages.
 -   **Example**, to demonstrate functions from package **`maxEff`**.
--   **Advanced**, for experts in R.
+-   **Advanced**, discussions for R experts.
 -   **Figure**, to create a `ggplot`.
 -   **Workaround**, to provide alternative solutions to a problem.
 
