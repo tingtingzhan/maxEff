@@ -505,7 +505,9 @@ Function `statusPartition()`
 1.  splits a `left`-censored `survival::Surv` object by its survival status, i.e., observed vs. `left`-censored;
 2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets.
 
-We follow the terminology of the (very popular) function `caret::createDataPartition()`.  We [**split**]{style="background-color: #FFFF00"} the data into multiple *strata*, and [**partition**]{style="background-color: #FFFF00"} each stratum into test/training sets.
+We follow the terminology of the (very popular) function `caret::createDataPartition()`, that  
+
+> We [**split**]{style="background-color: #FFFF00"} the data into multiple *strata*, and [**partition**]{style="background-color: #FFFF00"} each stratum into test/training sets.
 
 ```{r}
 #| code-fold: true
