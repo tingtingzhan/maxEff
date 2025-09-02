@@ -368,7 +368,7 @@ rp0 = rpart::rpart(
 rp0
 ```
 
-Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeric` variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a `closure` that consists of a `function` and the `environment` in which it was created.
+Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeric` variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a [closure](https://en.wikipedia.org/wiki/Closure_(computer_programming)) that consists of a `function` and the `environment` in which it was created.
 
 ```{r}
 #| label: node1
@@ -762,6 +762,7 @@ R terminology and nomenclature could be *drastically different* from that of mat
 | [`as.environment`](https://search.r-project.org/R/refmans/base/html/as.environment.html) | Convert an object to an environment |
 | [`abs`](https://search.r-project.org/R/refmans/base/html/MathFun.html) | Absolute value |
 | [`call`](https://search.r-project.org/R/refmans/base/html/call.html) | Unevaluated expression |
+| closure | <https://www.r-bloggers.com/2012/12/closures-in-r-a-useful-abstraction/>, <http://adv-r.had.co.nz/Functional-programming.html#closures> |
 | [`coxph`](https://search.r-project.org/CRAN/refmans/survival/html/coxph.html) | Cox proportional hazards model |
 | [`createDataPartition`](https://search.r-project.org/CRAN/refmans/caret/html/createDataPartition.html) | Test vs. training data set partition, from package **`caret`** [@caret] |
 | [`duplicated`](https://search.r-project.org/R/refmans/base/html/duplicated.html) | Duplicate elements |
