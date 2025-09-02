@@ -531,7 +531,7 @@ Consider a toy example of
 #| code-fold: true
 #| code-summary: '**Data**: `left`-censored `Surv` object *`capacitor_failure`*'
 capacitor_failure = survival::capacitor |> 
-  with(expr = Surv(time, status))
+  with(expr = survival::Surv(time, status))
 capacitor_failure
 ```
 
