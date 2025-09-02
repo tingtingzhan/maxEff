@@ -193,7 +193,7 @@ First, function `add_numeric()`
 
 -   considers each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* as an additional `numeric` predictor. Users are encourage to read the package **`groupedHyperframe`** [vignette](https://rpubs.com/tingtingzhan/groupedHyperframe), Appendix Section *On `anylist`* for more details;
 -   `update`s the starting model *`m0`* with each one of the additional `numeric` predictors, respectively;
--   returns an `'add_numeric'` object, which `inherits` from class `'add_'`. This is a `listof` objects with internal class `'add_numeric_'`, see Appendix @sec-add_numeric_.
+-   returns an `'add_numeric'` object, which `inherits` from the class `'add_'`. This is a `listof` objects with internal class `'add_numeric_'` (Appendix @sec-add_numeric_).
 
 Second, the `S3` method dispatch `sort_by.add_()` sorts the input by the `abs`olute values of the regression coefficients, i.e., effect size `effsize`, of the additional `numeric` predictors.
 
@@ -218,7 +218,6 @@ a1 = a0 |>
 a1
 ```
 
-Developers are encouraged to learn more about advanced usage of the class `'add_numeric_'` in Appendix @sec-add_numeric_.
 
 # Adding `logical` Predictor
 
@@ -237,10 +236,10 @@ The pipeline above consists of four steps.
 
 First, function `add_dummy()`
 
--   dichotomizes each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* into a `logical` variable, see Appendix @sec-node1;
+-   dichotomizes (Appendix @sec-node1) each "slice" of the `numeric`-hypercolumn *`logKi67.quantile`* into a `logical` variable;
 -   removes the `duplicated` `logical` variables;
 -   `update`s the starting model *`m0`* with each one of the additional `logical` predictors, respectively;
--   returns an `'add_dummy'` object, which `inherits` from class `'add_'`. This is a `listof` objects with internal class `add_dummy_`, see Appendix @sec-add_dummy_.
+-   returns an `'add_dummy'` object, which `inherits` from the class `'add_'`. This is a `listof` objects with internal class `'add_dummy_'` (Appendix @sec-add_dummy_).
 
 Second, the `S3` method dispatch `subset.add_dummy()` subsets the input by the balance of the partition of the additional `logical` predictor.
 
@@ -267,9 +266,8 @@ b1 = b0 |>
 b1
 ```
 
-Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
 
-## via Repeated Partitions
+## via Repeated Partitions {#sec-add_dummy_partition}
 
 ```{r}
 #| label: add_dummy_partition
@@ -318,7 +316,6 @@ c1 = c0 |>
 c1
 ```
 
-Developers are encouraged to learn more about advanced usage of the class `add_dummy_` in Appendix @sec-add_dummy_.
 
 # Appendix
 
@@ -473,7 +470,7 @@ tryCatch(expr = {
 rm(ev, D0.)
 ```
 
-The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule.
+The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule $\mathcal{D}$.
 
 ```{r}
 #| code-fold: true
@@ -492,11 +489,11 @@ D0 |>
   predict(newdata = stagec1)
 ```
 
-The (tentatively named) `S3` method dispatch `get_cutoff.node1()` returns the `numeric` cutoff value of the dichotomizing rule *`D0`*.
+The (tentatively named) `S3` method dispatch `get_cutoff.node1()` returns the `numeric` cutoff value of the dichotomizing rule $\mathcal{D}$.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Example**: get_cutoff.node1()'
+#| code-summary: '**Example**: `get_cutoff.node1()`'
 D0 |> 
   get_cutoff()
 ```
@@ -506,7 +503,9 @@ D0 |>
 Function `statusPartition()`
 
 1.  splits a `left`-censored `survival::Surv` object by its survival status, i.e., observed vs. `left`-censored;
-2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets
+2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets.
+
+We follow the terminology of the (very popular) function `caret::createDataPartition()`.  We [**split**]{style="background-color: #FFFF00"} the data into multiple *strata*, and [**partition**]{style="background-color: #FFFF00"} each stratum into test/training sets.
 
 ```{r}
 #| code-fold: true
@@ -546,7 +545,7 @@ capacitor_failure[id0[[1L]], 2L] |>
 
 ## Class `'add_numeric_'` {#sec-add_numeric_}
 
-The internal class `'add_numeric_'` `inherits` from class `'call'`, with additional `attributes`
+The internal class `'add_numeric_'` `inherits` from the class `'call'`, with additional `attributes`
 
 -   `attr(., 'effsize')`, a `numeric` scalar, regression coefficients, i.e., effect size `effsize`, of the additional `numeric` predictor
 -   `attr(., 'model')`, the regression model with additional `numeric` predictor
@@ -609,7 +608,7 @@ stopifnot(identical(a1[[2L]], a12))
 
 ## Class `'add_dummy_'` {#sec-add_dummy_}
 
-The internal class `'add_dummy_'` `inherits` from class `'node1'` (see Appendix @sec-node1), with additional `attributes`
+The internal class `'add_dummy_'` `inherits` from the class `'node1'` (Appendix @sec-node1), with additional `attributes`
 
 -   `attr(., 'p1')`, a `numeric` scalar between 0 and 1, the `TRUE` probability of the additional `logical` predictor in the training set
 -   `attr(., 'effsize')`, a `numeric` scalar, the regression coefficients, i.e., effect size `effsize`, of the additional `logical` predictor
@@ -729,6 +728,22 @@ c12 = c0[[2L]] |>
 stopifnot(identical(c1[[2L]], c12))  
 ```
 
+# What We Don't Do
+
+## Use of "Optim"
+
+In earlier publications, a junior author referred to the methodology outlined in @sec-add_dummy_partition using the term 'optim'.  This is a **wrong** practice of nomenclature, indicating a **wrong** understanding of R terminology.
+
+In the world of R, an algorithm may use the term 'optim' if-and-only-if its core/workhorse function is either one of
+
+-   [Brent–Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) algorithm in one-dimensional optimization, via function `stats::optimize()` and its alias `stats::optimise()`.
+-   [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder–Mead_method), [quasi-Newton](https://en.wikipedia.org/wiki/Quasi-Newton_method), [conjugate-gradient](https://en.wikipedia.org/wiki/Conjugate_gradient_method) algorithms in higher-dimensional optimization, via function `stats::optim()`.
+
+Otherwise, it is strongly advised **not** call an algorithm 'optim'.  
+
+Therefore, we now name this package `maxEff`, meaning 'maximum effect size'.
+
+
 # Terms & Abbreviations {#sec-terms}
 
 @tbl-Rterm presents a comprehensive glossary of R terms and abbreviations used in this vignette.  
@@ -768,6 +783,7 @@ R terminology and nomenclature could be *drastically different* from that of mat
 | `logistic` | Logistic regression model, `stats::glm(., family = binomial('logit'))` |
 | [`matrix`](https://search.r-project.org/R/refmans/base/html/matrix.html) | Matrix |
 | [`median`](https://search.r-project.org/R/refmans/stats/html/median.html) | Median value |
+| [`optimize`, `optimise`](https://search.r-project.org/R/refmans/stats/html/optimize.html), [`optim`](https://search.r-project.org/R/refmans/stats/html/optim.html) | [Brent–Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) in one-dimensional optimization; [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder–Mead_method), [quasi-Newton](https://en.wikipedia.org/wiki/Quasi-Newton_method), [conjugate-gradient](https://en.wikipedia.org/wiki/Conjugate_gradient_method) in higher-dimensional optimizations |
 | [`parent.env`](https://search.r-project.org/R/refmans/base/html/environment.html) | Parent environment |
 | `PFS` | Progression/recurrence free survival, <https://en.wikipedia.org/wiki/Progression-free_survival> |
 | [`predict`](https://search.r-project.org/R/refmans/stats/html/predict.html) | Model prediction |
