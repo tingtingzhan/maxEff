@@ -509,6 +509,9 @@ We follow the terminology of the (very popular) function `caret::createDataParti
 
 > We [**split**]{style="background-color: #FFFF00"} the data into multiple *strata*, and [**partition**]{style="background-color: #FFFF00"} each stratum into test/training sets.
 
+
+Consider a toy example of 
+
 ```{r}
 #| code-fold: true
 #| code-summary: '**Data**: `left`-censored `Surv` object *`capacitor_failure`*'
