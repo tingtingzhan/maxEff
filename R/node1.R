@@ -60,6 +60,7 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
   # clean the enclosure envir of `.fn` as much as possible
   rm(list = c(
     # '.fn', # no!! otherwise nothing to return ..
+    '...', 
     'fn_', 'labs', 'nd1', 'nm', 'object', 's'
   ), envir = environment(.fn))
   

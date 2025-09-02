@@ -395,6 +395,21 @@ The `S3` method dispatch `base::print.function()` displays the dichomizing rule 
 D0
 ```
 
+The enclosure `environment` of the dichomizing rule *`D0`* is intentionally cleaned up.
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Advanced**: enclosure `environment` of *`D0`*'
+D0 |>
+  environment() |>
+  ls(envir = _)
+D0 |>
+  environment() |>
+  ls(envir = _, all.names = TRUE)
+```
+
+
+
 The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick. The `eval`uation of the dichotomizing rule discovers the variable *`age`* in
 
 -   the global environment `.GlobalEnv`
