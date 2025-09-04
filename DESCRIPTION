@@ -6,7 +6,7 @@ Description: Methods of selecting one from many numeric predictors
        for a regression model, to ensure that the additional
        predictor has the maximum effect size.
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 License: GPL-2
 Depends: R (>= 4.5)
