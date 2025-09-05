@@ -1,7 +1,7 @@
 ---
 title: "Additional Predictor with Maximum Effect Size"
 author: Tingting Zhan
-date: "`r format(Sys.time(), 'Last updated %d %B, %Y')`"
+date: today
 format: 
   html:
     page-layout: full
