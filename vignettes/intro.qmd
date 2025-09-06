@@ -350,60 +350,62 @@ stagec0 = stagec[1:140,] # training set
 stagec1 = stagec[-(1:140),] # test set
 ```
 
+### `numeric` Predictor
+
 Function `rpart::rpart()` creates a recursive partitioning model of the `numeric` variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*, with
 
 -   parameter `cp = .Machine$double.eps`, to ensure at least one node/split of the partitioning tree.
 -   parameter `maxdepth = 2L`, to reduce the computation cost as we need only the first node.
 
 ```{r}
-#| label: rpart
+#| label: rpart_numeric
 #| code-fold: true
-#| code-summary: '**Review**: `rpart::rpart()`'
-rp0 = rpart::rpart(
+#| code-summary: '**Review**: `rpart::rpart()`, `numeric` predictor'
+rp0a = rpart::rpart(
   formula = survival::Surv(pgtime, pgstat) ~ age, 
   data = stagec0, 
   cp = .Machine$double.eps,
   maxdepth = 2L
 )
-rp0
+rp0a
 ```
 
-Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeric` variable *`age`* based on the first node in the tree *`rp0`*. Function `node1()` returns an object of class `'node1'`, which is also a [closure](https://en.wikipedia.org/wiki/Closure_(computer_programming)) that consists of a `function` and the `environment` in which it was created.
+Function `node1()` creates a **dichotomizing rule** $\mathcal{D}$ of the `numeric` variable *`age`* based on the first node in the tree *`rp0a`*. Function `node1()` returns an object of class `'node1'`, which is also a [closure](https://en.wikipedia.org/wiki/Closure_(computer_programming)) that consists of a `function` and the `environment` in which it was created.
 
 ```{r}
-#| label: node1
+#| label: node1_numeric
 #| code-fold: true
-#| code-summary: '**Example**: `node1()`'
-D0 = rp0 |>
+#| code-summary: '**Example**: `node1()`, `numeric` predictor'
+D0a = rp0a |>
   node1()
 ```
 
-Dichotomizing rule *`D0`* should be used as an R `function`.
+Dichotomizing rule *`D0a`* should be used as an R `function`.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Example**: application of dichotomizing rule *`D0`*'
+#| code-summary: '**Example**: application of dichotomizing rule *`D0a`*'
 set.seed(35); rnorm(n = 6L, mean = 53.5) |> 
-  D0()
+  D0a()
 ```
 
-The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`D0`* and its enclosure `environment`,
+The `S3` method dispatch `base::print.function()` displays the dichomizing rule *`D0a`* and its enclosure `environment`,
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Review**: `base::print.function()`'
-D0
+#| code-summary: '**Review**: `base::print.function()` on *`D0a`*'
+D0a
 ```
 
-The enclosure `environment` of the dichomizing rule *`D0`* is intentionally cleaned up.
+The enclosure `environment` of the dichomizing rule *`D0a`* is intentionally cleaned up.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Advanced**: enclosure `environment` of *`D0`*'
-D0 |>
+#| code-summary: '**Advanced**: enclosure `environment` of *`D0a`*'
+D0a |>
   environment() |>
   ls(envir = _)
-D0 |>
+D0a |>
   environment() |>
   ls(envir = _, all.names = TRUE)
 ```
@@ -419,21 +421,21 @@ The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` 
 #| code-fold: true
 #| code-summary: '**Advanced**: `eval`uate in `.GlobalEnv`'
 age = stagec1$age
-D0()
+D0a()
 rm(age)
 ```
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Advanced**: `eval`uate in *`environment(D0)`*, child of package `namespace`'
-ev = environment(D0)
+#| code-summary: '**Advanced**: `eval`uate in *`environment(D0a)`*, child of package `namespace`'
+ev = environment(D0a)
 parent.env(ev)
 stopifnot(isNamespace(parent.env(ev)))
 ls(envir = ev)
 assign(x = 'age', value = stagec1$age, envir = ev)
-D0()
+D0a()
 rm(age, envir = ev)
-ls(envir = environment(D0))
+ls(envir = environment(D0a))
 rm(ev)
 ```
 
@@ -444,19 +446,19 @@ ev = new.env(parent = .GlobalEnv)
 parent.env(ev)
 assign(x = 'age', value = stagec1$age, envir = ev)
 ls(envir = ev)
-D0. = D0
-environment(D0.) = ev
-D0.()
+D0a. = D0a
+environment(D0a.) = ev
+D0a.()
 tryCatch(expr = {
-  as.function(D0, envir = ev)()
+  as.function(D0a, envir = ev)()
 }, error = identity)
 tryCatch(expr = {
-  eval(D0(), envir = ev)
+  eval(D0a(), envir = ev)
 }, error = identity)
 tryCatch(expr = {
-  eval(D0(), enclos = ev)
+  eval(D0a(), enclos = ev)
 }, error = identity)  
-rm(ev, D0.)
+rm(ev, D0a.)
 ```
 
 ```{r}
@@ -465,10 +467,10 @@ rm(ev, D0.)
 ev = stagec1 |> 
   list2env(parent = .GlobalEnv) 
 parent.env(ev)
-D0. = D0
-environment(D0.) = ev
-D0.()
-rm(ev, D0.)
+D0a. = D0a
+environment(D0a.) = ev
+D0a.()
+rm(ev, D0a.)
 ```
 
 ```{r}
@@ -477,30 +479,30 @@ rm(ev, D0.)
 ev = stagec1 |>
   as.environment()
 parent.env(ev)
-D0. = D0
-environment(D0.) = ev
+D0a. = D0a
+environment(D0a.) = ev
 tryCatch(expr = {
-  D0.()
+  D0a.()
 }, error = identity)
-rm(ev, D0.)
+rm(ev, D0a.)
 ```
 
 The `S3` method dispatch `labels.node1()` returns a human-friendly `character` text to describe the dichotomizing rule $\mathcal{D}$.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Example**: `labels.node1()`'
-D0 |> 
+#| code-summary: '**Example**: `labels.node1()` on *`D0a`*'
+D0a |> 
   labels()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomizes the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0`* determined by the training set *`stagec0`*.
+The `S3` method dispatch `predict.node1()` dichotomizes the `numeric` variable *`age`* in the test set *`stagec1`*, using the dichotomizing rule *`D0a`* determined by the training set *`stagec0`*.
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Example**: `predict.node1()`'
+#| code-summary: '**Example**: `predict.node1()` on *`D0a`*'
 stagec1$age
-D0 |> 
+D0a |> 
   predict(newdata = stagec1)
 ```
 
@@ -508,10 +510,58 @@ The (tentatively named) `S3` method dispatch `get_cutoff.node1()` returns the `n
 
 ```{r}
 #| code-fold: true
-#| code-summary: '**Example**: `get_cutoff.node1()`'
-D0 |> 
+#| code-summary: '**Example**: `get_cutoff.node1()` on *`D0a`*'
+D0a |> 
   get_cutoff()
 ```
+
+### `factor` Predictor
+
+```{r}
+#| label: rpart_factor
+#| code-fold: true
+#| code-summary: '**Review**: `rpart::rpart()`, `factor` predictor'
+rp0b = rpart::rpart(
+  formula = survival::Surv(pgtime, pgstat) ~ ploidy, 
+  data = stagec0, 
+  cp = .Machine$double.eps,
+  maxdepth = 2L
+)
+rp0b
+```
+
+```{r}
+#| label: node1_factor
+#| code-fold: true
+#| code-summary: '**Example**: `node1()`, `factor` predictor'
+D0b = rp0b |>
+  node1()
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Review**: `base::print.function()` on *`D0b`*'
+D0b
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Example**: `labels.node1()` on *`D0b`*'
+D0b |> 
+  labels()
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Example**: `predict.node1()` on *`D0b`*'
+stagec1$ploidy
+D0b |> 
+  predict(newdata = stagec1)
+```
+
+
+
 
 ## `statusPartition()` {#sec-statusPartition}
 

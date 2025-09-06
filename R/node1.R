@@ -16,6 +16,7 @@
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
 #' 
 #' @keywords internal
+#' @importFrom stats terms
 #' @export
 node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
   
@@ -26,31 +27,75 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
     } else stop('really?')
   }
   
+  trm <- object |>
+    terms() # ?stats:::terms.default
+  dc <- trm |>
+    attr(which = 'dataClasses', exact = TRUE)
+  if (length(dc) != 2L) stop('`rpart` must have one endpoint and one predictor')
+
   labs <- labels(object) # ?rpart:::labels.rpart
-  nd1 <- labs[2L] |> # first node!!!
-    str2lang() 
+
+  switch(EXPR = dc[[2L]], 'numeric' = {
+    
+    nd1 <- labs[2L] |> # first node!!!
+      str2lang() 
+    
+    if (nd1[[1L]] == '<=') {
+      nd1[[1L]] <- quote(`>`)
+    } else if (nd1[[1L]] == '<') {
+      nd1[[1L]] <- quote(`>=`)
+    } # else if (nd1[[1L]] is '>' or '>=')  do nothing
+    
+    nd1[[2L]] <- quote(newx)
+    
+    nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
+    
+    fn_ <- nm |>
+      call(name = 'alist', newx = _) |> 
+      eval()
+    
+    fn_[[2L]] <- call(
+      name = '{',
+      call(
+        name = '<-', 
+        quote(ret), 
+        call(name = '(', nd1)
+      ),
+      call(name = '<-', quote(ret0), call(name = 'na.omit', quote(ret))),
+      quote(if ((length(ret0) > 1L) && (all(ret0) || !any(ret0))) warning('Dichotomized values are all-0 or all-1')),
+      quote(return(ret))
+    )
+    
+  }, 'factor' = {
+    
+    nd1 <- strsplit(x = labs[2L], split = '=')[[1L]][2L]
+    letter1 <- strsplit(x = nd1, split = '')[[1L]]
+    if (length(letter1) > 26L) stop('rpart::rpart() should have error here..')
+    id1 <- letter1 |> 
+      match(table = letters)
+    
+    fn_ <- nm |>
+      call(name = 'alist', newx = _) |> 
+      eval()
+    
+    fn_[[2L]] <- call(
+      name = '{',
+      call(
+        name = '<-', 
+        quote(ret), 
+        call(
+          name = '%in%', 
+          call(name = 'unclass', quote(newx)),
+          do.call(what = 'call', args = c(list(name = 'c'), as.list(id1)))
+        )
+      ),
+      call(name = '<-', quote(ret0), call(name = 'na.omit', quote(ret))),
+      quote(if ((length(ret0) > 1L) && (all(ret0) || !any(ret0))) warning('Dichotomized values are all-0 or all-1')),
+      quote(return(ret))
+    )
+    
+  }, stop('not supported!'))
   
-  if (nd1[[1L]] == '<=') {
-    nd1[[1L]] <- quote(`>`)
-  } else if (nd1[[1L]] == '<') {
-    nd1[[1L]] <- quote(`>=`)
-  } # else if (nd1[[1L]] is '>' or '>=')  do nothing
-  
-  nd1[[2L]] <- quote(newx)
-  
-  nd1[[3L]] <- s[1L, 4L] # threshold, in case `labels` are truncated due to `digits`
-  
-  fn_ <- nm |>
-    call(name = 'alist', newx = _) |> 
-    eval()
-  
-  fn_[[2L]] <- call(
-    name = '{',
-    call(name = '<-', quote(ret), call(name = '(', nd1)),
-    call(name = '<-', quote(ret0), call(name = 'na.omit', quote(ret))),
-    quote(if ((length(ret0) > 1L) && (all(ret0) || !any(ret0))) warning('Dichotomized values are all-0 or all-1')),
-    quote(return(ret))
-  )
   
   .fn <- fn_ |> 
     # as.function.default(envir = new.env()) |> # NO!! read ?base::new.env very carefully! Default creates a child of current environment
@@ -64,7 +109,11 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
     'fn_', 'labs', 'nd1', 'nm', 'object', 's'
   ), envir = environment(.fn))
   
-  class(.fn) <- c('node1', class(.fn))
+  class(.fn) <- c(
+    dc[[2L]] |> sprintf(fmt = 'node1_%s'), 
+    'node1', 
+    class(.fn)
+  )
   return(.fn)
   
 }
@@ -101,6 +150,8 @@ predict.node1 <- function(object, newdata, ...) {
   }
   
 }
+
+
 
 
 
@@ -145,11 +196,22 @@ get_cutoff.node1 <- function(x) {
 #' @export labels.node1
 #' @export
 labels.node1 <- function(object, ...) {
+  
   z1 <- formals(object)$newx |> 
     deparse1()
-  z2 <- (body(object)[[2L]][[3L]][[2L]][c(1L,3L)]) |>
-    deparse1()
-  paste0(z1, z2)
+  
+  b. <- body(object)
+  
+  if (inherits(object, what = 'node1_numeric')) {
+    z2 <- (b.[[2L]][[3L]][[2L]][c(1L,3L)]) |>
+      deparse1()
+    return(paste0(z1, z2))
+  } else if (inherits(object, what = 'node1_factor')) {
+    z2 <- (b.[[2L]][[3L]][[3L]]) |>
+      deparse1()
+    return(paste(z1, z2, sep = ' in levels '))
+  } 
+
 }
 
 
