@@ -333,7 +333,7 @@ All R code-chunks are folded in the Appendix, for ease of navigation. They are c
 
 ## `node1()` {#sec-node1}
 
-Function `node1()` dichotomizes a single `numeric` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
+Function `node1()` dichotomizes a single `numeric` or `factor` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
 
 -   the use of function `node1()`, and
 -   the `S3` method dispatches `predict.node1()` and `labels.node1()`
