@@ -756,7 +756,7 @@ In earlier publications, a junior author referred to the methodology outlined in
 
 In the world of R, an algorithm may use the term 'optim' if-and-only-if its core/workhorse function is either one of
 
--   [Brent–Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) algorithm in one-dimensional optimization, via function `stats::optimize()` and its alias `stats::optimise()`.
+-   [Brent–Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) algorithm in one-dimensional optimization, via function `stats::optimize()` and/or its alias `stats::optimise()`.
 -   [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder–Mead_method), [quasi-Newton](https://en.wikipedia.org/wiki/Quasi-Newton_method), [conjugate-gradient](https://en.wikipedia.org/wiki/Conjugate_gradient_method) algorithms in higher-dimensional optimization, via function `stats::optim()`.
 
 Otherwise, it is strongly advised **not** call an algorithm 'optim'.  
