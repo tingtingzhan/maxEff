@@ -345,12 +345,11 @@ Data set *`stagec`* from package **`rpart`** contains 146 subjects with [Stage C
 ```{r}
 #| code-fold: true
 #| code-summary: '**Data**: training set *`stagec0`* and test set *`stagec1`*'
-data(stagec, package = 'rpart')
-stagec0 = stagec[1:140,] # training set
-stagec1 = stagec[-(1:140),] # test set
+stagec0 = rpart::stagec[1:140,] # training set
+stagec1 = rpart::stagec[-(1:140),] # test set
 ```
 
-### `numeric` Predictor
+### `numeric` Predictor {#sec-node1_numeric}
 
 Function `rpart::rpart()` creates a recursive partitioning model of the `numeric` variable *`age`* with the endpoint of progression-free survival in the training set *`stagec0`*, with
 
@@ -517,6 +516,8 @@ D0a |>
 
 ### `factor` Predictor
 
+Function `node1()` creates a dichotomizing rule *`D0b`* for the `factor` variable *`ploidy`* based on the first node in the recursive partitioning tree *`rp0b`*, in a similar procedure as outlined in Appendix @sec-node1_numeric. 
+
 ```{r}
 #| label: rpart_factor
 #| code-fold: true
@@ -551,10 +552,12 @@ D0b |>
   labels()
 ```
 
+The `S3` method dispatch `predict.node1()` dichotomizes the `factor` variable *`ploidy`* in the test set *`stagec1`*, using the dichotomizing rule *`D0b`* determined by the training set *`stagec0`*.  User must make sure that the `factor` variable being dichotomized has the same `levels` in the training and the test set.
 
 ```{r}
 #| code-fold: true
 #| code-summary: '**Example**: `predict.node1()` on *`D0b`*'
+stopifnot(identical(levels(stagec0$ploidy), levels(stagec1$ploidy)))
 stagec1$ploidy
 D0b |> 
   predict(newdata = stagec1)
