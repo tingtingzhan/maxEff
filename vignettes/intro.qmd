@@ -113,7 +113,8 @@ Ki67q = groupedHyperframe::Ki67 |>
     x = y = NULL # remove x- and y-coords for non-spatial application
   }) |>
   as.groupedHyperframe(group = ~ patientID/tissueID) |>
-  aggregate_quantile(by = ~ patientID, probs = seq.int(from = .01, to = .99, by = .01))
+  quantile(probs = seq.int(from = .01, to = .99, by = .01)) |>
+  aggregate(by = ~ patientID)
 ```
 
 ```{r}
@@ -134,7 +135,8 @@ Ki67q |>
 Ki67s = groupedHyperframe::Ki67 |>
   grouped_ppp(formula = logKi67 ~ . | patientID/tissueID) |>
   Emark_(r = seq.int(from = 0, to = 100)) |>
-  aggregate_fv(by = ~ patientID)
+  summary_fv() |>
+  aggregate(by = ~ patientID)
 ```
 
 ```{r}
@@ -218,7 +220,6 @@ a1 = a0 |>
 a1
 ```
 
-
 # Adding `logical` Predictor
 
 ## Naive Practice {#sec-add_dummy}
@@ -265,7 +266,6 @@ b1 = b0 |>
 #| code-summary: 'Predicted models *`b1`*' 
 b1
 ```
-
 
 ## via Repeated Partitions {#sec-add_dummy_partition}
 
@@ -316,7 +316,6 @@ c1 = c0 |>
 c1
 ```
 
-
 # Appendix
 
 Technical details, as well as the minor and/or experimental features, are covered in the Appendix, in order not to interrupt the main narrative of this vignette.
@@ -330,7 +329,6 @@ All R code-chunks are folded in the Appendix, for ease of navigation. They are c
 -   **Figure**, to create a `ggplot`.
 -   **Workaround**, to provide alternative solutions to a problem.
 
-
 ## `node1()` {#sec-node1}
 
 Function `node1()` dichotomizes a single `numeric` or `factor` `vector` based on the first node of a recursive partitioning and regression tree `rpart.object` from package **`rpart`** [@rpart]. In this section, we illustrate
@@ -340,7 +338,7 @@ Function `node1()` dichotomizes a single `numeric` or `factor` `vector` based on
 
 using data examples from package **`rpart`**. To keep the user's `search` path simple and clean, we intentionally call the objects and functions in package **`rpart`** and **`survival`** [@survival] with explicit namespace, instead of using `library()` or `require()`.
 
-Data set *`stagec`* from package **`rpart`** contains 146 subjects with [Stage C prostate cancer](https://www.cancer.org/cancer/types/prostate-cancer/detection-diagnosis-staging/staging.html).  We use the first 140 subjects as the training set, and the last 6 subjects as the test set.
+Data set *`stagec`* from package **`rpart`** contains 146 subjects with [Stage C prostate cancer](https://www.cancer.org/cancer/types/prostate-cancer/detection-diagnosis-staging/staging.html). We use the first 140 subjects as the training set, and the last 6 subjects as the test set.
 
 ```{r}
 #| code-fold: true
@@ -408,8 +406,6 @@ D0a |>
   environment() |>
   ls(envir = _, all.names = TRUE)
 ```
-
-
 
 The `name` of the `numeric` variable, e.g., *`age`*, is stored as the `formals` argument of the parameter *`newx`*. This is an advanced R programming trick. The `eval`uation of the dichotomizing rule discovers the variable *`age`* in
 
@@ -516,7 +512,7 @@ D0a |>
 
 ### `factor` Predictor
 
-Function `node1()` creates a dichotomizing rule *`D0b`* for the `factor` variable *`ploidy`* based on the first node in the recursive partitioning tree *`rp0b`*, in a similar procedure as outlined in Appendix @sec-node1_numeric. 
+Function `node1()` creates a dichotomizing rule *`D0b`* for the `factor` variable *`ploidy`* based on the first node in the recursive partitioning tree *`rp0b`*, in a similar procedure as outlined in Appendix @sec-node1_numeric.
 
 ```{r}
 #| label: rpart_factor
@@ -552,7 +548,7 @@ D0b |>
   labels()
 ```
 
-The `S3` method dispatch `predict.node1()` dichotomizes the `factor` variable *`ploidy`* in the test set *`stagec1`*, using the dichotomizing rule *`D0b`* determined by the training set *`stagec0`*.  User must make sure that the `factor` variable being dichotomized has the same `levels` in the training and the test set.
+The `S3` method dispatch `predict.node1()` dichotomizes the `factor` variable *`ploidy`* in the test set *`stagec1`*, using the dichotomizing rule *`D0b`* determined by the training set *`stagec0`*. User must make sure that the `factor` variable being dichotomized has the same `levels` in the training and the test set.
 
 ```{r}
 #| code-fold: true
@@ -563,9 +559,6 @@ D0b |>
   predict(newdata = stagec1)
 ```
 
-
-
-
 ## `statusPartition()` {#sec-statusPartition}
 
 Function `statusPartition()`
@@ -573,12 +566,11 @@ Function `statusPartition()`
 1.  splits a `left`-censored `survival::Surv` object by its survival status, i.e., observed vs. `left`-censored;
 2.  partitions the observed and `left`-censored subjects, respectively, into test/training sets.
 
-We follow the terminology of the (very popular) function `caret::createDataPartition()`, that  
+We follow the terminology of the (very popular) function `caret::createDataPartition()`, that
 
 > We [**split**]{style="background-color: #FFFF00"} the data into multiple *strata*, and [**partition**]{style="background-color: #FFFF00"} each stratum into test/training sets.
 
-
-Consider a toy example of 
+Consider a toy example of
 
 ```{r}
 #| code-fold: true
@@ -588,10 +580,7 @@ capacitor_failure = survival::capacitor |>
 capacitor_failure
 ```
 
-
-
 Function `statusPartition()` intends to avoid the situation that a Cox proportional hazards model `survival::coxph()` in one or more of the partitioned data set being degenerate due to the fact that all subjects in that partition being censored.
-
 
 ```{r}
 #| label: statusPartition
@@ -603,9 +592,7 @@ capacitor_failure[id[[1L]], 2L] |>
   table() # balanced by survival status
 ```
 
-
 Function `statusPartition()` is an extension of the very popular function `caret::createDataPartition()`, which stratifies a `Surv` object by the `quantile`s of its survival time (as of package **`caret`** v`r packageVersion('caret')`).
-
 
 ```{r}
 #| code-fold: true
@@ -805,28 +792,25 @@ stopifnot(identical(c1[[2L]], c12))
 
 ## Use of "Optim"
 
-In earlier publications, a junior author referred to the methodology outlined in @sec-add_dummy_partition using the term 'optim'.  This is a **wrong** practice of nomenclature, indicating a **wrong** understanding of R terminology.
+In earlier publications, a junior author referred to the methodology outlined in @sec-add_dummy_partition using the term 'optim'. This is a **wrong** practice of nomenclature, indicating a **wrong** understanding of R terminology.
 
 In the world of R, an algorithm may use the term 'optim' if-and-only-if its core/workhorse function is either one of
 
 -   [Brent–Dekker](https://en.wikipedia.org/wiki/Brent%27s_method) algorithm in one-dimensional optimization, via function `stats::optimize()` and/or its alias `stats::optimise()`.
 -   [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder–Mead_method), [quasi-Newton](https://en.wikipedia.org/wiki/Quasi-Newton_method), [conjugate-gradient](https://en.wikipedia.org/wiki/Conjugate_gradient_method) algorithms in higher-dimensional optimization, via function `stats::optim()`.
 
-Otherwise, it is strongly advised **not** call an algorithm 'optim'.  
+Otherwise, it is strongly advised **not** call an algorithm 'optim'.
 
 Therefore, we now name this package `maxEff`, meaning 'maximum effect size'.
 
-
 # Terms & Abbreviations {#sec-terms}
 
-@tbl-Rterm presents a comprehensive glossary of R terms and abbreviations used in this vignette.  
+@tbl-Rterm presents a comprehensive glossary of R terms and abbreviations used in this vignette.
 
-R terminology and nomenclature could be *drastically different* from that of mathematics and statistics.  Users are *strongly advised* to read closely from the links in @tbl-Rterm, which point to webpages on [search.r-project.org](https://search.r-project.org), [cran.r-project.org](https://cran.r-project.org), and [en.wikipedia.org](https://en.wikipedia.org).
-
-
+R terminology and nomenclature could be *drastically different* from that of mathematics and statistics. Users are *strongly advised* to read closely from the links in @tbl-Rterm, which point to webpages on [search.r-project.org](https://search.r-project.org), [cran.r-project.org](https://cran.r-project.org), and [en.wikipedia.org](https://en.wikipedia.org).
 
 | Term / Abbreviation | Description |
-|:----|:----|
+|:---|:---|
 | CRAN, R | The Comprehensive R Archive Network, <https://cran.r-project.org> |
 | `Depends`, `Imports`, `Suggests`, `Enhances` | [*Writing R Extensions*, Section 1.1.3 *Package Dependencies*](https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Package-Dependencies) |
 | [`|>`](https://search.r-project.org/R/refmans/base/html/pipeOp.html) | Forward pipe operator introduced since R 4.1.0 |
@@ -874,9 +858,6 @@ R terminology and nomenclature could be *drastically different* from that of mat
 | [`update`](https://search.r-project.org/R/refmans/stats/html/update.html) | Update and re-fit a model call |
 
 : Terms & Abbreviations in R {#tbl-Rterm}
-
-
-
 
 # References
 
