@@ -17,6 +17,8 @@ Authors@R: c(person(given = 'Tingting', family = 'Zhan', role =
        family = 'Chervoneva', role = c('aut'), email =
        'Inna.Chervoneva@jefferson.edu', comment = c(ORCID =
        '0000-0002-9104-4505')))
+URL: 
+    https://github.com/tingtingzhan/maxEff
 Imports: caret, parallel, rpart, spatstat.geom, groupedHyperframe
 Suggests: knitr, quarto, rmarkdown, 
     survival
