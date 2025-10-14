@@ -16,7 +16,9 @@
 #' Function [add_dummy()] returns an object of class `'add_dummy'`.
 #' 
 #' @keywords internal
-#' @importFrom parallel mclapply
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach `%dopar%`
+#' @importFrom parallel mclapply makeCluster stopCluster
 #' @importFrom rpart rpart
 #' @importFrom stats update
 #' @export
@@ -34,36 +36,69 @@ add_dummy <- function(
   x_ <- tmp$x_
   xval <- tmp$xval
   
-  sq <- x_ |>
-    seq_along()
+  rpart_node1 <- \(i) {
+    rpart(formula = y ~ xval[[i]], cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
+      node1(nm = x_[[i]])
+  }
   
   # all `rule`s
-  rule. <- sq |>  
-    mclapply(mc.cores = mc.cores, FUN = \(i) {
-      rpart(formula = y ~ xval[[i]], cp = .Machine$double.eps, maxdepth = 2L) |> # partition rule based on complete data
-        node1(nm = x_[[i]])
+  sq <- x_ |>
+    seq_along()
+  switch(
+    EXPR = .Platform$OS.type, # as of R 4.5, only two responses, 'windows' or 'unix'
+    unix = {
+      rule. <- sq |>  
+        mclapply(mc.cores = mc.cores, FUN = rpart_node1)
+    }, windows = {
+      i <- NULL # just to suppress devtools::check NOTE
+      registerDoParallel(cl = (cl <- makeCluster(spec = mc.cores)))
+      out <- foreach(i = sq, .options.multicore = list(cores = mc.cores)) %dopar% rpart_node1(i)
+      stopCluster(cl)
     })
+  
+  do_node1 <- \(i) {
+    rule.[[i]](xval[[i]]) # partition rule applied to complete data
+  }
   
   # all dichotomized predictors
-  x. <- sq |> 
-    mclapply(mc.cores = mc.cores, FUN = \(i) {
-      rule.[[i]](xval[[i]]) # partition rule applied to complete data
+  switch(
+    EXPR = .Platform$OS.type, # as of R 4.5, only two responses, 'windows' or 'unix'
+    unix = {
+      x. <- sq |> 
+        mclapply(mc.cores = mc.cores, FUN = do_node1)
+    }, windows = {
+      i <- NULL # just to suppress devtools::check NOTE
+      registerDoParallel(cl = (cl <- makeCluster(spec = mc.cores)))
+      out <- foreach(i = sq0, .options.multicore = list(cores = mc.cores)) %dopar% do_node1(i)
+      stopCluster(cl)
     })
   
+  do_update <- \(i) {
+    data_$x. <- x.[[i]]
+    m_ <- update(start.model, formula. = . ~ . + x., data = data_)
+    cf <- m_$coefficients
+    cf_ <- cf[length(cf)]
+    rule <- rule.[[i]]
+    attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
+    attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(rule, which = 'model') <- m_ # only model formula needed for [predict.add_dummy_]!!!
+    class(rule) <- c('add_dummy_', class(rule))
+    return(rule)
+  }
+  
   # only choose unique dichotomized predictors!!!
-  out <- sq[!duplicated.default(x.)] |>  
-    mclapply(mc.cores = mc.cores, FUN = \(i) {
-    #lapply(FUN = \(i) {
-      data_$x. <- x.[[i]]
-      m_ <- update(start.model, formula. = . ~ . + x., data = data_)
-      cf <- m_$coefficients
-      cf_ <- cf[length(cf)]
-      rule <- rule.[[i]]
-      attr(rule, which = 'p1') <- mean.default(data_$x., na.rm = TRUE)
-      attr(rule, which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-      attr(rule, which = 'model') <- m_ # only model formula needed for [predict.add_dummy_]!!!
-      class(rule) <- c('add_dummy_', class(rule))
-      return(rule)
+  sq0 <- sq[!duplicated.default(x.)]
+  switch(
+    EXPR = .Platform$OS.type, # as of R 4.5, only two responses, 'windows' or 'unix'
+    unix = {
+      out <- sq0 |>  
+        mclapply(mc.cores = mc.cores, FUN = do_update)
+      #lapply(FUN = do_update) # debug
+    }, windows = {
+      i <- NULL # just to suppress devtools::check NOTE
+      registerDoParallel(cl = (cl <- makeCluster(spec = mc.cores)))
+      out <- foreach(i = sq0, .options.multicore = list(cores = mc.cores)) %dopar% do_update(i)
+      stopCluster(cl)
     })
   
   class(out) <- c('add_dummy', 'add_', 'listof', class(out))

@@ -25,7 +25,9 @@
 #' which is a \link[stats]{listof} objects with an internal class `'add_numeric_'`.
 #' 
 #' @keywords internal
-#' @importFrom parallel mclapply
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach `%dopar%`
+#' @importFrom parallel mclapply makeCluster stopCluster
 #' @importFrom stats update
 #' @export
 add_numeric <- function(
@@ -42,20 +44,33 @@ add_numeric <- function(
   x_ <- tmp$x_
   xval <- tmp$xval
 
-  out <- x_ |>
-    seq_along() |>  
-    mclapply(mc.cores = mc.cores, FUN = \(i) {
-      x. <- x_[[i]]
-      data_$x. <- xval[[i]]
-      m_ <- update(start.model, formula. = . ~ . + x., data = data_)
-      cf <- m_$coefficients
-      cf_ <- cf[length(cf)]
-      attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
-      attr(x., which = 'model') <- m_ # needed for [predict.*]
-      class(x.) <- c('add_numeric_', class(x.))
-      return(x.)
-    }) # 'list'
+  fn <- \(i) {
+    x. <- x_[[i]]
+    data_$x. <- xval[[i]]
+    m_ <- update(start.model, formula. = . ~ . + x., data = data_)
+    cf <- m_$coefficients
+    cf_ <- cf[length(cf)]
+    attr(x., which = 'effsize') <- if (is.finite(cf_)) unname(cf_) else NA_real_
+    attr(x., which = 'model') <- m_ # needed for [predict.*]
+    class(x.) <- c('add_numeric_', class(x.))
+    return(x.)
+  }
   
+  sq <- x_ |>
+    seq_along()
+  switch(
+    EXPR = .Platform$OS.type, # as of R 4.5, only two responses, 'windows' or 'unix'
+    unix = {
+      out <- sq |>  
+        mclapply(mc.cores = mc.cores, FUN = fn) # 'list'
+        #lapply(FUN = fn) # debugging
+    }, windows = {
+      i <- NULL # just to suppress devtools::check NOTE
+      registerDoParallel(cl = (cl <- makeCluster(spec = mc.cores)))
+      out <- foreach(i = sq, .options.multicore = list(cores = mc.cores)) %dopar% fn(i)
+      stopCluster(cl)
+    })
+    
   class(out) <- c('add_numeric', 'add_', 'listof', class(out))
   return(invisible(out))
   

@@ -19,7 +19,7 @@ Authors@R: c(person(given = 'Tingting', family = 'Zhan', role =
        '0000-0002-9104-4505')))
 URL: 
     https://github.com/tingtingzhan/maxEff
-Imports: caret, parallel, rpart, spatstat.geom, groupedHyperframe
+Imports: parallel, doParallel, foreach, caret, rpart, spatstat.geom, groupedHyperframe (>= 0.3.0)
 Suggests: knitr, quarto, rmarkdown, 
     survival
 VignetteBuilder: quarto

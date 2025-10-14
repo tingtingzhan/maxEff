@@ -19,7 +19,9 @@
 #' 
 #' @keywords internal
 #' @importFrom caret createDataPartition
-#' @importFrom parallel mclapply
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach `%dopar%`
+#' @importFrom parallel mclapply makeCluster stopCluster
 #' @importFrom stats quantile
 #' @export
 add_dummy_partition <- function(
@@ -42,20 +44,32 @@ add_dummy_partition <- function(
   } else createDataPartition(y = y, times = times, groups = 2L, ...)
   # using same split for all predictors
   
-  out <- x_ |>
-    seq_along() |>
-    mclapply(mc.cores = mc.cores, FUN = \(i) { 
-      #lapply(FUN = \(i) { # debugging
-      tmp_ <- ids |>
-        lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
-      tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
-      
-      effsize <- tmp |> 
-        vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
-      id <- tmp |> 
-        seq_along() |> 
-        quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
-      return(tmp[[order(effsize)[id]]])  
+  fn <- \(i) { 
+    tmp_ <- ids |>
+      lapply(FUN = splitd, start.model = start.model, x_ = x_[[i]], x = xval[[i]], data = data)
+    tmp <- tmp_[lengths(tmp_, use.names = FALSE) > 0L]
+    
+    effsize <- tmp |> 
+      vapply(FUN = attr, which = 'effsize', exact = TRUE, FUN.VALUE = NA_real_)
+    id <- tmp |> 
+      seq_along() |> 
+      quantile(probs = .5, type = 3L, na.rm = TRUE) # median *location*
+    return(tmp[[order(effsize)[id]]])  
+  }
+  
+  sq <- x_ |>
+    seq_along()
+  switch(
+    EXPR = .Platform$OS.type, # as of R 4.5, only two responses, 'windows' or 'unix'
+    unix = {
+      out <- sq |>
+        mclapply(mc.cores = mc.cores, FUN = fn)
+        #lapply(FUN = fn) # debugging
+    }, windows = {
+      i <- NULL # just to suppress devtools::check NOTE
+      registerDoParallel(cl = (cl <- makeCluster(spec = mc.cores)))
+      out <- foreach(i = sq, .options.multicore = list(cores = mc.cores)) %dopar% fn(i)
+      stopCluster(cl)
     })
   
   class(out) <- c('add_dummy', 'add_', 'listof', class(out))
