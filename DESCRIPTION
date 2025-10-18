@@ -1,7 +1,7 @@
 Package: maxEff
 Type: Package
 Title: Additional Predictor with Maximum Effect Size
-Version: 0.2.0
+Version: 0.2.0.20251018
 Description: Methods of selecting one from many numeric predictors
        for a regression model, to ensure that the additional
        predictor has the maximum effect size.

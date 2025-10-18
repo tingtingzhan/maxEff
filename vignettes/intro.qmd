@@ -76,6 +76,7 @@ Examples in the [complete vignette](https://rpubs.com/tingtingzhan/hyper_gam) re
 
 ```{r}
 #| warning: false
+#| eval: false
 library(maxEff)
 library(groupedHyperframe)
 library(survival)

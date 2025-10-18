@@ -102,18 +102,19 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
     as.function.default()
   # prefix dot (.) will not show up in ls(., all.names = FALSE)
   
-  # clean the enclosure envir of `.fn` as much as possible
-  rm(list = c(
-    # '.fn', # no!! otherwise nothing to return ..
-    '...', 
-    'fn_', 'labs', 'nd1', 'nm', 'object', 's'
-  ), envir = environment(.fn))
-  
   class(.fn) <- c(
     dc[[2L]] |> sprintf(fmt = 'node1_%s'), 
     'node1', 
     class(.fn)
   )
+
+  # clean the enclosure envir of `.fn` as much as possible
+  rm(list = c(
+    # '.fn', # no!! otherwise nothing to return ..
+    '...', 
+    'fn_', 'labs', 'nd1', 'nm', 'object', 's', 'dc', 'trm'
+  ), envir = environment(.fn))
+  
   return(.fn)
   
 }
