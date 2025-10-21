@@ -8,7 +8,7 @@ add_numeric(
   start.model,
   x,
   data = eval(start.model$call$data),
-  mc.cores = getOption("mc.cores"),
+  mc.cores = getOption("cores"),
   ...
 )
 }

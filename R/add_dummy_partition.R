@@ -29,7 +29,7 @@ add_dummy_partition <- function(
     x,
     data = eval(start.model$call$data),
     times, 
-    mc.cores = getOption('mc.cores'), 
+    mc.cores = getOption('cores'), 
     ...
 ) {
   
