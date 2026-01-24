@@ -14,11 +14,11 @@ Language: en-US
 Authors@R: c(person(given = 'Tingting', family = 'Zhan', role =
        c('aut', 'cre'), email = 'tingtingzhan@gmail.com', comment =
        c(ORCID = '0000-0001-9971-4844')), person(given = 'Inna',
-       family = 'Chervoneva', role = c('aut'), email =
+       family = 'Chervoneva', role = c('ctb'), email =
        'Inna.Chervoneva@jefferson.edu', comment = c(ORCID =
        '0000-0002-9104-4505')))
 URL: 
-    https://github.com/tingtingzhan/maxEff
+    https://tingtingzhan.quarto.pub/groupedhyperframe/maxEff.html
 Imports: parallel, doParallel, foreach, caret, rpart, spatstat.geom
 Suggests: knitr, quarto, rmarkdown, 
     survival
