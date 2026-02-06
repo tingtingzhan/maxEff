@@ -27,7 +27,7 @@ vignette: >
 
 The complete vignette of R package **`maxEff`** (v`r packageVersion('maxEff')`) 
 
-> <https://rpubs.com/tingtingzhan/maxEff>
+> <https://tingtingzhan.quarto.pub/groupedhyperframe/maxEff.html>
 
 documents the selection of one from many `numeric` predictors for a regression model, to ensure that the additional predictor has the maximum effect size.
 
@@ -38,50 +38,31 @@ The complete vignette exceeds the file size limit allowed on [CRAN](https://cran
 
 ## Environment
 
-Package **`maxEff`** (v`r packageVersion('maxEff')`) requires R version 4.5.0 (released 2025-04-11) or higher ([macOS](https://cran.r-project.org/bin/macosx/), [Windows](https://cran.r-project.org/bin/windows/base/), [Linux](https://cran.r-project.org/bin/linux/)).
+Package **`maxEff`** (v`r packageVersion('maxEff')`) requires R version 4.5.0 (released 2025-04-11) or higher.  Details are provided in the [book chapter](https://tingtingzhan.quarto.pub/groupedhyperframe/appendix/about.html#sec-envir).
 
-An Integrated Development Environment (IDE), e.g., [RStudio](https://posit.co/download/rstudio-desktop/) [@RStudio] or [Positron](https://positron.posit.co/download.html), is not required, but highly recommended.
 
+
+## Installation
+
+Packages **`maxEff`** (v`r packageVersion('maxEff')`) can be installed using the following command.
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Environment on author's computer"
-#| label: author-env
-Sys.info()[c('sysname', 'release', 'machine')]
-R.version
+#| eval: false
+utils::install.packages('maxEff')
 ```
 
 
 ## Dependency
 
-The dependencies of package **`maxEff`** are detailed in the [complete vignette](https://rpubs.com/tingtingzhan/maxEff). 
+The dependencies of package **`maxEff`** are detailed in the [book chapter](https://tingtingzhan.quarto.pub/groupedhyperframe/appendix/about.html#maxEff-1).
+
+Package **`maxEff`** requires the *development versions* of the **`spatstat.*`** family of packages [@spatstat15; @spatstat05]. Installation instructions are provided in the [book chapter](https://tingtingzhan.quarto.pub/groupedhyperframe/appendix/dev.html).
 
 
-Package **`maxEff`** requires the *development versions* of the **`spatstat.*`** family of packages [@spatstat15; @spatstat05]. Installation instructions are provided in the [complete vignette](https://rpubs.com/tingtingzhan/groupedHyperframe) of package **`groupedHyperframe`** [@groupedHyperframe, v`r packageVersion('groupedHyperframe')`], Section 4.1. 
 
 
-## Installation
 
-Packages **`maxEff`** (v`r packageVersion('maxEff')`) and **`groupedHyperframe`** (v`r packageVersion('groupedHyperframe')`) can be installed using the following command.
-
-```{r}
-#| eval: false
-utils::install.packages('groupedHyperframe')
-utils::install.packages('maxEff')
-```
-
-## Getting Started
-
-Examples in the [complete vignette](https://rpubs.com/tingtingzhan/hyper_gam) require that the `search` path has
-
-```{r}
-#| warning: false
-#| eval: false
-library(maxEff)
-library(groupedHyperframe)
-library(survival)
-```
-
+<!--
 
 ## Acknowledgement
 
@@ -90,6 +71,7 @@ This work is supported by National Institutes of Health, U.S. Department of Heal
 -   R01CA222847 ([I. Chervoneva](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844), and [H. Rui](https://orcid.org/0000-0002-8778-261X))
 -   R01CA253977 (H. Rui and I. Chervoneva).
 
+-->
 
 # References {.appendix}
 
