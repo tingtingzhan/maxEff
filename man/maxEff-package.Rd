@@ -19,6 +19,7 @@ Useful links:
 \itemize{
   \item \url{https://github.com/tingtingzhan/maxEff}
   \item \url{https://tingtingzhan.quarto.pub/groupedhyperframe/maxEff.html}
+  \item \url{https://tingtingzhan-groupedhyperframe.netlify.app/maxEff.html}
 }
 
 }
