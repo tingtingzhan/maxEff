@@ -16,7 +16,7 @@
 \item{...}{additional parameters of function \code{predict.add_numeric_}, e.g., \code{newdata}}
 }
 \value{
-Function \code{\link[=predict.add_numeric]{predict.add_numeric()}} returns a \link[stats]{listof} regression models.
+The \code{S3} method \code{\link[=predict.add_numeric]{predict.add_numeric()}} returns a \link[stats]{listof} regression models.
 }
 \description{
 Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).

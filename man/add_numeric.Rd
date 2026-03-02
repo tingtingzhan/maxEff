@@ -25,14 +25,14 @@ the \link[base]{numeric} predictors \eqn{x}'s as the columns of one \link[base]{
 \item{...}{additional parameters, currently of no use}
 }
 \value{
-Function \code{\link[=add_numeric]{add_numeric()}} returns an \link{add_numeric} object,
+The function \code{\link[=add_numeric]{add_numeric()}} returns an \link{add_numeric} object,
 which is a \link[stats]{listof} objects with an internal class \code{'add_numeric_'}.
 }
 \description{
 Additional predictor as \link[base]{numeric}.
 }
 \details{
-Function \code{\link[=add_numeric]{add_numeric()}} treats each additional predictor as a \link[base]{numeric} variable,
+The function \code{\link[=add_numeric]{add_numeric()}} treats each additional predictor as a \link[base]{numeric} variable,
 and \link[stats]{update}s the starting model with each additional predictor.
 }
 \keyword{internal}

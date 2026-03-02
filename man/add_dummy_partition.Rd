@@ -27,7 +27,7 @@ add_dummy_partition(
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
 }
 \value{
-Function \code{\link[=add_dummy_partition]{add_dummy_partition()}} returns an object of \link[base]{class} \code{'add_dummy'}.
+The function \code{\link[=add_dummy_partition]{add_dummy_partition()}} returns an object of \link[base]{class} \code{'add_dummy'}.
 }
 \description{
 Additional \link[base]{logical} Predictor via Repeated Partitioning

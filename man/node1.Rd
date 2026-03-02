@@ -14,7 +14,7 @@ node1(object, nm = as.symbol(rownames(s)[1L]), ...)
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=node1]{node1()}} returns an object of class \code{'node1'},
+The function \code{\link[=node1]{node1()}} returns an object of class \code{'node1'},
 which is a \link[base]{function}
 with one parameter \code{newx} taking a \link[base]{double} \link[base]{vector}.
 }

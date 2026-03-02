@@ -12,7 +12,7 @@
 \item{...}{..}
 }
 \value{
-Function \code{\link[=labels.add_dummy]{labels.add_dummy()}} returns a \link[base]{character} \link[base]{vector}.
+The \code{S3} method \code{\link[=labels.add_dummy]{labels.add_dummy()}} returns a \link[base]{character} \link[base]{vector}.
 }
 \description{
 \link{labels.add_dummy}

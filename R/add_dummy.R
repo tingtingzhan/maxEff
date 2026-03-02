@@ -13,14 +13,13 @@
 #' @param mc.cores \link[base]{integer} scalar, see function \link[parallel]{mclapply}
 #' 
 #' @returns
-#' Function [add_dummy()] returns an object of class `'add_dummy'`.
+#' The function [add_dummy()] returns an object of class `'add_dummy'`.
 #' 
 #' @keywords internal
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
 #' @importFrom parallel mclapply makeCluster stopCluster
 #' @importFrom rpart rpart
-#' @importFrom stats update
 #' @export
 add_dummy <- function(
     start.model, 
@@ -125,7 +124,7 @@ add_dummy <- function(
 #' @param ... ..
 #' 
 #' @returns
-#' Function [labels.add_dummy()] returns a \link[base]{character} \link[base]{vector}.
+#' The `S3` method [labels.add_dummy()] returns a \link[base]{character} \link[base]{vector}.
 #' 
 #' @keywords internal
 #' @export labels.add_dummy
@@ -151,7 +150,7 @@ labels.add_dummy <- function(object, ...) {
 #' ..
 #' 
 #' @returns
-#' Function [print.add_dummy()] does not have a returned value
+#' The `S3` method [print.add_dummy()] does not have a returned value
 #' 
 #' @keywords internal
 #' @export print.add_dummy
@@ -195,11 +194,11 @@ if (FALSE) {
 #' @param ... additional parameters of function [predict.add_dummy_()], e.g., `newdata`
 #' 
 #' @details
-#' Function [subset.add_dummy()], default subset `(p1>.15 & p1<.85)`.
+#' The `S3` method [subset.add_dummy()], default subset `(p1>.15 & p1<.85)`.
 #' See explanation of \eqn{p_1} in function [splitd()].
 #' 
 #' @returns
-#' Function [subset.add_dummy()] returns a [add_dummy()] object.
+#' The `S3` method [subset.add_dummy()] returns a [add_dummy()] object.
 #' 
 #' @keywords internal
 #' @export subset.add_dummy
@@ -227,7 +226,7 @@ subset.add_dummy <- function(x, subset, ...) {
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns
-#' Function [predict.add_dummy()] returns a \link[stats]{listof} regression models.
+#' The `S3` method [predict.add_dummy()] returns a \link[stats]{listof} regression models.
 #' 
 #' @keywords internal
 #' @name predict_add_dummy
@@ -246,9 +245,8 @@ predict.add_dummy <- function(object, ...) {
 #' @rdname predict_add_dummy
 #' 
 #' @returns
-#' Function [predict.add_dummy_()] returns a updated regression model.
+#' The function [predict.add_dummy_()] returns a updated regression model.
 #' 
-#' @importFrom stats predict update
 #' @export predict.add_dummy_
 #' @export
 predict.add_dummy_ <- function(object, newdata, ...) {

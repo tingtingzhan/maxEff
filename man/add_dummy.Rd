@@ -24,7 +24,7 @@ add_dummy(
 \item{mc.cores}{\link[base]{integer} scalar, see function \link[parallel]{mclapply}}
 }
 \value{
-Function \code{\link[=add_dummy]{add_dummy()}} returns an object of class \code{'add_dummy'}.
+The function \code{\link[=add_dummy]{add_dummy()}} returns an object of class \code{'add_dummy'}.
 }
 \description{
 Additional \link[base]{logical} Predictor

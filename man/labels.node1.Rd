@@ -12,7 +12,7 @@
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=labels.node1]{labels.node1()}} returns a \link[base]{character} scalar.
+The \code{S3} method \code{\link[=labels.node1]{labels.node1()}} returns a \link[base]{character} scalar.
 }
 \description{
 Find \link[base]{labels} from \link{node1}

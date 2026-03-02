@@ -15,14 +15,13 @@
 #' @param times,... additional parameters of function \link[caret]{createDataPartition} or [statusPartition()]
 #' 
 #' @returns 
-#' Function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`.
+#' The function [add_dummy_partition()] returns an object of \link[base]{class} `'add_dummy'`.
 #' 
 #' @keywords internal
 #' @importFrom caret createDataPartition
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
 #' @importFrom parallel mclapply makeCluster stopCluster
-#' @importFrom stats quantile
 #' @export
 add_dummy_partition <- function(
     start.model, 
@@ -101,7 +100,7 @@ add_dummy_partition <- function(
 #' 
 #' @section Split-Dichotomized Regression Model:
 #' 
-#' Function [splitd()] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
+#' The function [splitd()] performs a univariable regression model on the test set with a dichotomized predictor, using a dichotomizing rule determined by a recursive partitioning of the training set. 
 #' Specifically, given a training-test sample split,
 #' \enumerate{
 #' \item find the *dichotomizing rule* \eqn{\mathcal{D}} of the predictor \eqn{x_0} given the response \eqn{y_0} in the training set (via function [node1()]);
@@ -111,7 +110,7 @@ add_dummy_partition <- function(
 #' 
 #' @returns
 #' 
-#' Function [splitd()] returns a \link[base]{function}, 
+#' The function [splitd()] returns a \link[base]{function}, 
 #' the dichotomizing rule \eqn{\mathcal{D}} based on the training set \eqn{(y_0, x_0)}, 
 #' with additional attributes
 #' \describe{
@@ -121,7 +120,6 @@ add_dummy_partition <- function(
 #' 
 #' @keywords internal
 #' @importFrom rpart rpart
-#' @importFrom stats update
 #' @export
 splitd <- function(start.model, x_, x, data, id, ...) {
   

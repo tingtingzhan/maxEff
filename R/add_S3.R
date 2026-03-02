@@ -24,11 +24,11 @@
 #' @param ... additional parameters of S3 generic \link[base]{sort_by}, etc.
 #' 
 #' @details
-#' Function [sort_by.add_()] sorts the elements of an `'add_'` object by a certain criterion `y`.
+#' The `S3` method [sort_by.add_()] sorts the elements of an `'add_'` object by a certain criterion `y`.
 #' We suggest using `y = abc(effsize)` and `decreasing = TRUE` order of the \link[base]{abs}olute values of the effect sizes of additional predictor.  
 #'
 #' @returns 
-#' Function [sort_by.add_()] returns an object of the same \link[base]{class} as input `x`.
+#' The `S3` method [sort_by.add_()] returns an object of the same \link[base]{class} as input `x`.
 #' 
 #' @keywords internal
 #' @export sort_by.add_

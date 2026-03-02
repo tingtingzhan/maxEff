@@ -15,13 +15,13 @@
 \item{...}{additional parameters of S3 generic \link[base]{sort_by}, etc.}
 }
 \value{
-Function \code{\link[=sort_by.add_]{sort_by.add_()}} returns an object of the same \link[base]{class} as input \code{x}.
+The \code{S3} method \code{\link[=sort_by.add_]{sort_by.add_()}} returns an object of the same \link[base]{class} as input \code{x}.
 }
 \description{
 \link{sort_by.add_}
 }
 \details{
-Function \code{\link[=sort_by.add_]{sort_by.add_()}} sorts the elements of an \code{'add_'} object by a certain criterion \code{y}.
+The \code{S3} method \code{\link[=sort_by.add_]{sort_by.add_()}} sorts the elements of an \code{'add_'} object by a certain criterion \code{y}.
 We suggest using \code{y = abc(effsize)} and \code{decreasing = TRUE} order of the \link[base]{abs}olute values of the effect sizes of additional predictor.
 }
 \keyword{internal}

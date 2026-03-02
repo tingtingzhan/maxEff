@@ -25,12 +25,15 @@
 #' See `vignette('intro', package = 'maxEff')`.
 #' 
 #' @returns 
-#' Function [statusPartition()] returns a length-\eqn{n} \link[stats]{listof}
+#' The function [statusPartition()] returns a length-\eqn{n} \link[stats]{listof}
 #' \link[base]{integer} \link[base]{vector}s.
 #' In each \link[base]{integer} \link[base]{vector} indicates the training subjects.
 #' 
 #' @note
-#' Function `caTools::sample.split` is not what we need.
+#' The function `caTools::sample.split` is not what we need.
+#' 
+#' @references
+#' \url{https://tingtingzhan.quarto.pub/groupedhyperframe/nonS3/statusPartition.html}
 #' 
 #' @keywords internal
 #' @export 

@@ -14,13 +14,13 @@
 \item{...}{additional parameters of function \code{\link[=predict.add_dummy_]{predict.add_dummy_()}}, e.g., \code{newdata}}
 }
 \value{
-Function \code{\link[=subset.add_dummy]{subset.add_dummy()}} returns a \code{\link[=add_dummy]{add_dummy()}} object.
+The \code{S3} method \code{\link[=subset.add_dummy]{subset.add_dummy()}} returns a \code{\link[=add_dummy]{add_dummy()}} object.
 }
 \description{
 S3 Method Dispatches to \code{'add_dummy'} Class
 }
 \details{
-Function \code{\link[=subset.add_dummy]{subset.add_dummy()}}, default subset \code{(p1>.15 & p1<.85)}.
+The \code{S3} method \code{\link[=subset.add_dummy]{subset.add_dummy()}}, default subset \code{(p1>.15 & p1<.85)}.
 See explanation of \eqn{p_1} in function \code{\link[=splitd]{splitd()}}.
 }
 \keyword{internal}

@@ -13,7 +13,7 @@ get_cutoff(x)
 \item{x}{see Usage}
 }
 \value{
-Function \code{\link[=get_cutoff.node1]{get_cutoff.node1()}} returns a \link[base]{numeric} scalar.
+The \code{S3} method \code{\link[=get_cutoff.node1]{get_cutoff.node1()}} returns a \link[base]{numeric} scalar.
 }
 \description{
 To get the cutoff value from a Dichotomizing Rule \code{\link[=node1]{node1()}}.

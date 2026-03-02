@@ -19,7 +19,7 @@ percentage \eqn{p} of training subjects, default \code{.8}}
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=statusPartition]{statusPartition()}} returns a length-\eqn{n} \link[stats]{listof}
+The function \code{\link[=statusPartition]{statusPartition()}} returns a length-\eqn{n} \link[stats]{listof}
 \link[base]{integer} \link[base]{vector}s.
 In each \link[base]{integer} \link[base]{vector} indicates the training subjects.
 }
@@ -32,6 +32,9 @@ instead of the percentiles survival time.
 See \code{vignette('intro', package = 'maxEff')}.
 }
 \note{
-Function \code{caTools::sample.split} is not what we need.
+The function \code{caTools::sample.split} is not what we need.
+}
+\references{
+\url{https://tingtingzhan.quarto.pub/groupedhyperframe/nonS3/statusPartition.html}
 }
 \keyword{internal}

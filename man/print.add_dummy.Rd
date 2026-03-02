@@ -13,7 +13,7 @@
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=print.add_dummy]{print.add_dummy()}} does not have a returned value
+The \code{S3} method \code{\link[=print.add_dummy]{print.add_dummy()}} does not have a returned value
 }
 \description{
 \link{print.add_dummy}

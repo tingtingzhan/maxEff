@@ -18,9 +18,9 @@
 \item{newdata}{\link[base]{data.frame}, candidate \link[base]{numeric} predictors \eqn{x}'s must have the same \link[base]{name} and \link[base]{dim}ension as the training data. If missing, the training data is used}
 }
 \value{
-Function \code{\link[=predict.add_dummy]{predict.add_dummy()}} returns a \link[stats]{listof} regression models.
+The \code{S3} method \code{\link[=predict.add_dummy]{predict.add_dummy()}} returns a \link[stats]{listof} regression models.
 
-Function \code{\link[=predict.add_dummy_]{predict.add_dummy_()}} returns a updated regression model.
+The function \code{\link[=predict.add_dummy_]{predict.add_dummy_()}} returns a updated regression model.
 }
 \description{
 Regression models with optimal dichotomizing predictor(s), used either as boolean or continuous predictor(s).

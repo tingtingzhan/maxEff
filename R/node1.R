@@ -8,7 +8,7 @@
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns 
-#' Function [node1()] returns an object of class `'node1'`, 
+#' The function [node1()] returns an object of class `'node1'`, 
 #' which is a \link[base]{function}
 #' with one parameter `newx` taking a \link[base]{double} \link[base]{vector}.
 #' 
@@ -16,7 +16,6 @@
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
 #' 
 #' @keywords internal
-#' @importFrom stats terms
 #' @export
 node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
   
@@ -130,7 +129,6 @@ node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
 #' @param ... place holder for `S3` generic
 #' 
 #' @keywords internal
-#' @importFrom stats predict
 #' @importFrom spatstat.geom with.hyperframe
 #' @export predict.node1
 #' @export
@@ -174,7 +172,7 @@ get_cutoff <- function(x) UseMethod(generic = 'get_cutoff')
 #' @rdname get_cutoff
 #' 
 #' @returns
-#' Function [get_cutoff.node1()] returns a \link[base]{numeric} scalar.
+#' The `S3` method [get_cutoff.node1()] returns a \link[base]{numeric} scalar.
 #' 
 #' @export get_cutoff.node1
 #' @export
@@ -191,7 +189,7 @@ get_cutoff.node1 <- function(x) {
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns 
-#' Function [labels.node1()] returns a \link[base]{character} scalar.
+#' The `S3` method [labels.node1()] returns a \link[base]{character} scalar.
 #' 
 #' @keywords internal
 #' @export labels.node1

@@ -17,18 +17,17 @@
 #' @param ... additional parameters, currently of no use
 #' 
 #' @details 
-#' Function [add_numeric()] treats each additional predictor as a \link[base]{numeric} variable, 
+#' The function [add_numeric()] treats each additional predictor as a \link[base]{numeric} variable, 
 #' and \link[stats]{update}s the starting model with each additional predictor.  
 #' 
 #' @returns 
-#' Function [add_numeric()] returns an [add_numeric] object, 
+#' The function [add_numeric()] returns an [add_numeric] object, 
 #' which is a \link[stats]{listof} objects with an internal class `'add_numeric_'`.
 #' 
 #' @keywords internal
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
 #' @importFrom parallel mclapply makeCluster stopCluster
-#' @importFrom stats update
 #' @export
 add_numeric <- function(
     start.model, 
@@ -88,7 +87,7 @@ add_numeric <- function(
 #' @param ... ..
 #' 
 #' @returns
-#' Function [labels.add_numeric()] returns a \link[base]{character} \link[base]{vector}.
+#' The `S3` method [labels.add_numeric()] returns a \link[base]{character} \link[base]{vector}.
 #' 
 #' @keywords internal
 #' @export labels.add_numeric
@@ -130,11 +129,10 @@ print.add_numeric <- function(x, ...) {
 #' @param ... additional parameters of function `predict.add_numeric_`, e.g., `newdata`
 #' 
 #' @returns
-#' Function [predict.add_numeric()] returns a \link[stats]{listof} regression models.
+#' The `S3` method [predict.add_numeric()] returns a \link[stats]{listof} regression models.
 #' 
 #' @keywords internal
 #' @name predict_add_numeric
-#' @importFrom stats predict
 #' @export predict.add_numeric
 #' @export
 predict.add_numeric <- function(object, ...) {
@@ -147,7 +145,6 @@ predict.add_numeric <- function(object, ...) {
 }
 
 #' @rdname predict_add_numeric
-#' @importFrom stats predict update
 #' @export predict.add_numeric_
 #' @export
 predict.add_numeric_ <- function(object, newdata, ...) {
