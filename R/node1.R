@@ -15,6 +15,17 @@
 #' @note
 #' In future \link[base]{integer} and \link[base]{factor} predictors will be supported.
 #' 
+#' @references
+#' \url{https://tingtingzhan.quarto.pub/groupedhyperframe/object/node1.html}
+#' 
+#' @examples
+#' rpart::rpart(
+#'  formula = survival::Surv(pgtime, pgstat) ~ age, 
+#'  data = rpart::stagec[1:135,], 
+#'  cp = .Machine$double.eps, maxdepth = 2L
+#' ) |>
+#'  node1()
+#' 
 #' @keywords internal
 #' @export
 node1 <- function(object, nm = as.symbol(rownames(s)[1L]), ...) {
