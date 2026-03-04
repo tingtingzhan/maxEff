@@ -27,13 +27,13 @@
 #' @keywords internal
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
-#' @importFrom parallel mclapply makeCluster stopCluster
+#' @importFrom parallel detectCores mclapply makeCluster stopCluster
 #' @export
 add_numeric <- function(
     start.model, 
     x,
     data = eval(start.model$call$data),
-    mc.cores = getOption('cores'), 
+    mc.cores = detectCores(), 
     ...
 ) {
   

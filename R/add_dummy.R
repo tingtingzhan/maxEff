@@ -18,14 +18,14 @@
 #' @keywords internal
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
-#' @importFrom parallel mclapply makeCluster stopCluster
+#' @importFrom parallel detectCores mclapply makeCluster stopCluster
 #' @importFrom rpart rpart
 #' @export
 add_dummy <- function(
     start.model, 
     x, 
     data = eval(start.model$call$data),
-    mc.cores = getOption('cores'), 
+    mc.cores = detectCores(), 
     ...
 ) {
   

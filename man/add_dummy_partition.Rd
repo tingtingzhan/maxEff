@@ -9,7 +9,7 @@ add_dummy_partition(
   x,
   data = eval(start.model$call$data),
   times,
-  mc.cores = getOption("cores"),
+  mc.cores = detectCores(),
   ...
 )
 }

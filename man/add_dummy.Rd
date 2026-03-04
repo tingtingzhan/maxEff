@@ -8,7 +8,7 @@ add_dummy(
   start.model,
   x,
   data = eval(start.model$call$data),
-  mc.cores = getOption("cores"),
+  mc.cores = detectCores(),
   ...
 )
 }

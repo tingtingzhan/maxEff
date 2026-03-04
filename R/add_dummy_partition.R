@@ -21,14 +21,14 @@
 #' @importFrom caret createDataPartition
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach `%dopar%`
-#' @importFrom parallel mclapply makeCluster stopCluster
+#' @importFrom parallel detectCores mclapply makeCluster stopCluster
 #' @export
 add_dummy_partition <- function(
     start.model, 
     x,
     data = eval(start.model$call$data),
     times, 
-    mc.cores = getOption('cores'), 
+    mc.cores = detectCores(), 
     ...
 ) {
   
