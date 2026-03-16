@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^CRAN-SUBMISSION$
 vignettes/rsconnect
+^\.positai$
+^\.claude$
