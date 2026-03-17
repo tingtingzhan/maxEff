@@ -12,7 +12,7 @@ further notice, these packages should
 - **not** be used to support or fulfill requirements for pursuing an
   academic degree.
 
-Furthermore, a person’s ability to use these packages does not
+Furthermore, a person’s **ability to use** these packages does not
 necessarily indicate an understanding of their underlying mechanisms.
 Accordingly, demonstration of their use **alone** should **not** be
 considered sufficient evidence of expertise, nor should it be credited
