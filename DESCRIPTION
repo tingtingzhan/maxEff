@@ -2,7 +2,7 @@ Package: maxEff
 Type: Package
 Title: Additional Predictor with Maximum Effect Size
 Version: 0.2.4
-Date: 2026-03-20
+Date: 2026-03-17
 Description: Methods of selecting one from many numeric predictors for a regression model, to ensure that the additional predictor has the maximum effect size.
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
