@@ -4,3 +4,5 @@
 vignettes/rsconnect
 ^\.positai$
 ^\.claude$
+^.*\.Rmd$
+^.*\.yml$

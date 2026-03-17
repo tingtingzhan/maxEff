@@ -1,0 +1,26 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+
+# maxEff: Additional Predictor with Maximum Effect Size
+
+
+
+Active development of these R packages is temporarily suspended. 
+
+Until further notice, these packages should [**not**]{style="background-color: #FFFF00"} be 
+
+-   used as a basis for research grant applications, or 
+-   cited as an actively maintained tool.
+
