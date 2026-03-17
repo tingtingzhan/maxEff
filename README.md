@@ -9,4 +9,6 @@ Until further notice, these packages should
 <span style="background-color: #FFFF00">**not**</span> be
 
 - used as a basis for research grant applications, or
-- cited as an actively maintained tool.
+- cited as an actively maintained tool, or
+- used to support or fulfill requirements for pursuing an academic
+  degree.
