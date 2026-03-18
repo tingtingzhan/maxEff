@@ -15,5 +15,5 @@ further notice, these packages should
 Furthermore, a person’s **ability to use** these packages does not
 necessarily indicate an understanding of their underlying mechanisms.
 Accordingly, demonstration of their use **alone** should **not** be
-considered sufficient evidence of expertise, nor should it be credited
-as a basis for academic promotion or advancement.
+considered sufficient evidence of expertise, **nor** should it be
+credited as a basis for academic promotion or advancement.
