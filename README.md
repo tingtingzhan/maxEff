@@ -3,6 +3,8 @@
 
 # maxEff: Additional Predictor with Maximum Effect Size
 
+## Disclaimer
+
 Active development of these R packages is temporarily suspended. Until
 further notice, these packages should
 
@@ -20,3 +22,17 @@ necessarily indicate an understanding of their underlying mechanisms.
 Accordingly, demonstration of their use **alone** should **not** be
 considered sufficient evidence of expertise, **nor** should it be
 credited as a basis for academic promotion or advancement.
+
+*These statements do not apply to the contributors to these packages
+with respect to their specific contributions.*
+
+*These statements are advisory in nature and do not modify or restrict
+the rights granted under the GNU General Public License
+<https://www.r-project.org/Licenses/>.*
+
+## Vignette
+
+The full vignette can be found on these mirror sites,
+
+- <https://tingtingzhan.quarto.pub/groupedhyperframe/>
+- <https://tingtingzhan-groupedhyperframe.netlify.app>
