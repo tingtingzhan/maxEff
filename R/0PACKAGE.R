@@ -4,9 +4,9 @@
 #' @import cli
 #' 
 #' @import stats
-#' 
 '_PACKAGE'
 
+# groupedHyperframe:::t.vectorlist # no longer explorted
 
 #' @importFrom utils citation
 .onAttach <- function(libname, pkgname) {
